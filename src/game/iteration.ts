@@ -1,17 +1,17 @@
-import { status } from "./status.ts";
+import { stateType } from "./state.ts";
 
 export function iteration(
-    currentStatus: status,
+    state: stateType,
     numberOfAliveNeighbors: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
-): status {
-    switch (currentStatus) {
-        case status.ALIVE:
+): stateType {
+    switch (state) {
+        case stateType.ALIVE:
             return [2, 3].includes(numberOfAliveNeighbors)
-                ? status.ALIVE
-                : status.DEAD;
-        case status.DEAD:
-            return numberOfAliveNeighbors === 3
-                ? status.ALIVE
-                : status.DEAD;
+                ? stateType.ALIVE
+                : stateType.DEAD;
+        case stateType.DEAD:
+            return [3].includes(numberOfAliveNeighbors)
+                ? stateType.ALIVE
+                : stateType.DEAD;
     }
 }
