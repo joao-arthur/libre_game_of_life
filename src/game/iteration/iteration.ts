@@ -1,4 +1,4 @@
-import { stateType } from "./state.ts";
+import { stateType } from "../state.ts";
 
 export function iteration(
     state: stateType,
