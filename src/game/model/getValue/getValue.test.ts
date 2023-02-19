@@ -1,13 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../../state.ts";
+import { stateType } from "../../cell/mod.ts";
 import { getValue } from "./getValue.ts";
 
-Deno.test("Values out of range", () => {
+Deno.test("Value out of range", () => {
     assertEquals(
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -21,7 +21,7 @@ Deno.test("Values out of range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -35,7 +35,7 @@ Deno.test("Values out of range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -49,7 +49,7 @@ Deno.test("Values out of range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -63,7 +63,7 @@ Deno.test("Values out of range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -77,7 +77,7 @@ Deno.test("Values out of range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -89,12 +89,12 @@ Deno.test("Values out of range", () => {
     );
 });
 
-Deno.test("Values in range", () => {
+Deno.test("Value in range", () => {
     assertEquals(
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -108,7 +108,7 @@ Deno.test("Values in range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -122,7 +122,7 @@ Deno.test("Values in range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -136,7 +136,7 @@ Deno.test("Values in range", () => {
         getValue({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE],
             ],

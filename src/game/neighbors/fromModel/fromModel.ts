@@ -1,21 +1,14 @@
-import { modelFns, modelType, positionType } from "../model/mod.ts";
-import { stateType } from "../state.ts";
+import {
+    modelFns,
+    modelType,
+    positionType,
+} from "../../model/mod.ts";
+import { neighborsType } from "../neighbors.ts";
 
-type returnType = readonly [
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-];
-
-export function getNeighbors(
+export function fromModel(
     model: modelType,
     { column, row }: positionType,
-): returnType {
+): neighborsType {
     const { getValue } = modelFns;
 
     return [

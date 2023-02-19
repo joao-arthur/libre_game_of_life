@@ -1,4 +1,4 @@
-import { stateType } from "../../state.ts";
+import { stateType } from "../../cell/mod.ts";
 import { modelType } from "../model.ts";
 import { positionType } from "../position.ts";
 
@@ -11,5 +11,5 @@ export function getValue(
     if (column >= model.width) return undefined;
     if (row >= model.height) return undefined;
 
-    return model.values[row][column];
+    return model.value[row][column];
 }

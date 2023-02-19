@@ -1,14 +1,14 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../state.ts";
-import { getNeighbors } from "./getNeighbors.ts";
+import { stateType } from "../../cell/mod.ts";
+import { fromModel } from "./fromModel.ts";
 
-Deno.test("getNeighbors", () => {
+Deno.test("fromModel", () => {
     assertEquals(
-        getNeighbors(
+        fromModel(
             {
                 width: 2,
                 height: 2,
-                values: [
+                value: [
                     [stateType.DEAD, stateType.ALIVE],
                     [stateType.DEAD, stateType.ALIVE],
                 ],
@@ -29,11 +29,11 @@ Deno.test("getNeighbors", () => {
         ],
     );
     assertEquals(
-        getNeighbors(
+        fromModel(
             {
                 width: 3,
                 height: 3,
-                values: [
+                value: [
                     [
                         stateType.DEAD,
                         stateType.ALIVE,

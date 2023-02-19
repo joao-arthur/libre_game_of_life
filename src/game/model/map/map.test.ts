@@ -1,13 +1,13 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../../state.ts";
-import { mapModel } from "./mapModel.ts";
+import { stateType } from "../../cell/mod.ts";
+import { map } from "./map.ts";
 
-Deno.test("mapModel", () => {
+Deno.test("map", () => {
     assertEquals(
-        mapModel({
+        map({
             width: 2,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.ALIVE],
                 [stateType.ALIVE, stateType.DEAD],
                 [stateType.DEAD, stateType.ALIVE],
@@ -16,7 +16,7 @@ Deno.test("mapModel", () => {
         {
             width: 2,
             height: 3,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.DEAD],
                 [stateType.DEAD, stateType.DEAD],
@@ -24,11 +24,11 @@ Deno.test("mapModel", () => {
         },
     );
     assertEquals(
-        mapModel(
+        map(
             {
                 width: 3,
                 height: 2,
-                values: [
+                value: [
                     [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                     [
                         stateType.ALIVE,
@@ -43,18 +43,18 @@ Deno.test("mapModel", () => {
         {
             width: 3,
             height: 2,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.DEAD, stateType.DEAD],
             ],
         },
     );
     assertEquals(
-        mapModel(
+        map(
             {
                 width: 3,
                 height: 3,
-                values: [
+                value: [
                     [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                     [
                         stateType.ALIVE,
@@ -64,14 +64,15 @@ Deno.test("mapModel", () => {
                     [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                 ],
             },
-            ({ row, column }) => row > 1 || column > 1
-                ? stateType.DEAD
-                : stateType.ALIVE,
+            ({ row, column }) =>
+                row > 1 || column > 1
+                    ? stateType.DEAD
+                    : stateType.ALIVE,
         ),
         {
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.ALIVE, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE, stateType.DEAD],
                 [stateType.DEAD, stateType.DEAD, stateType.DEAD],

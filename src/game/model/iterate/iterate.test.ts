@@ -1,21 +1,21 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../state.ts";
-import { modelIteration } from "./modelIteration.ts";
+import { stateType } from "../../cell/mod.ts";
+import { iterate } from "./iterate.ts";
 
-Deno.test("mapModel", () => {
+Deno.test("iterate", () => {
     assertEquals(
-        modelIteration({
+        iterate({
             width: 1,
             height: 1,
-            values: [[stateType.ALIVE]],
+            value: [[stateType.ALIVE]],
         }),
-        { width: 1, height: 1, values: [[stateType.DEAD]] },
+        { width: 1, height: 1, value: [[stateType.DEAD]] },
     );
     assertEquals(
-        modelIteration({
+        iterate({
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.ALIVE],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
@@ -23,17 +23,17 @@ Deno.test("mapModel", () => {
         {
             width: 2,
             height: 2,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.ALIVE],
                 [stateType.ALIVE, stateType.ALIVE],
             ],
         },
     );
     assertEquals(
-        modelIteration({
+        iterate({
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
@@ -42,7 +42,7 @@ Deno.test("mapModel", () => {
         {
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.DEAD, stateType.DEAD],
@@ -50,10 +50,10 @@ Deno.test("mapModel", () => {
         },
     );
     assertEquals(
-        modelIteration({
+        iterate({
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.DEAD, stateType.DEAD],
@@ -62,7 +62,7 @@ Deno.test("mapModel", () => {
         {
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
@@ -70,10 +70,10 @@ Deno.test("mapModel", () => {
         },
     );
     assertEquals(
-        modelIteration({
+        iterate({
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD, stateType.ALIVE],
                 [stateType.ALIVE, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.DEAD, stateType.DEAD],
@@ -82,7 +82,7 @@ Deno.test("mapModel", () => {
         {
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
@@ -90,10 +90,10 @@ Deno.test("mapModel", () => {
         },
     );
     assertEquals(
-        modelIteration({
+        iterate({
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.DEAD, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
@@ -102,7 +102,7 @@ Deno.test("mapModel", () => {
         {
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.DEAD, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.ALIVE],
@@ -110,10 +110,10 @@ Deno.test("mapModel", () => {
         },
     );
     assertEquals(
-        modelIteration({
+        iterate({
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.ALIVE, stateType.DEAD],
                 [stateType.ALIVE, stateType.ALIVE, stateType.ALIVE],
                 [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
@@ -122,7 +122,7 @@ Deno.test("mapModel", () => {
         {
             width: 3,
             height: 3,
-            values: [
+            value: [
                 [stateType.ALIVE, stateType.DEAD, stateType.ALIVE],
                 [stateType.DEAD, stateType.DEAD, stateType.ALIVE],
                 [stateType.ALIVE, stateType.ALIVE, stateType.ALIVE],

@@ -1,7 +1,9 @@
 import { getValue } from "./getValue/mod.ts";
-import { mapModel } from "./mapModel/mod.ts";
+import { map } from "./map/mod.ts";
+import { iterate } from "./iterate/mod.ts";
 
 export const modelFns = {
     getValue,
-    mapModel,
+    map,
+    iterate,
 } as const;
