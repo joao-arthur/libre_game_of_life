@@ -1,14 +1,10 @@
 import { stateType } from "../../state.ts";
 import { modelType } from "../model.ts";
-
-type coordinatesType = {
-    readonly column: number;
-    readonly row: number;
-};
+import { positionType } from "../position.ts";
 
 export function getValue(
     model: modelType,
-    { column, row }: coordinatesType,
+    { column, row }: positionType,
 ): stateType | undefined {
     if (column < 0) return undefined;
     if (row < 0) return undefined;
