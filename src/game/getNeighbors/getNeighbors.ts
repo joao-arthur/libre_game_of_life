@@ -1,7 +1,5 @@
-import { modelType } from "./model/model.ts";
-import { modelFns } from "./model/modelFns.ts";
-import { positionType } from "./model/position.ts";
-import { stateType } from "./state.ts";
+import { modelFns, modelType, positionType } from "../model/mod.ts";
+import { stateType } from "../state.ts";
 
 type returnType = readonly [
     stateType | undefined,

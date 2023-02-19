@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "./state.ts";
+import { stateType } from "../state.ts";
 import { getNeighbors } from "./getNeighbors.ts";
 
 Deno.test("getNeighbors", () => {
