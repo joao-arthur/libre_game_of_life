@@ -22,5 +22,6 @@ export function fromString(stringValue: string[]): modelType {
         width,
         height,
         value,
+        iteration: 0,
     };
 }

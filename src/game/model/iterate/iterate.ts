@@ -7,9 +7,24 @@ import { modelType } from "../model.ts";
 export function iterate(
     model: modelType,
 ): modelType {
-    return map(model, (position, state) =>
-        pipe(
-            () => neighborsFns.aliveFromModel(model, position),
-            (neighbors) => cellFns.iterate(state, neighbors),
-        )(undefined));
+    return pipe(
+        () =>
+            map(
+                model,
+                (position, state) =>
+                    pipe(
+                        () =>
+                            neighborsFns.aliveFromModel(
+                                model,
+                                position,
+                            ),
+                        (neighbors) =>
+                            cellFns.iterate(state, neighbors),
+                    )(undefined),
+            ),
+        (newModel) => ({
+            ...newModel,
+            iteration: newModel.iteration + 1,
+        }),
+    )(undefined);
 }

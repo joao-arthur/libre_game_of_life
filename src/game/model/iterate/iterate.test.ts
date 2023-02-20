@@ -7,7 +7,10 @@ Deno.test("iterate", () => {
         iterate(
             fromString(["⬜"]),
         ),
-        fromString(["⬛"]),
+        {
+            ...fromString(["⬛"]),
+            iteration: 1,
+        },
     );
     assertEquals(
         iterate(
@@ -16,10 +19,13 @@ Deno.test("iterate", () => {
                 "⬜⬜",
             ]),
         ),
-        fromString([
-            "⬜⬜",
-            "⬜⬜",
-        ]),
+        {
+            ...fromString([
+                "⬜⬜",
+                "⬜⬜",
+            ]),
+            iteration: 1,
+        },
     );
     assertEquals(
         iterate(
@@ -29,11 +35,14 @@ Deno.test("iterate", () => {
                 "⬛⬜⬛",
             ]),
         ),
-        fromString([
-            "⬛⬛⬛",
-            "⬜⬜⬜",
-            "⬛⬛⬛",
-        ]),
+        {
+            ...fromString([
+                "⬛⬛⬛",
+                "⬜⬜⬜",
+                "⬛⬛⬛",
+            ]),
+            iteration: 1,
+        },
     );
     assertEquals(
         iterate(
@@ -43,11 +52,14 @@ Deno.test("iterate", () => {
                 "⬛⬛⬛",
             ]),
         ),
-        fromString([
-            "⬛⬜⬛",
-            "⬛⬜⬛",
-            "⬛⬜⬛",
-        ]),
+        {
+            ...fromString([
+                "⬛⬜⬛",
+                "⬛⬜⬛",
+                "⬛⬜⬛",
+            ]),
+            iteration: 1,
+        },
     );
     assertEquals(
         iterate(
@@ -57,11 +69,14 @@ Deno.test("iterate", () => {
                 "⬛⬛⬛",
             ]),
         ),
-        fromString([
-            "⬛⬛⬜",
-            "⬛⬜⬜",
-            "⬛⬜⬛",
-        ]),
+        {
+            ...fromString([
+                "⬛⬛⬜",
+                "⬛⬜⬜",
+                "⬛⬜⬛",
+            ]),
+            iteration: 1,
+        },
     );
     assertEquals(
         iterate(
@@ -71,11 +86,14 @@ Deno.test("iterate", () => {
                 "⬛⬜⬛",
             ]),
         ),
-        fromString([
-            "⬛⬜⬜",
-            "⬛⬜⬜",
-            "⬛⬜⬜",
-        ]),
+        {
+            ...fromString([
+                "⬛⬜⬜",
+                "⬛⬜⬜",
+                "⬛⬜⬜",
+            ]),
+            iteration: 1,
+        },
     );
     assertEquals(
         iterate(
@@ -85,10 +103,13 @@ Deno.test("iterate", () => {
                 "⬛⬜⬛",
             ]),
         ),
-        fromString([
-            "⬜⬛⬜",
-            "⬛⬛⬜",
-            "⬜⬜⬜",
-        ]),
+        {
+            ...fromString([
+                "⬜⬛⬜",
+                "⬛⬛⬜",
+                "⬜⬜⬜",
+            ]),
+            iteration: 1,
+        },
     );
 });

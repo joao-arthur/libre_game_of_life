@@ -5,11 +5,21 @@ import { fromString } from "./fromString.ts";
 Deno.test("fromString", () => {
     assertEquals(
         fromString(["⬛"]),
-        { width: 1, height: 1, value: [[stateType.DEAD]] },
+        {
+            width: 1,
+            height: 1,
+            value: [[stateType.DEAD]],
+            iteration: 0,
+        },
     );
     assertEquals(
         fromString(["⬜"]),
-        { width: 1, height: 1, value: [[stateType.ALIVE]] },
+        {
+            width: 1,
+            height: 1,
+            value: [[stateType.ALIVE]],
+            iteration: 0,
+        },
     );
     assertEquals(
         fromString([
@@ -27,6 +37,7 @@ Deno.test("fromString", () => {
                 [stateType.DEAD, stateType.ALIVE],
                 [stateType.DEAD, stateType.DEAD],
             ],
+            iteration: 0,
         },
     );
 });

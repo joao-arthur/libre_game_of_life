@@ -4,4 +4,5 @@ export type modelType = {
     readonly width: number;
     readonly height: number;
     readonly value: readonly (readonly stateType[])[];
+    readonly iteration: number;
 };
