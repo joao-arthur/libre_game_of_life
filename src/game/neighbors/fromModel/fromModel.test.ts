@@ -1,18 +1,15 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
 import { stateType } from "../../cell/mod.ts";
 import { fromModel } from "./fromModel.ts";
+import { fromString } from "../../model/fromString/mod.ts";
 
 Deno.test("fromModel", () => {
     assertEquals(
         fromModel(
-            {
-                width: 2,
-                height: 2,
-                value: [
-                    [stateType.DEAD, stateType.ALIVE],
-                    [stateType.DEAD, stateType.ALIVE],
-                ],
-            },
+            fromString([
+                "⬛⬜",
+                "⬛⬜",
+            ]),
             { column: 0, row: 0 },
         ),
         [
@@ -30,23 +27,11 @@ Deno.test("fromModel", () => {
     );
     assertEquals(
         fromModel(
-            {
-                width: 3,
-                height: 3,
-                value: [
-                    [
-                        stateType.DEAD,
-                        stateType.ALIVE,
-                        stateType.ALIVE,
-                    ],
-                    [
-                        stateType.DEAD,
-                        stateType.ALIVE,
-                        stateType.ALIVE,
-                    ],
-                    [stateType.DEAD, stateType.ALIVE, stateType.DEAD],
-                ],
-            },
+            fromString([
+                "⬛⬜⬜",
+                "⬛⬜⬜",
+                "⬛⬜⬛",
+            ]),
             { column: 1, row: 1 },
         ),
         [
