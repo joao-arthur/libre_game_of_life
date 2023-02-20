@@ -1,3 +1,4 @@
+import { pipe } from "https://deno.land/x/funis@v1.0.2/mod.ts";
 import { aliveNeighborsType } from "../aliveNeighbors.ts";
 import { fromModel } from "../fromModel/mod.ts";
 import { modelType } from "../../model/mod.ts";
@@ -8,7 +9,8 @@ export function aliveFromModel(
     model: modelType,
     position: positionType,
 ): aliveNeighborsType {
-    const neighbors = fromModel(model, position);
-    const numberOfAliveNeighbors = numberOfAlive(neighbors);
-    return numberOfAliveNeighbors;
+    return pipe(
+        () => fromModel(model, position),
+        (neighbors) => numberOfAlive(neighbors),
+    )(undefined);
 }
