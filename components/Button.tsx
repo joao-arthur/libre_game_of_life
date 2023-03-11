@@ -1,8 +1,8 @@
 import { VNode } from "preact";
 
 type props = {
-    label: string;
-    onClick: () => void;
+    readonly label: string;
+    readonly onClick: () => void;
 };
 
 export function Button({ label, onClick }: props): VNode {

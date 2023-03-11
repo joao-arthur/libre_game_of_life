@@ -38,8 +38,9 @@ function getSquareColor(state: stateType): string {
 export function renderLoop(
     { drawContext, dimensions, isPaused }: renderContext,
 ): void {
-    model = modelFns.iterate(model);
+    const { forEach, iterate } = modelFns;
 
+    model = iterate(model);
     const dimensionSize = Math.min(
         dimensions.width,
         dimensions.height,
@@ -48,7 +49,7 @@ export function renderLoop(
     const size = dimensionSize / modelSize;
     const gap = 1;
 
-    modelFns.map(model, ({ column, row }, state) => {
+    forEach(model, ({ column, row }, state) => {
         drawContext.drawSquare({
             x: column * size + gap,
             y: row * size + gap,
