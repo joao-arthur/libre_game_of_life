@@ -1,21 +1,35 @@
-import { useEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import { JSX, VNode } from "preact";
+import { modelFns } from "../src/game/model/mod.ts";
 import { useWindowDimensions } from "../hooks/useWindowDimensions.ts";
 import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
+import { useGameStore } from "../integrations/useGameStore.ts";
+import { drawContextType } from "../src/ports/drawContext.ts";
+import { stateType } from "../src/game/cell/mod.ts";
+
+let timeoutId = 0;
+let drawContext: drawContextType;
+
+function getSquareColor(state: stateType): string {
+    switch (state) {
+        case stateType.DEAD:
+            return "#2e2e2e";
+        case stateType.ALIVE:
+            return "#dbdbdb";
+    }
+}
 
 export default function Canvas(): VNode {
     const dimensions = useWindowDimensions();
     const dimension = Math.min(dimensions.height, dimensions.width);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const [gap, setGap] = useState(1);
-    const [size, setSize] = useState(20);
-    const [fps, setFps] = useState(20);
-    const [status, setStatus] = useState<"resumed" | "paused">(
-        "resumed",
-    );
+    const {
+        store,
+        actions,
+    } = useGameStore();
 
     useEffect(() => {
         if (!canvasRef.current) {
@@ -25,25 +39,42 @@ export default function Canvas(): VNode {
         if (!context) {
             return;
         }
-        const drawContext = new CanvasDrawContext(context);
-
-        console.log({
-            drawContext,
-            isPaused,
-            interval: 500,
-            dimensions,
-        });
-
-        globalThis.setInterval(
-            () =>
-                renderLoop({
-                    drawContext,
-                    dimensions,
-                    status,
-                }),
-            1000 / fps,
-        );
+        drawContext = new CanvasDrawContext(context);
     }, []);
+
+    useEffect(() => {
+        const { iterate } = modelFns;
+        console.log("render", 1000 / store.fps);
+
+        if (timeoutId) {
+            globalThis.clearInterval(timeoutId);
+        }
+        if (store.status === "paused") return;
+        timeoutId = globalThis.setInterval(() => {
+            console.log("render");
+            //    model = iterate(model);
+            const dimensionSize = Math.min(
+                dimensions.width,
+                dimensions.height,
+            );
+            const modelSize = Math.min(
+                store.model.width,
+                store.model.height,
+            );
+            const size = dimensionSize / modelSize;
+
+            modelFns.forEach(
+                store.model,
+                ({ column, row }, state) => {
+                    drawContext.drawSquare({
+                        x: column * size + store.gap,
+                        y: row * size + store.gap,
+                        size: size - store.gap * 2,
+                    }, getSquareColor(state));
+                },
+            );
+        }, 1000 / store.fps);
+    }, [store]);
 
     function onClick(
         e: JSX.TargetedMouseEvent<HTMLCanvasElement>,
@@ -73,8 +104,8 @@ export default function Canvas(): VNode {
                         min={0}
                         max={10}
                         step={1}
-                        value={gap}
-                        setValue={setGap}
+                        value={store.gap}
+                        setValue={actions.setGap}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -84,8 +115,8 @@ export default function Canvas(): VNode {
                         min={10}
                         max={100}
                         step={1}
-                        value={size}
-                        setValue={setSize}
+                        value={store.size}
+                        setValue={actions.setSize}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -95,32 +126,23 @@ export default function Canvas(): VNode {
                         min={1}
                         max={100}
                         step={1}
-                        value={fps}
-                        setValue={setFps}
+                        value={store.fps}
+                        setValue={actions.setFps}
                     />
                 </div>
                 <span>
                     0
                     <label>Iteration</label>
                 </span>
-                {status === "resumed"
-                    ? (
-                        <Button
-                            label="pause"
-                            onClick={() => {
-                                setStatus("paused");
-                            }}
-                        />
-                    )
+                {store.status === "resumed"
+                    ? <Button label="pause" onClick={actions.pause} />
                     : (
                         <Button
                             label="resume"
-                            onClick={() => {
-                                setStatus("resumed");
-                            }}
+                            onClick={actions.resume}
                         />
                     )}
-                <Button label="iterate" onClick={() => {}} />
+                <Button label="iterate" onClick={actions.iterate} />
             </div>
         </>
     );

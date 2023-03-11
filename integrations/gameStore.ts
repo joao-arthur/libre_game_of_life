@@ -3,16 +3,16 @@ import { dimensionType } from "../src/core/dimension.ts";
 import { modelType } from "../src/game/model/mod.ts";
 import { modelFns } from "../src/game/model/modelFns.ts";
 
-type gameStoreType = {
-    model: modelType;
-    dimensions: dimensionType;
-    gap: number;
-    size: number;
-    speed: number;
-    status: "resumed" | "paused";
+export type gameStoreType = {
+    readonly model: modelType;
+    readonly dimensions: dimensionType;
+    readonly gap: number;
+    readonly size: number;
+    readonly fps: number;
+    readonly status: "resumed" | "paused";
 };
 
-const defaultState: gameStoreType = {
+export const defaultState: gameStoreType = {
     model: fromString([
         "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
         "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
@@ -38,11 +38,11 @@ const defaultState: gameStoreType = {
     dimensions: { width: 0, height: 0 },
     gap: 1,
     size: 20,
-    speed: 20,
+    fps: 20,
     status: "paused",
 };
 
-const actions = {
+export const actions = {
     pause: (state: gameStoreType): gameStoreType => ({
         ...state,
         status: "paused",
@@ -70,11 +70,11 @@ const actions = {
         ...state,
         size: action.size,
     }),
-    setSpeed: (
+    setFps: (
         state: gameStoreType,
-        action: { speed: gameStoreType["speed"] },
+        action: { fps: gameStoreType["fps"] },
     ): gameStoreType => ({
         ...state,
-        speed: action.speed,
+        fps: action.fps,
     }),
 };
