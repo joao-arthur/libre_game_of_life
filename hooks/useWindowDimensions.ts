@@ -1,9 +1,13 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { dimensionType } from "../src/core/dimension.ts";
 
 export function useWindowDimensions(): dimensionType {
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
+    const dimensions = useMemo(() => ({ width, height }), [
+        width,
+        height,
+    ]);
 
     function onWindowResize(): void {
         setWidth(window.innerWidth);
@@ -16,8 +20,5 @@ export function useWindowDimensions(): dimensionType {
             globalThis.removeEventListener("resize", onWindowResize);
     }, []);
 
-    return {
-        width,
-        height,
-    };
+    return dimensions;
 }

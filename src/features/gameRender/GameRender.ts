@@ -43,6 +43,11 @@ export class GameRender {
             state.model.height,
         );
         const size = dimensionSize / modelSize;
+        this.drawContext.clear({
+            x: 0,
+            y: 0,
+            size: dimensionSize,
+        });
 
         modelFns.forEach(
             state.model,

@@ -1,7 +1,6 @@
 # game-of-life
 
-Simple `canvas` / `opengl` implementation of the # Conway's Game of
-Life.
+`canvas` / `opengl` implementation of the conway's game of life.
 
 ## Conway's game of life rules
 
@@ -16,5 +15,11 @@ Life.
 
 ## TODO
 
+- render at open
+- fix iterate
 - presets
 - change rules
+- rename size to tiles
+- dimensions to a single number
+- validations
+- opengl

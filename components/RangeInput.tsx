@@ -27,7 +27,7 @@ export function RangeInput(
             max={String(max)}
             step={String(step)}
             value={String(value)}
-            onChange={(e) => {
+            onInput={(e) => {
                 handleSetValue(Number(e.currentTarget.value));
             }}
         />

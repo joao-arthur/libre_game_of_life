@@ -6,6 +6,13 @@ export class CanvasDrawContext implements drawContextType {
         private readonly context: CanvasRenderingContext2D,
     ) {}
 
+    public clear(
+        { x, y, size }: squareType,
+    ): void {
+        this.context.fillStyle = "white";
+        this.context.fillRect(x, y, size, size);
+    }
+
     public drawSquare(
         { x, y, size }: squareType,
         color: string,

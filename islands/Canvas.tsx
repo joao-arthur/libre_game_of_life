@@ -8,22 +8,17 @@ import { drawContextType } from "../src/ports/drawContext.ts";
 import { GameRender } from "../src/features/gameRender/mod.ts";
 import { useGameModel } from "../src/integrations/useGameModel.ts";
 
-let drawContext: drawContextType;
-let gameRender: GameRender;
-
 export default function Canvas(): VNode {
+    const drawContext = useRef<drawContextType>(null);
+    const gameRender = useRef<GameRender>(null);
     const dimensions = useWindowDimensions();
     const dimension = Math.min(dimensions.height, dimensions.width);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const {
-        model,
-        actions,
-        gameModelProxy,
-    } = useGameModel();
+    const { model, gameModelProxy } = useGameModel();
 
     useEffect(() => {
-        actions.setDimensions(dimensions);
+        gameModelProxy.setDimensions(dimensions);
     }, [dimensions]);
 
     useEffect(() => {
@@ -34,8 +29,11 @@ export default function Canvas(): VNode {
         if (!context) {
             return;
         }
-        drawContext = new CanvasDrawContext(context);
-        gameRender = new GameRender(gameModelProxy, drawContext);
+        drawContext.current = new CanvasDrawContext(context);
+        gameRender.current = new GameRender(
+            gameModelProxy,
+            drawContext.current,
+        );
     }, []);
 
     function onClick(
@@ -64,10 +62,10 @@ export default function Canvas(): VNode {
                     <RangeInput
                         id="gap"
                         min={0}
-                        max={10}
+                        max={7}
                         step={1}
                         value={model.gap}
-                        setValue={actions.setGap}
+                        setValue={(gap) => gameModelProxy.setGap(gap)}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -78,7 +76,8 @@ export default function Canvas(): VNode {
                         max={100}
                         step={1}
                         value={model.size}
-                        setValue={actions.setSize}
+                        setValue={(size) =>
+                            gameModelProxy.setSize(size)}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -89,7 +88,7 @@ export default function Canvas(): VNode {
                         max={10}
                         step={1}
                         value={model.fps}
-                        setValue={actions.setFps}
+                        setValue={(fps) => gameModelProxy.setFps(fps)}
                     />
                 </div>
                 <span>
@@ -97,16 +96,21 @@ export default function Canvas(): VNode {
                     <label>Iteration</label>
                 </span>
                 {model.status === "resumed"
-                    ? <Button label="pause" onClick={actions.pause} />
+                    ? (
+                        <Button
+                            label="pause"
+                            onClick={() => gameModelProxy.pause()}
+                        />
+                    )
                     : (
                         <Button
                             label="resume"
-                            onClick={actions.resume}
+                            onClick={() => gameModelProxy.resume()}
                         />
                     )}
                 <Button
                     label="iterate"
-                    onClick={actions.singleIteration}
+                    onClick={() => gameModelProxy.singleIteration()}
                 />
             </div>
         </>

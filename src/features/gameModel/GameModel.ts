@@ -46,7 +46,7 @@ export class GameModel {
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
         ]);
         this.dimensions = { width: 0, height: 0 };
-        this.gap = 1;
+        this.gap = 2;
         this.size = 20;
         this.fps = 1;
         this.status = "paused";
