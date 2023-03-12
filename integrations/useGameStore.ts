@@ -1,54 +1,84 @@
 import { useState } from "preact/hooks";
-import { actions, defaultState, gameStoreType } from "./gameStore.ts";
+import { dimensionType } from "../src/core/dimension.ts";
+import {
+    gameStateType,
+    GameStore,
+    GameStoreProxy,
+} from "../src/features/gameStore/mod.ts";
 
 type returnType = {
-    readonly store: gameStoreType;
+    readonly state: gameStateType;
     readonly actions: {
         readonly pause: () => void;
         readonly resume: () => void;
+        readonly singleIteration: () => void;
         readonly iterate: () => void;
+        readonly setDimensions: (dimensions: dimensionType) => void;
         readonly setGap: (gap: number) => void;
         readonly setSize: (size: number) => void;
         readonly setFps: (fps: number) => void;
     };
+    readonly store: GameStoreProxy;
 };
 
+const store = new GameStore();
+const storeProxy = new GameStoreProxy(store);
+
 export function useGameStore(): returnType {
-    const [store, setStore] = useState(defaultState);
+    const [gameState, setGameState] = useState(storeProxy.getState());
 
     function pause(): void {
-        setStore(actions.pause(store));
+        storeProxy.pause();
+        setGameState(storeProxy.getState());
     }
 
     function resume(): void {
-        setStore(actions.resume(store));
+        storeProxy.resume();
+        setGameState(storeProxy.getState());
+    }
+
+    function singleIteration(): void {
+        storeProxy.singleIteration();
+        setGameState(storeProxy.getState());
     }
 
     function iterate(): void {
-        setStore(actions.iterate(store));
+        storeProxy.iterate();
+        setGameState(storeProxy.getState());
+    }
+
+    function setDimensions(dimensions: dimensionType): void {
+        storeProxy.setDimensions(dimensions);
+        setGameState(storeProxy.getState());
     }
 
     function setGap(gap: number): void {
-        setStore(actions.setGap(store, { gap }));
+        storeProxy.setGap(gap);
+        setGameState(storeProxy.getState());
     }
 
     function setSize(size: number): void {
-        setStore(actions.setSize(store, { size }));
+        storeProxy.setSize(size);
+        setGameState(storeProxy.getState());
     }
 
     function setFps(fps: number): void {
-        setStore(actions.setFps(store, { fps }));
+        storeProxy.setFps(fps);
+        setGameState(storeProxy.getState());
     }
 
     return {
-        store,
+        state: gameState,
         actions: {
             pause,
             resume,
+            singleIteration,
             iterate,
+            setDimensions,
             setGap,
             setSize,
             setFps,
         },
+        store: storeProxy,
     };
 }

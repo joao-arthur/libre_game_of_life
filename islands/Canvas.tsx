@@ -1,25 +1,15 @@
 import { useEffect, useRef } from "preact/hooks";
 import { JSX, VNode } from "preact";
-import { modelFns } from "../src/game/model/mod.ts";
 import { useWindowDimensions } from "../hooks/useWindowDimensions.ts";
 import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
 import { useGameStore } from "../integrations/useGameStore.ts";
 import { drawContextType } from "../src/ports/drawContext.ts";
-import { stateType } from "../src/game/cell/mod.ts";
+import { GameRender } from "../src/features/render/mod.ts";
 
-let timeoutId = 0;
 let drawContext: drawContextType;
-
-function getSquareColor(state: stateType): string {
-    switch (state) {
-        case stateType.DEAD:
-            return "#2e2e2e";
-        case stateType.ALIVE:
-            return "#dbdbdb";
-    }
-}
+let gameRender: GameRender;
 
 export default function Canvas(): VNode {
     const dimensions = useWindowDimensions();
@@ -27,9 +17,14 @@ export default function Canvas(): VNode {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const {
-        store,
+        state,
         actions,
+        store,
     } = useGameStore();
+
+    useEffect(() => {
+        actions.setDimensions(dimensions);
+    }, [dimensions]);
 
     useEffect(() => {
         if (!canvasRef.current) {
@@ -40,41 +35,8 @@ export default function Canvas(): VNode {
             return;
         }
         drawContext = new CanvasDrawContext(context);
+        gameRender = new GameRender(store, drawContext);
     }, []);
-
-    useEffect(() => {
-        const { iterate } = modelFns;
-        console.log("render", 1000 / store.fps);
-
-        if (timeoutId) {
-            globalThis.clearInterval(timeoutId);
-        }
-        if (store.status === "paused") return;
-        timeoutId = globalThis.setInterval(() => {
-            console.log("render");
-            //    model = iterate(model);
-            const dimensionSize = Math.min(
-                dimensions.width,
-                dimensions.height,
-            );
-            const modelSize = Math.min(
-                store.model.width,
-                store.model.height,
-            );
-            const size = dimensionSize / modelSize;
-
-            modelFns.forEach(
-                store.model,
-                ({ column, row }, state) => {
-                    drawContext.drawSquare({
-                        x: column * size + store.gap,
-                        y: row * size + store.gap,
-                        size: size - store.gap * 2,
-                    }, getSquareColor(state));
-                },
-            );
-        }, 1000 / store.fps);
-    }, [store]);
 
     function onClick(
         e: JSX.TargetedMouseEvent<HTMLCanvasElement>,
@@ -104,7 +66,7 @@ export default function Canvas(): VNode {
                         min={0}
                         max={10}
                         step={1}
-                        value={store.gap}
+                        value={state.gap}
                         setValue={actions.setGap}
                     />
                 </div>
@@ -115,7 +77,7 @@ export default function Canvas(): VNode {
                         min={10}
                         max={100}
                         step={1}
-                        value={store.size}
+                        value={state.size}
                         setValue={actions.setSize}
                     />
                 </div>
@@ -124,9 +86,9 @@ export default function Canvas(): VNode {
                     <RangeInput
                         id="fps"
                         min={1}
-                        max={100}
+                        max={10}
                         step={1}
-                        value={store.fps}
+                        value={state.fps}
                         setValue={actions.setFps}
                     />
                 </div>
@@ -134,7 +96,7 @@ export default function Canvas(): VNode {
                     0
                     <label>Iteration</label>
                 </span>
-                {store.status === "resumed"
+                {state.status === "resumed"
                     ? <Button label="pause" onClick={actions.pause} />
                     : (
                         <Button
@@ -142,7 +104,10 @@ export default function Canvas(): VNode {
                             onClick={actions.resume}
                         />
                     )}
-                <Button label="iterate" onClick={actions.iterate} />
+                <Button
+                    label="iterate"
+                    onClick={actions.singleIteration}
+                />
             </div>
         </>
     );
