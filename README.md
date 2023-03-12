@@ -20,6 +20,5 @@
 - presets
 - change rules
 - rename size to tiles
-- dimensions to a single number
 - validations
 - opengl

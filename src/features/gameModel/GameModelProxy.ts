@@ -1,4 +1,3 @@
-import { dimensionType } from "../../core/dimension.ts";
 import { GameModel, gameModelType } from "./GameModel.ts";
 
 type cbType = () => void;
@@ -32,8 +31,8 @@ export class GameModelProxy {
         this.onChange();
     }
 
-    public setDimensions(dimensions: dimensionType): void {
-        this.gameModel.setDimensions(dimensions);
+    public setDimension(dimension: number): void {
+        this.gameModel.setDimension(dimension);
         this.onChange();
     }
 

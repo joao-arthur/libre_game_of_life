@@ -1,4 +1,3 @@
-import { dimensionType } from "../../core/dimension.ts";
 import {
     fromString,
     modelFns,
@@ -7,20 +6,20 @@ import {
 
 export type gameModelType = {
     readonly model: modelType;
-    readonly dimensions: dimensionType;
+    readonly dimension: number;
     readonly gap: number;
     readonly size: number;
     readonly fps: number;
-    readonly status: "resumed" | "paused";
+    readonly status: "initial" | "resumed" | "paused";
 };
 
 export class GameModel {
     private model: modelType;
-    private dimensions: dimensionType;
+    private dimension: number;
     private gap: number;
     private size: number;
     private fps: number;
-    private status: "resumed" | "paused";
+    private status: "initial" | "resumed" | "paused";
 
     constructor() {
         this.model = fromString([
@@ -45,11 +44,11 @@ export class GameModel {
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
         ]);
-        this.dimensions = { width: 0, height: 0 };
+        this.dimension = 0;
         this.gap = 2;
         this.size = 20;
         this.fps = 1;
-        this.status = "paused";
+        this.status = "initial";
     }
 
     public pause(): void {
@@ -69,8 +68,8 @@ export class GameModel {
         this.model = modelFns.iterate(this.model);
     }
 
-    public setDimensions(dimensions: dimensionType): void {
-        this.dimensions = dimensions;
+    public setDimension(dimension: number): void {
+        this.dimension = dimension;
     }
 
     public setGap(gap: number): void {
@@ -88,7 +87,7 @@ export class GameModel {
     public getModel(): gameModelType {
         return {
             model: this.model,
-            dimensions: this.dimensions,
+            dimension: this.dimension,
             gap: this.gap,
             size: this.size,
             fps: this.fps,

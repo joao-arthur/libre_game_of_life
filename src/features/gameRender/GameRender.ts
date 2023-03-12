@@ -33,22 +33,16 @@ export class GameRender {
 
     private loop(): void {
         const state = this.gameModel.getModel();
-
-        const dimensionSize = Math.min(
-            state.dimensions.width,
-            state.dimensions.height,
-        );
         const modelSize = Math.min(
             state.model.width,
             state.model.height,
         );
-        const size = dimensionSize / modelSize;
+        const size = state.dimension / modelSize;
         this.drawContext.clear({
             x: 0,
             y: 0,
-            size: dimensionSize,
+            size: state.dimension,
         });
-
         modelFns.forEach(
             state.model,
             ({ column, row }, cellState) => {

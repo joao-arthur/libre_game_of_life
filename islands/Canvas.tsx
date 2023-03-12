@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "preact/hooks";
 import { JSX, VNode } from "preact";
-import { useWindowDimensions } from "../hooks/useWindowDimensions.ts";
+import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
 import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
@@ -11,15 +11,13 @@ import { useGameModel } from "../src/integrations/useGameModel.ts";
 export default function Canvas(): VNode {
     const drawContext = useRef<drawContextType>(null);
     const gameRender = useRef<GameRender>(null);
-    const dimensions = useWindowDimensions();
-    const dimension = Math.min(dimensions.height, dimensions.width);
+    const dimension = useWindowDimension();
     const canvasRef = useRef<HTMLCanvasElement>(null);
-
     const { model, gameModelProxy } = useGameModel();
 
     useEffect(() => {
-        gameModelProxy.setDimensions(dimensions);
-    }, [dimensions]);
+        gameModelProxy.setDimension(dimension);
+    }, [dimension]);
 
     useEffect(() => {
         if (!canvasRef.current) {
