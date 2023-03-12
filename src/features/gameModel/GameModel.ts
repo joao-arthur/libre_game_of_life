@@ -5,7 +5,7 @@ import {
     modelType,
 } from "../../game/model/mod.ts";
 
-export type gameStateType = {
+export type gameModelType = {
     readonly model: modelType;
     readonly dimensions: dimensionType;
     readonly gap: number;
@@ -14,7 +14,7 @@ export type gameStateType = {
     readonly status: "resumed" | "paused";
 };
 
-export class GameStore {
+export class GameModel {
     private model: modelType;
     private dimensions: dimensionType;
     private gap: number;
@@ -85,7 +85,7 @@ export class GameStore {
         this.fps = fps;
     }
 
-    public getState(): gameStateType {
+    public getModel(): gameModelType {
         return {
             model: this.model,
             dimensions: this.dimensions,

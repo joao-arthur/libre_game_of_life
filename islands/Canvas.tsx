@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "preact/hooks";
 import { JSX, VNode } from "preact";
 import { useWindowDimensions } from "../hooks/useWindowDimensions.ts";
-import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
-import { useGameStore } from "../integrations/useGameStore.ts";
+import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
 import { drawContextType } from "../src/ports/drawContext.ts";
-import { GameRender } from "../src/features/render/mod.ts";
+import { GameRender } from "../src/features/gameRender/mod.ts";
+import { useGameModel } from "../src/integrations/useGameModel.ts";
 
 let drawContext: drawContextType;
 let gameRender: GameRender;
@@ -17,10 +17,10 @@ export default function Canvas(): VNode {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const {
-        state,
+        model,
         actions,
-        store,
-    } = useGameStore();
+        gameModelProxy,
+    } = useGameModel();
 
     useEffect(() => {
         actions.setDimensions(dimensions);
@@ -35,7 +35,7 @@ export default function Canvas(): VNode {
             return;
         }
         drawContext = new CanvasDrawContext(context);
-        gameRender = new GameRender(store, drawContext);
+        gameRender = new GameRender(gameModelProxy, drawContext);
     }, []);
 
     function onClick(
@@ -66,7 +66,7 @@ export default function Canvas(): VNode {
                         min={0}
                         max={10}
                         step={1}
-                        value={state.gap}
+                        value={model.gap}
                         setValue={actions.setGap}
                     />
                 </div>
@@ -77,7 +77,7 @@ export default function Canvas(): VNode {
                         min={10}
                         max={100}
                         step={1}
-                        value={state.size}
+                        value={model.size}
                         setValue={actions.setSize}
                     />
                 </div>
@@ -88,15 +88,15 @@ export default function Canvas(): VNode {
                         min={1}
                         max={10}
                         step={1}
-                        value={state.fps}
+                        value={model.fps}
                         setValue={actions.setFps}
                     />
                 </div>
                 <span>
-                    0
+                    <label>{model.model.iteration}</label>
                     <label>Iteration</label>
                 </span>
-                {state.status === "resumed"
+                {model.status === "resumed"
                     ? <Button label="pause" onClick={actions.pause} />
                     : (
                         <Button

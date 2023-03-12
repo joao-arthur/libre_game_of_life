@@ -1,46 +1,47 @@
 import { dimensionType } from "../../core/dimension.ts";
-import { gameStateType, GameStore } from "./GameStore.ts";
+import { GameModel, gameModelType } from "./GameModel.ts";
 
 type cbType = () => void;
 
-export class GameStoreProxy {
+export class GameModelProxy {
     private onSettingsChangeListeners: (cbType)[] = [];
 
-    public constructor(private readonly gameStore: GameStore) {}
+    public constructor(private readonly gameModel: GameModel) {}
 
     public pause(): void {
-        this.gameStore.pause();
+        this.gameModel.pause();
         this.onSettingsChange();
     }
 
     public resume(): void {
-        this.gameStore.resume();
+        this.gameModel.resume();
         this.onSettingsChange();
     }
 
     public singleIteration(): void {
-        this.gameStore.singleIteration();
+        this.gameModel.singleIteration();
+        this.onSettingsChange();
     }
 
     public iterate(): void {
-        this.gameStore.iterate();
+        this.gameModel.iterate();
     }
 
     public setDimensions(dimensions: dimensionType): void {
-        this.gameStore.setDimensions(dimensions);
+        this.gameModel.setDimensions(dimensions);
     }
 
     public setGap(gap: number): void {
-        this.gameStore.setGap(gap);
+        this.gameModel.setGap(gap);
     }
 
     public setSize(size: number): void {
-        this.gameStore.setSize(size);
+        this.gameModel.setSize(size);
         this.onSettingsChange();
     }
 
     public setFps(fps: number): void {
-        this.gameStore.setFps(fps);
+        this.gameModel.setFps(fps);
         this.onSettingsChange();
     }
 
@@ -48,8 +49,8 @@ export class GameStoreProxy {
         this.onSettingsChangeListeners.forEach((cb) => cb());
     }
 
-    public getState(): gameStateType {
-        return this.gameStore.getState();
+    public getModel(): gameModelType {
+        return this.gameModel.getModel();
     }
 
     public addOnSettingsChangeListener(cb: cbType): void {
