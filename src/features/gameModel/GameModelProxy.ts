@@ -41,8 +41,8 @@ export class GameModelProxy {
         this.onChange();
     }
 
-    public setSize(size: number): void {
-        this.gameModel.setSize(size);
+    public setTiles(tiles: number): void {
+        this.gameModel.setTiles(tiles);
         this.onSettingsChange();
         this.onChange();
     }

@@ -8,7 +8,7 @@ export type gameModelType = {
     readonly model: modelType;
     readonly dimension: number;
     readonly gap: number;
-    readonly size: number;
+    readonly tiles: number;
     readonly fps: number;
     readonly status: "initial" | "resumed" | "paused";
 };
@@ -17,7 +17,7 @@ export class GameModel {
     private model: modelType;
     private dimension: number;
     private gap: number;
-    private size: number;
+    private tiles: number;
     private fps: number;
     private status: "initial" | "resumed" | "paused";
 
@@ -46,7 +46,7 @@ export class GameModel {
         ]);
         this.dimension = 0;
         this.gap = 2;
-        this.size = 20;
+        this.tiles = 20;
         this.fps = 1;
         this.status = "initial";
     }
@@ -76,8 +76,8 @@ export class GameModel {
         this.gap = gap;
     }
 
-    public setSize(size: number): void {
-        this.size = size;
+    public setTiles(tiles: number): void {
+        this.tiles = tiles;
     }
 
     public setFps(fps: number): void {
@@ -89,7 +89,7 @@ export class GameModel {
             model: this.model,
             dimension: this.dimension,
             gap: this.gap,
-            size: this.size,
+            tiles: this.tiles,
             fps: this.fps,
             status: this.status,
         };

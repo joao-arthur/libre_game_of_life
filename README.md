@@ -19,6 +19,5 @@
 - fix iterate
 - presets
 - change rules
-- rename size to tiles
 - validations
 - opengl

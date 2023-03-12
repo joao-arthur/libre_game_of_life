@@ -67,15 +67,15 @@ export default function Canvas(): VNode {
                     />
                 </div>
                 <div className="flex flex-col">
-                    <label for="size">Size</label>
+                    <label for="tiles">Tiles</label>
                     <RangeInput
-                        id="size"
+                        id="tiles"
                         min={10}
                         max={100}
                         step={1}
-                        value={model.size}
-                        setValue={(size) =>
-                            gameModelProxy.setSize(size)}
+                        value={model.tiles}
+                        setValue={(tiles) =>
+                            gameModelProxy.setTiles(tiles)}
                     />
                 </div>
                 <div className="flex flex-col">
