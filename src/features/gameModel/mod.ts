@@ -1,3 +1,3 @@
-export type { gameModelType } from "./GameModel.ts";
-export { GameModel } from "./GameModel.ts";
-export { GameModelProxy } from "./GameModelProxy.ts";
+export type { gameModelType } from "./gameModel.ts";
+export { GameModel } from "./gameModel.ts";
+export { GameModelProxy } from "./gameModelProxy.ts";

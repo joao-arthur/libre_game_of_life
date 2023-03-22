@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { JSX, VNode } from "preact";
 import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { Button } from "../components/Button.tsx";
@@ -6,17 +6,29 @@ import { RangeInput } from "../components/RangeInput.tsx";
 import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
 import { drawContextType } from "../src/ports/drawContext.ts";
 import { GameRender } from "../src/features/gameRender/mod.ts";
-import { useGameModel } from "../src/integrations/useGameModel.ts";
+import {
+    GameModel,
+    GameModelProxy,
+    gameModelType,
+} from "../src/features/gameModel/mod.ts";
+import { GameController } from "../src/features/gameController/mod.ts";
+import { GameManager } from "../src/features/gameManager/mod.ts";
+import { fromString } from "../src/game/model/mod.ts";
 
 export default function Canvas(): VNode {
-    const drawContext = useRef<drawContextType>(null);
-    const gameRender = useRef<GameRender>(null);
-    const dimension = useWindowDimension();
+    const gameModelRef = useRef<GameModel>(null);
+    const gameModelProxyRef = useRef<GameModelProxy>(null);
+    const gameControllerRef = useRef<GameController>(null);
+    const drawContextRef = useRef<drawContextType>(null);
+    const gameRenderRef = useRef<GameRender>(null);
+    const gameManagerRef = useRef<GameManager>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const { model, gameModelProxy } = useGameModel();
+    const dimension = useWindowDimension();
+
+    const [model, setModel] = useState<gameModelType | null>(null);
 
     useEffect(() => {
-        gameModelProxy.setDimension(dimension);
+        gameControllerRef.current?.setDimension(dimension);
     }, [dimension]);
 
     useEffect(() => {
@@ -27,11 +39,56 @@ export default function Canvas(): VNode {
         if (!context) {
             return;
         }
-        drawContext.current = new CanvasDrawContext(context);
-        gameRender.current = new GameRender(
-            gameModelProxy,
-            drawContext.current,
+        const drawContext = new CanvasDrawContext(context);
+        const gameModel = new GameModel(
+            {
+                model: fromString([
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                    "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+                ]),
+                dimension: 0,
+                gap: 2,
+                tiles: 20,
+                fps: 1,
+                status: "initial",
+                drawContext,
+            },
         );
+        const gameModelProxy = new GameModelProxy(gameModel);
+        const gameRender = new GameRender(gameModel, drawContext);
+        const gameController = new GameController(gameModelProxy);
+        const gameManager = new GameManager(
+            gameModelProxy,
+            gameController,
+            gameRender,
+        );
+        gameModelProxy.addOnChangeListener(() =>
+            setModel(gameModelProxy.getModel())
+        );
+        gameModelRef.current = gameModel;
+        gameModelProxyRef.current = gameModelProxy;
+        gameControllerRef.current = gameController;
+        drawContextRef.current = drawContext;
+        gameRenderRef.current = gameRender;
+        gameManagerRef.current = gameManager;
     }, []);
 
     function onClick(
@@ -39,6 +96,10 @@ export default function Canvas(): VNode {
     ): void {
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
+    }
+
+    function getStatusLabel(): string {
+        return model?.status === "resumed" ? "pause" : "resume";
     }
 
     return (
@@ -62,8 +123,9 @@ export default function Canvas(): VNode {
                         min={0}
                         max={7}
                         step={1}
-                        value={model.gap}
-                        setValue={(gap) => gameModelProxy.setGap(gap)}
+                        value={model ? model.gap : 0}
+                        setValue={(gap) =>
+                            gameControllerRef.current?.setGap(gap)}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -73,9 +135,11 @@ export default function Canvas(): VNode {
                         min={10}
                         max={100}
                         step={1}
-                        value={model.tiles}
+                        value={model ? model.tiles : 0}
                         setValue={(tiles) =>
-                            gameModelProxy.setTiles(tiles)}
+                            gameControllerRef.current?.setTiles(
+                                tiles,
+                            )}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -85,30 +149,24 @@ export default function Canvas(): VNode {
                         min={1}
                         max={10}
                         step={1}
-                        value={model.fps}
-                        setValue={(fps) => gameModelProxy.setFps(fps)}
+                        value={model ? model.fps : 0}
+                        setValue={(fps) =>
+                            gameControllerRef.current?.setFps(fps)}
                     />
                 </div>
                 <span>
-                    <label>{model.model.iteration}</label>
+                    <label>{model ? model.model.iteration : 0}</label>
                     <label>Iteration</label>
                 </span>
-                {model.status === "resumed"
-                    ? (
-                        <Button
-                            label="pause"
-                            onClick={() => gameModelProxy.pause()}
-                        />
-                    )
-                    : (
-                        <Button
-                            label="resume"
-                            onClick={() => gameModelProxy.resume()}
-                        />
-                    )}
+                <Button
+                    label={getStatusLabel()}
+                    onClick={() =>
+                        gameControllerRef.current?.resume()}
+                />
                 <Button
                     label="iterate"
-                    onClick={() => gameModelProxy.singleIteration()}
+                    onClick={() =>
+                        gameControllerRef.current?.singleIteration()}
                 />
             </div>
         </>

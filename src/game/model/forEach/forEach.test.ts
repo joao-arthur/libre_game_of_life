@@ -4,7 +4,7 @@ import { fromString } from "../fromString/mod.ts";
 import { forEach } from "./forEach.ts";
 
 Deno.test("forEach", () => {
-    const values1: stateType[][] = [];
+    const values1: stateType[][] = [[]];
     forEach(
         fromString([
             "⬛⬜",
@@ -20,7 +20,7 @@ Deno.test("forEach", () => {
         ]).value,
     );
 
-    const values2: stateType[][] = [];
+    const values2: stateType[][] = [[]];
     forEach(
         fromString([
             "⬛⬜⬛",
@@ -33,7 +33,7 @@ Deno.test("forEach", () => {
         fromString(["⬛⬜⬛⬜⬛⬜"]).value,
     );
 
-    const values3: stateType[][] = [];
+    const values3: stateType[][] = [[]];
     forEach(
         fromString([
             "⬛⬜⬛",

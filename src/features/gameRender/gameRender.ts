@@ -1,37 +1,15 @@
 import { stateType } from "../../game/cell/mod.ts";
 import { modelFns } from "../../game/model/mod.ts";
 import { drawContextType } from "../../ports/drawContext.ts";
-import { GameModelProxy } from "../gameModel/GameModelProxy.ts";
+import { GameModel } from "../gameModel/mod.ts";
 
 export class GameRender {
-    timeoutId = 0;
-
     public constructor(
-        private readonly gameModel: GameModelProxy,
+        private readonly gameModel: GameModel,
         private readonly drawContext: drawContextType,
-    ) {
-        this.setup();
-    }
+    ) {}
 
-    private setup(): void {
-        this.gameModel.addOnSettingsChangeListener(() =>
-            this.setupLoop()
-        );
-    }
-
-    private setupLoop(): void {
-        if (this.timeoutId) {
-            globalThis.clearInterval(this.timeoutId);
-        }
-        const state = this.gameModel.getModel();
-        if (state.status === "paused") return;
-        this.timeoutId = globalThis.setInterval(
-            () => this.loop(),
-            1000 / state.fps,
-        );
-    }
-
-    private loop(): void {
+    public render(): void {
         const state = this.gameModel.getModel();
         const modelSize = Math.min(
             state.model.width,
@@ -53,7 +31,6 @@ export class GameRender {
                 }, this.getSquareColor(cellState));
             },
         );
-        this.gameModel.iterate();
     }
 
     private getSquareColor(state: stateType): string {

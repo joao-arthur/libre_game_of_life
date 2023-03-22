@@ -1,1 +1,1 @@
-export { GameRender } from "./GameRender.ts";
+export { GameRender } from "./gameRender.ts";
