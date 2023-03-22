@@ -16,12 +16,8 @@ import { GameManager } from "../src/features/gameManager/mod.ts";
 import { fromString } from "../src/game/model/mod.ts";
 
 export default function Canvas(): VNode {
-    const gameModelRef = useRef<GameModel>(null);
     const gameModelProxyRef = useRef<GameModelProxy>(null);
     const gameControllerRef = useRef<GameController>(null);
-    const drawContextRef = useRef<drawContextType>(null);
-    const gameRenderRef = useRef<GameRender>(null);
-    const gameManagerRef = useRef<GameManager>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimension = useWindowDimension();
 
@@ -80,15 +76,13 @@ export default function Canvas(): VNode {
             gameController,
             gameRender,
         );
+        gameController.setDimension(dimension);
         gameModelProxy.addOnChangeListener(() =>
             setModel(gameModelProxy.getModel())
         );
-        gameModelRef.current = gameModel;
+        setModel(gameModelProxy.getModel());
         gameModelProxyRef.current = gameModelProxy;
         gameControllerRef.current = gameController;
-        drawContextRef.current = drawContext;
-        gameRenderRef.current = gameRender;
-        gameManagerRef.current = gameManager;
     }, []);
 
     function onClick(

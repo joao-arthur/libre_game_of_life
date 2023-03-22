@@ -30,28 +30,28 @@ export class GameManager {
         if (this.timeoutId) {
             globalThis.clearInterval(this.timeoutId);
         }
-        const model = this.gameModelProxy
-            .getModel();
-        if (
-            model.status === "initial" &&
-            model.dimension !== undefined
-        ) {
-            this.initialRender();
-            this.gameController.pause();
+        const model = this.gameModelProxy.getModel();
+        switch (model.status) {
+            case "initial":
+                if (model.dimension !== undefined) {
+                    this.initialLoop();
+                    this.gameController.pause();
+                }
+                break;
+            case "resumed":
+                this.timeoutId = globalThis.setInterval(
+                    () => this.loop(),
+                    1000 / model.fps,
+                );
         }
-        if (model.status === "paused") return;
-        this.timeoutId = globalThis.setInterval(
-            () => this.loop(),
-            1000 / model.fps,
-        );
+    }
+
+    private initialLoop(): void {
+        this.gameRender.render();
     }
 
     private loop(): void {
         this.gameRender.render();
         this.gameController.iterate();
-    }
-
-    private initialRender(): void {
-        this.gameRender.render();
     }
 }
