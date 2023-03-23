@@ -11,11 +11,7 @@ export class GameRender {
 
     public render(): void {
         const state = this.gameModel.getModel();
-        const modelSize = Math.min(
-            state.model.width,
-            state.model.height,
-        );
-        const size = state.dimension / modelSize;
+        const size = state.dimension / state.model.size;
         this.drawContext.clear({
             x: 0,
             y: 0,

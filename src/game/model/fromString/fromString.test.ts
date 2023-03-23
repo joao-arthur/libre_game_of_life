@@ -6,8 +6,7 @@ Deno.test("fromString", () => {
     assertEquals(
         fromString(["⬛"]),
         {
-            width: 1,
-            height: 1,
+            size: 1,
             value: [[stateType.DEAD]],
             iteration: 0,
         },
@@ -15,8 +14,7 @@ Deno.test("fromString", () => {
     assertEquals(
         fromString(["⬜"]),
         {
-            width: 1,
-            height: 1,
+            size: 1,
             value: [[stateType.ALIVE]],
             iteration: 0,
         },
@@ -25,17 +23,12 @@ Deno.test("fromString", () => {
         fromString([
             "⬜⬜",
             "⬜⬛",
-            "⬛⬜",
-            "⬛⬛",
         ]),
         {
-            width: 2,
-            height: 4,
+            size: 2,
             value: [
                 [stateType.ALIVE, stateType.ALIVE],
                 [stateType.ALIVE, stateType.DEAD],
-                [stateType.DEAD, stateType.ALIVE],
-                [stateType.DEAD, stateType.DEAD],
             ],
             iteration: 0,
         },

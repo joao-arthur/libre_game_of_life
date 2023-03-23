@@ -25,8 +25,16 @@ export default function Canvas(): VNode {
     function onClick(
         e: JSX.TargetedMouseEvent<HTMLCanvasElement>,
     ): void {
+        if (!model) {
+            return;
+        }
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
+
+        const unitSize = model.dimension / model.model.size;
+
+        const xInTiles = Math.trunc(x / unitSize);
+        const yInTiles = Math.trunc(y / unitSize);
     }
 
     function getToggleLabel(): string {

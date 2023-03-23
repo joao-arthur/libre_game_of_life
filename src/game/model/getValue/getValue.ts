@@ -8,8 +8,8 @@ export function getValue(
 ): stateType | undefined {
     if (column < 0) return undefined;
     if (row < 0) return undefined;
-    if (column >= model.width) return undefined;
-    if (row >= model.height) return undefined;
+    if (column >= model.size) return undefined;
+    if (row >= model.size) return undefined;
 
     return model.value[row][column];
 }
