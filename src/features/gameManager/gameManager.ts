@@ -24,6 +24,7 @@ export class GameManager {
                     this.setupLoop();
             }
         });
+        this.setupLoop();
     }
 
     private setupLoop(): void {
@@ -51,7 +52,7 @@ export class GameManager {
     }
 
     private loop(): void {
-        this.gameRender.render();
         this.gameController.iterate();
+        this.gameRender.render();
     }
 }

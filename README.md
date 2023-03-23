@@ -15,8 +15,6 @@
 
 ## TODO
 
-- render at open
-- fix iterate
 - presets
 - change rules
 - validations

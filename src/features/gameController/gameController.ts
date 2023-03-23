@@ -16,7 +16,7 @@ export class GameController {
         this.gameModelProxy.setModel(
             modelFns.iterate(this.gameModelProxy.getModel().model),
         );
-        this.gameModelProxy.setStatus("paused");
+        this.gameModelProxy.setStatus("initial");
     }
 
     public iterate(): void {

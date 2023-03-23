@@ -7,7 +7,7 @@ type props = {
 
 export function Button({ label, onClick }: props): VNode {
     return (
-        <button className="bg-gray-500" onClick={onClick}>
+        <button className="bg-gray-500 my-1" onClick={onClick}>
             {label}
         </button>
     );

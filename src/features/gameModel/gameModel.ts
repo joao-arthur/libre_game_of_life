@@ -7,8 +7,8 @@ export type gameModelType = {
     readonly tiles: number;
     readonly fps: number;
     readonly status: "initial" | "resumed" | "paused";
-    readonly dimension: number | undefined;
-    readonly drawContext: drawContextType | undefined;
+    readonly dimension: number;
+    readonly drawContext: drawContextType;
 };
 
 export class GameModel {
@@ -17,8 +17,8 @@ export class GameModel {
     private tiles: number;
     private fps: number;
     private status: "initial" | "resumed" | "paused";
-    private dimension: number | undefined;
-    private drawContext: drawContextType | undefined;
+    private dimension: number;
+    private drawContext: drawContextType;
 
     constructor(gameModel: gameModelType) {
         this.model = gameModel.model;
