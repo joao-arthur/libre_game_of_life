@@ -34,10 +34,8 @@ export class GameManager {
         const model = this.gameModelProxy.getModel();
         switch (model.status) {
             case "initial":
-                if (model.dimension !== undefined) {
-                    this.initialLoop();
-                    this.gameController.pause();
-                }
+                this.render();
+                this.gameController.pause();
                 break;
             case "resumed":
                 this.timeoutId = globalThis.setInterval(
@@ -47,7 +45,7 @@ export class GameManager {
         }
     }
 
-    private initialLoop(): void {
+    private render(): void {
         this.gameRender.render();
     }
 

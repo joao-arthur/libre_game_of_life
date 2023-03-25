@@ -3,7 +3,7 @@ import { stateType } from "../../cell/mod.ts";
 import { fromModel } from "./fromModel.ts";
 import { fromString } from "../../model/mod.ts";
 
-Deno.test("fromModel", () => {
+Deno.test("Should return the neighbors of the cell", () => {
     assertEquals(
         fromModel(
             fromString([

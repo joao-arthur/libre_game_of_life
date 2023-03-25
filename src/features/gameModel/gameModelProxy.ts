@@ -37,19 +37,19 @@ export class GameModelProxy {
         this.onChange("dimension");
     }
 
+    public setDrawContext(
+        drawContext: gameModelType["drawContext"],
+    ): void {
+        this.gameModel.setDrawContext(drawContext);
+        this.onChange("drawContext");
+    }
+
     public getModel(): gameModelType {
         return this.gameModel.getModel();
     }
 
     public addOnChangeListener(cb: cbType): void {
         this.onChangeListeners.push(cb);
-    }
-
-    public removeOnChangeListener(cb: cbType): void {
-        this.onChangeListeners.splice(
-            this.onChangeListeners.indexOf(cb),
-            1,
-        );
     }
 
     private onChange(param: keyof gameModelType): void {

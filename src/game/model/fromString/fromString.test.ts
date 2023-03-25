@@ -4,6 +4,14 @@ import { fromString } from "./fromString.ts";
 
 Deno.test("fromString", () => {
     assertEquals(
+        fromString([""]),
+        {
+            size: 0,
+            value: [[]],
+            iteration: 0,
+        },
+    );
+    assertEquals(
         fromString(["⬛"]),
         {
             size: 1,

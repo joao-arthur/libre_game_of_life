@@ -17,9 +17,9 @@ import {
 } from "../src/features/mod.ts";
 
 type gameOfLifeType = {
-    init: (canvasElement: HTMLCanvasElement) => void;
-    model: gameModelType | undefined;
-    controller: GameController | undefined;
+    readonly init: (canvasElement: HTMLCanvasElement) => void;
+    readonly model: gameModelType | undefined;
+    readonly controller: GameController | undefined;
 };
 
 export function useGameOfLife(): gameOfLifeType {

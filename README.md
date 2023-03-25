@@ -15,6 +15,7 @@
 
 ## TODO
 
+- unify model and proxy for the sake of simplicity
 - tiles size
 - click to dead/live
 - presets
