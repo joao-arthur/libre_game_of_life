@@ -1,6 +1,7 @@
-import { SystemModel } from "../systemModel/mod.ts";
-import { SystemController } from "../systemController/mod.ts";
-import { SystemRender } from "../systemRender/mod.ts";
+import { SystemModel } from "../model/mod.ts";
+import { SystemController } from "../controller/mod.ts";
+import { SystemRender } from "../render/mod.ts";
+import { fpsToMilis } from "../../features/mod.ts";
 
 export class SystemManager {
     private timeoutId = 0;
@@ -40,7 +41,7 @@ export class SystemManager {
             case "resumed":
                 this.timeoutId = globalThis.setInterval(
                     () => this.loop(),
-                    1000 / model.fps,
+                    fpsToMilis(model.fps),
                 );
         }
     }

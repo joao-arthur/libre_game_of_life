@@ -32,9 +32,9 @@ export class SystemRender {
     private getSquareColor(state: stateType): string {
         switch (state) {
             case stateType.DEAD:
-                return "#2e2e2e";
-            case stateType.ALIVE:
                 return "#dbdbdb";
+            case stateType.ALIVE:
+                return "#2e2e2e";
         }
     }
 }
