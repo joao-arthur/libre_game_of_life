@@ -21,16 +21,13 @@ export class SystemManager {
                 case "resumed":
                     switch (prop) {
                         case "status":
-                            globalThis.clearInterval(this.timeoutId);
-                            this.timeoutId = globalThis.setInterval(
-                                () => this.loop(),
-                                fpsToMilis(model.fps),
-                            );
-                            break;
                         case "fps":
                             globalThis.clearInterval(this.timeoutId);
                             this.timeoutId = globalThis.setInterval(
-                                () => this.loop(),
+                                () => {
+                                    this.systemController.iterate();
+                                    this.systemRender.render();
+                                },
                                 fpsToMilis(model.fps),
                             );
                     }
@@ -50,10 +47,5 @@ export class SystemManager {
         });
         this.systemRender.render();
         this.systemController.pause();
-    }
-
-    private loop(): void {
-        this.systemController.iterate();
-        this.systemRender.render();
     }
 }
