@@ -7,7 +7,7 @@ const defaultModel: systemModelType = {
     gap: 10,
     tiles: 50,
     fps: 1,
-    status: "initial",
+    status: "paused",
     dimension: 100,
     drawContext: {
         clear: () => {},

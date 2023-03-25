@@ -25,9 +25,7 @@ export function useGameOfLife(): gameOfLifeType {
     const systemControllerRef = useRef<SystemController | undefined>(
         undefined,
     );
-    const [model, setModel] = useState<
-        systemModelType | undefined
-    >(
+    const [model, setModel] = useState<systemModelType | undefined>(
         undefined,
     );
     const dimension = useWindowDimension();
@@ -46,10 +44,7 @@ export function useGameOfLife(): gameOfLifeType {
             const systemModel = new SystemModel(
                 buildModel(canvasDrawContext, dimension),
             );
-            const systemRender = new SystemRender(
-                systemModel,
-                canvasDrawContext,
-            );
+            const systemRender = new SystemRender(systemModel);
             const systemController = new SystemController(
                 systemModel,
             );

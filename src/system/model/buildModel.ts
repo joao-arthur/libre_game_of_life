@@ -32,7 +32,7 @@ export function buildModel(
         gap: 2,
         tiles: 20,
         fps: 2,
-        status: "initial",
+        status: "paused",
         drawContext,
     };
 }

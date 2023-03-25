@@ -16,38 +16,40 @@ export class SystemManager {
 
     private setup(): void {
         this.systemModel.addOnChangeListener((prop) => {
-            switch (prop) {
-                case "gap":
-                case "tiles":
-                case "fps":
-                case "status":
-                case "dimension":
-                    this.setupLoop();
+            const model = this.systemModel.getModel();
+            switch (model.status) {
+                case "resumed":
+                    switch (prop) {
+                        case "status":
+                            globalThis.clearInterval(this.timeoutId);
+                            this.timeoutId = globalThis.setInterval(
+                                () => this.loop(),
+                                fpsToMilis(model.fps),
+                            );
+                            break;
+                        case "fps":
+                            globalThis.clearInterval(this.timeoutId);
+                            this.timeoutId = globalThis.setInterval(
+                                () => this.loop(),
+                                fpsToMilis(model.fps),
+                            );
+                    }
+                    break;
+                case "paused":
+                    switch (prop) {
+                        case "gap":
+                        case "tiles":
+                        case "dimension":
+                        case "model":
+                            this.systemRender.render();
+                            break;
+                        case "status":
+                            globalThis.clearInterval(this.timeoutId);
+                    }
             }
         });
-        this.setupLoop();
-    }
-
-    private setupLoop(): void {
-        if (this.timeoutId) {
-            globalThis.clearInterval(this.timeoutId);
-        }
-        const model = this.systemModel.getModel();
-        switch (model.status) {
-            case "initial":
-                this.render();
-                this.systemController.pause();
-                break;
-            case "resumed":
-                this.timeoutId = globalThis.setInterval(
-                    () => this.loop(),
-                    fpsToMilis(model.fps),
-                );
-        }
-    }
-
-    private render(): void {
         this.systemRender.render();
+        this.systemController.pause();
     }
 
     private loop(): void {

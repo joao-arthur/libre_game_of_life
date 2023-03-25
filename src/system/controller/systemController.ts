@@ -16,7 +16,7 @@ export class SystemController {
         this.systemModel.setModel(
             modelFns.iterate(this.systemModel.getModel().model),
         );
-        this.systemModel.setStatus("initial");
+        this.systemModel.setStatus("paused");
     }
 
     public iterate(): void {

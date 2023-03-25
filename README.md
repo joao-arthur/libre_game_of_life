@@ -19,5 +19,4 @@
 - click to dead/live
 - presets
 - change rules
-- validations
 - opengl

@@ -35,7 +35,7 @@ Deno.test("singleIteration", () => {
     const systemController = new SystemController(systemModel);
     systemController.singleIteration();
     assertEquals(systemModel.getModel().model.iteration, 1);
-    assertEquals(systemModel.getModel().status, "initial");
+    assertEquals(systemModel.getModel().status, "paused");
 });
 
 Deno.test("iterate", () => {

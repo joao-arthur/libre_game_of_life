@@ -8,7 +8,7 @@ export type systemModelType = {
     readonly gap: number;
     readonly tiles: number;
     readonly fps: number;
-    readonly status: "initial" | "resumed" | "paused";
+    readonly status: "resumed" | "paused";
     readonly dimension: number;
     readonly drawContext: drawContextType;
 };
@@ -20,7 +20,7 @@ export class SystemModel {
     private gap: number;
     private tiles: number;
     private fps: number;
-    private status: "initial" | "resumed" | "paused";
+    private status: "resumed" | "paused";
     private dimension: number;
     private drawContext: drawContextType;
 
