@@ -1,1 +1,1 @@
-export { GameController } from "./gameController.ts";
+export { SystemController } from "./systemController.ts";

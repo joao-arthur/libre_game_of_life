@@ -1,16 +1,16 @@
 import { stateType } from "../../game/cell/mod.ts";
 import { modelFns } from "../../game/model/mod.ts";
 import { drawContextType } from "../../ports/drawContext.ts";
-import { GameModel } from "../gameModel/mod.ts";
+import { SystemModel } from "../model/mod.ts";
 
-export class GameRender {
+export class SystemRender {
     public constructor(
-        private readonly gameModel: GameModel,
+        private readonly systemModel: SystemModel,
         private readonly drawContext: drawContextType,
     ) {}
 
     public render(): void {
-        const state = this.gameModel.getModel();
+        const state = this.systemModel.getModel();
         const size = state.dimension / state.model.size;
         this.drawContext.clear({
             x: 0,

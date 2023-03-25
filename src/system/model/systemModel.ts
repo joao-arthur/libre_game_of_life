@@ -1,9 +1,9 @@
 import { modelType } from "../../game/model/mod.ts";
 import { drawContextType } from "../../ports/drawContext.ts";
 
-type cbType = (param: keyof gameModelType) => void;
+type cbType = (param: keyof systemModelType) => void;
 
-export type gameModelType = {
+export type systemModelType = {
     readonly model: modelType;
     readonly gap: number;
     readonly tiles: number;
@@ -13,7 +13,7 @@ export type gameModelType = {
     readonly drawContext: drawContextType;
 };
 
-export class GameModel {
+export class SystemModel {
     private readonly onChangeListeners: (cbType)[] = [];
 
     private model: modelType;
@@ -24,54 +24,56 @@ export class GameModel {
     private dimension: number;
     private drawContext: drawContextType;
 
-    constructor(gameModel: gameModelType) {
-        this.model = gameModel.model;
-        this.gap = gameModel.gap;
-        this.tiles = gameModel.tiles;
-        this.fps = gameModel.fps;
-        this.status = gameModel.status;
-        this.dimension = gameModel.dimension;
-        this.drawContext = gameModel.drawContext;
+    constructor(systemModel: systemModelType) {
+        this.model = systemModel.model;
+        this.gap = systemModel.gap;
+        this.tiles = systemModel.tiles;
+        this.fps = systemModel.fps;
+        this.status = systemModel.status;
+        this.dimension = systemModel.dimension;
+        this.drawContext = systemModel.drawContext;
     }
 
-    public setModel(model: gameModelType["model"]): void {
+    public setModel(model: systemModelType["model"]): void {
         this.model = model;
         this.onChange("model");
     }
 
-    public setGap(gap: gameModelType["gap"]): void {
+    public setGap(gap: systemModelType["gap"]): void {
         this.gap = gap;
         this.onChange("gap");
     }
 
-    public setTiles(tiles: gameModelType["tiles"]): void {
+    public setTiles(tiles: systemModelType["tiles"]): void {
         this.tiles = tiles;
         this.onChange("tiles");
     }
 
-    public setFps(fps: gameModelType["fps"]): void {
+    public setFps(fps: systemModelType["fps"]): void {
         this.fps = fps;
         this.onChange("fps");
     }
 
-    public setStatus(status: gameModelType["status"]): void {
+    public setStatus(status: systemModelType["status"]): void {
         this.status = status;
         this.onChange("status");
     }
 
-    public setDimension(dimension: gameModelType["dimension"]): void {
+    public setDimension(
+        dimension: systemModelType["dimension"],
+    ): void {
         this.dimension = dimension;
         this.onChange("dimension");
     }
 
     public setDrawContext(
-        drawContext: gameModelType["drawContext"],
+        drawContext: systemModelType["drawContext"],
     ): void {
         this.drawContext = drawContext;
         this.onChange("drawContext");
     }
 
-    public getModel(): gameModelType {
+    public getModel(): systemModelType {
         return {
             model: this.model,
             gap: this.gap,
@@ -87,7 +89,7 @@ export class GameModel {
         this.onChangeListeners.push(cb);
     }
 
-    private onChange(param: keyof gameModelType): void {
+    private onChange(param: keyof systemModelType): void {
         this.onChangeListeners.forEach((cb) => cb(param));
     }
 }

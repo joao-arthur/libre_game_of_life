@@ -1,1 +1,1 @@
-export { GameManager } from "./gameManager.ts";
+export { SystemManager } from "./systemManager.ts";

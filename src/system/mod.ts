@@ -1,5 +1,6 @@
-export type { gameModelType } from "./gameModel/mod.ts";
-export { GameController } from "./gameController/mod.ts";
-export { GameManager } from "./gameManager/mod.ts";
-export { buildModel, GameModel } from "./gameModel/mod.ts";
-export { GameRender } from "./gameRender/mod.ts";
+export type { systemModelType } from "./model/mod.ts";
+
+export { SystemController } from "./controller/mod.ts";
+export { SystemManager } from "./manager/mod.ts";
+export { buildModel, SystemModel } from "./model/mod.ts";
+export { SystemRender } from "./render/mod.ts";

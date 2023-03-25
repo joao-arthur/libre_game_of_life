@@ -1,9 +1,9 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
 import { fromString } from "../../game/model/mod.ts";
-import { GameModel, gameModelType } from "../gameModel/mod.ts";
-import { GameController } from "./gameController.ts";
+import { SystemModel, systemModelType } from "../model/mod.ts";
+import { SystemController } from "./systemController.ts";
 
-const defaultModel: gameModelType = {
+const defaultModel: systemModelType = {
     model: fromString([""]),
     gap: 10,
     tiles: 50,
@@ -17,59 +17,59 @@ const defaultModel: gameModelType = {
 };
 
 Deno.test("pause", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.pause();
-    assertEquals(gameModel.getModel().status, "paused");
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.pause();
+    assertEquals(systemModel.getModel().status, "paused");
 });
 
 Deno.test("resume", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.resume();
-    assertEquals(gameModel.getModel().status, "resumed");
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.resume();
+    assertEquals(systemModel.getModel().status, "resumed");
 });
 
 Deno.test("singleIteration", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.singleIteration();
-    assertEquals(gameModel.getModel().model.iteration, 1);
-    assertEquals(gameModel.getModel().status, "initial");
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.singleIteration();
+    assertEquals(systemModel.getModel().model.iteration, 1);
+    assertEquals(systemModel.getModel().status, "initial");
 });
 
 Deno.test("iterate", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.iterate();
-    assertEquals(gameModel.getModel().model.iteration, 1);
-    assertEquals(gameModel.getModel().status, "paused");
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.iterate();
+    assertEquals(systemModel.getModel().model.iteration, 1);
+    assertEquals(systemModel.getModel().status, "paused");
 });
 
 Deno.test("setDimension", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.setDimension(9);
-    assertEquals(gameModel.getModel().dimension, 9);
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.setDimension(9);
+    assertEquals(systemModel.getModel().dimension, 9);
 });
 
 Deno.test("setGap", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.setGap(9);
-    assertEquals(gameModel.getModel().gap, 9);
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.setGap(9);
+    assertEquals(systemModel.getModel().gap, 9);
 });
 
 Deno.test("setTiles", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.setTiles(9);
-    assertEquals(gameModel.getModel().tiles, 9);
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.setTiles(9);
+    assertEquals(systemModel.getModel().tiles, 9);
 });
 
 Deno.test("setFps", () => {
-    const gameModel = new GameModel(defaultModel);
-    const gameController = new GameController(gameModel);
-    gameController.setFps(9);
-    assertEquals(gameModel.getModel().fps, 9);
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.setFps(9);
+    assertEquals(systemModel.getModel().fps, 9);
 });

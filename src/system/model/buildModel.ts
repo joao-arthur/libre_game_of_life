@@ -1,10 +1,10 @@
 import { fromString } from "../../game/model/mod.ts";
-import { gameModelType } from "./gameModel.ts";
+import { systemModelType } from "./systemModel.ts";
 
 export function buildModel(
-    drawContext: gameModelType["drawContext"],
-    dimension: gameModelType["dimension"],
-): gameModelType {
+    drawContext: systemModelType["drawContext"],
+    dimension: systemModelType["dimension"],
+): systemModelType {
     return {
         model: fromString([
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",

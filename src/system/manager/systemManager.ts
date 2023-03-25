@@ -1,20 +1,20 @@
-import { GameModel } from "../gameModel/mod.ts";
-import { GameController } from "../gameController/mod.ts";
-import { GameRender } from "../gameRender/mod.ts";
+import { SystemModel } from "../systemModel/mod.ts";
+import { SystemController } from "../systemController/mod.ts";
+import { SystemRender } from "../systemRender/mod.ts";
 
-export class GameManager {
+export class SystemManager {
     private timeoutId = 0;
 
     constructor(
-        private readonly gameModel: GameModel,
-        private readonly gameController: GameController,
-        private readonly gameRender: GameRender,
+        private readonly systemModel: SystemModel,
+        private readonly systemController: SystemController,
+        private readonly systemRender: SystemRender,
     ) {
         this.setup();
     }
 
     private setup(): void {
-        this.gameModel.addOnChangeListener((prop) => {
+        this.systemModel.addOnChangeListener((prop) => {
             switch (prop) {
                 case "gap":
                 case "tiles":
@@ -31,11 +31,11 @@ export class GameManager {
         if (this.timeoutId) {
             globalThis.clearInterval(this.timeoutId);
         }
-        const model = this.gameModel.getModel();
+        const model = this.systemModel.getModel();
         switch (model.status) {
             case "initial":
                 this.render();
-                this.gameController.pause();
+                this.systemController.pause();
                 break;
             case "resumed":
                 this.timeoutId = globalThis.setInterval(
@@ -46,11 +46,11 @@ export class GameManager {
     }
 
     private render(): void {
-        this.gameRender.render();
+        this.systemRender.render();
     }
 
     private loop(): void {
-        this.gameController.iterate();
-        this.gameRender.render();
+        this.systemController.iterate();
+        this.systemRender.render();
     }
 }

@@ -1,43 +1,45 @@
 import { modelFns } from "../../game/model/mod.ts";
-import { GameModel, gameModelType } from "../gameModel/mod.ts";
+import { SystemModel, systemModelType } from "../model/mod.ts";
 
-export class GameController {
-    constructor(private readonly gameModel: GameModel) {}
+export class SystemController {
+    constructor(private readonly systemModel: SystemModel) {}
 
     public pause(): void {
-        this.gameModel.setStatus("paused");
+        this.systemModel.setStatus("paused");
     }
 
     public resume(): void {
-        this.gameModel.setStatus("resumed");
+        this.systemModel.setStatus("resumed");
     }
 
     public singleIteration(): void {
-        this.gameModel.setModel(
-            modelFns.iterate(this.gameModel.getModel().model),
+        this.systemModel.setModel(
+            modelFns.iterate(this.systemModel.getModel().model),
         );
-        this.gameModel.setStatus("initial");
+        this.systemModel.setStatus("initial");
     }
 
     public iterate(): void {
-        this.gameModel.setModel(
-            modelFns.iterate(this.gameModel.getModel().model),
+        this.systemModel.setModel(
+            modelFns.iterate(this.systemModel.getModel().model),
         );
     }
 
-    public setDimension(dimension: gameModelType["dimension"]): void {
-        this.gameModel.setDimension(dimension);
+    public setDimension(
+        dimension: systemModelType["dimension"],
+    ): void {
+        this.systemModel.setDimension(dimension);
     }
 
-    public setGap(gap: gameModelType["gap"]): void {
-        this.gameModel.setGap(gap);
+    public setGap(gap: systemModelType["gap"]): void {
+        this.systemModel.setGap(gap);
     }
 
-    public setTiles(tiles: gameModelType["tiles"]): void {
-        this.gameModel.setTiles(tiles);
+    public setTiles(tiles: systemModelType["tiles"]): void {
+        this.systemModel.setTiles(tiles);
     }
 
-    public setFps(fps: gameModelType["fps"]): void {
-        this.gameModel.setFps(fps);
+    public setFps(fps: systemModelType["fps"]): void {
+        this.systemModel.setFps(fps);
     }
 }

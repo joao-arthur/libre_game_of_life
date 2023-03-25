@@ -6,33 +6,34 @@ import {
 } from "preact/hooks";
 import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
-import { buildModel } from "../src/features/gameModel/buildModel.ts";
 import {
-    GameController,
-    GameManager,
-    GameModel,
-    gameModelType,
-    GameRender,
-} from "../src/features/mod.ts";
+    buildModel,
+    SystemController,
+    SystemManager,
+    SystemModel,
+    systemModelType,
+    SystemRender,
+} from "../src/system/mod.ts";
 
 type gameOfLifeType = {
     readonly init: (canvasElement: HTMLCanvasElement) => void;
-    readonly model: gameModelType | undefined;
-    readonly controller: GameController | undefined;
+    readonly model: systemModelType | undefined;
+    readonly controller: SystemController | undefined;
 };
 
 export function useGameOfLife(): gameOfLifeType {
-    const gameControllerRef = useRef<GameController | undefined>(
+    const systemControllerRef = useRef<SystemController | undefined>(
+        undefined,
+    );
+    const [model, setModel] = useState<
+        systemModelType | undefined
+    >(
         undefined,
     );
     const dimension = useWindowDimension();
 
-    const [model, setModel] = useState<gameModelType | undefined>(
-        undefined,
-    );
-
     useEffect(() => {
-        gameControllerRef.current?.setDimension(dimension);
+        systemControllerRef.current?.setDimension(dimension);
     }, [dimension]);
 
     const init = useCallback(
@@ -41,22 +42,27 @@ export function useGameOfLife(): gameOfLifeType {
             if (!context) {
                 return;
             }
-            const drawContext = new CanvasDrawContext(context);
-            const gameModel = new GameModel(
-                buildModel(drawContext, dimension),
+            const canvasDrawContext = new CanvasDrawContext(context);
+            const systemModel = new SystemModel(
+                buildModel(canvasDrawContext, dimension),
             );
-            const gameRender = new GameRender(gameModel, drawContext);
-            const gameController = new GameController(gameModel);
-            const _gameManager = new GameManager(
-                gameModel,
-                gameController,
-                gameRender,
+            const systemRender = new SystemRender(
+                systemModel,
+                canvasDrawContext,
             );
-            gameModel.addOnChangeListener(() =>
-                setModel(gameModel.getModel())
+            const systemController = new SystemController(
+                systemModel,
             );
-            setModel(gameModel.getModel());
-            gameControllerRef.current = gameController;
+            const _systemManager = new SystemManager(
+                systemModel,
+                systemController,
+                systemRender,
+            );
+            systemModel.addOnChangeListener(() =>
+                setModel(systemModel.getModel())
+            );
+            setModel(systemModel.getModel());
+            systemControllerRef.current = systemController;
         },
         [],
     );
@@ -64,6 +70,6 @@ export function useGameOfLife(): gameOfLifeType {
     return {
         init,
         model,
-        controller: gameControllerRef.current,
+        controller: systemControllerRef.current,
     };
 }

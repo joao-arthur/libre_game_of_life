@@ -1,8 +1,8 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
 import { fromString } from "../../game/model/mod.ts";
-import { GameModel, gameModelType } from "./gameModel.ts";
+import { SystemModel, systemModelType } from "./systemModel.ts";
 
-const defaultModel: gameModelType = {
+const defaultModel: systemModelType = {
     model: fromString([""]),
     gap: 10,
     tiles: 50,
@@ -15,7 +15,7 @@ const defaultModel: gameModelType = {
     },
 };
 
-const alternativeDrawContext: gameModelType["drawContext"] = {
+const alternativeDrawContext: systemModelType["drawContext"] = {
     clear: () => {
         return "clear";
     },
@@ -25,20 +25,20 @@ const alternativeDrawContext: gameModelType["drawContext"] = {
 };
 
 Deno.test("Should create with passed arguments", () => {
-    const gameModel = new GameModel(defaultModel);
-    assertEquals(gameModel.getModel(), defaultModel);
+    const systemModel = new SystemModel(defaultModel);
+    assertEquals(systemModel.getModel(), defaultModel);
 });
 
 Deno.test("Setters should", () => {
-    const gameModel = new GameModel(defaultModel);
-    gameModel.setModel(fromString(["⬛"]));
-    gameModel.setGap(0);
-    gameModel.setTiles(0);
-    gameModel.setFps(0);
-    gameModel.setStatus("resumed");
-    gameModel.setDimension(0);
-    gameModel.setDrawContext(alternativeDrawContext);
-    assertEquals(gameModel.getModel(), {
+    const systemModel = new SystemModel(defaultModel);
+    systemModel.setModel(fromString(["⬛"]));
+    systemModel.setGap(0);
+    systemModel.setTiles(0);
+    systemModel.setFps(0);
+    systemModel.setStatus("resumed");
+    systemModel.setDimension(0);
+    systemModel.setDrawContext(alternativeDrawContext);
+    assertEquals(systemModel.getModel(), {
         model: fromString(["⬛"]),
         gap: 0,
         tiles: 0,
@@ -50,18 +50,18 @@ Deno.test("Setters should", () => {
 });
 
 Deno.test("Should call the listener for each changed value", () => {
-    const gameModel = new GameModel(defaultModel);
-    const changedProps: (keyof gameModelType)[] = [];
-    gameModel.addOnChangeListener((prop) => {
+    const systemModel = new SystemModel(defaultModel);
+    const changedProps: (keyof systemModelType)[] = [];
+    systemModel.addOnChangeListener((prop) => {
         changedProps.push(prop);
     });
-    gameModel.setModel(fromString(["⬛"]));
-    gameModel.setGap(0);
-    gameModel.setTiles(0);
-    gameModel.setFps(0);
-    gameModel.setStatus("resumed");
-    gameModel.setDimension(0);
-    gameModel.setDrawContext({
+    systemModel.setModel(fromString(["⬛"]));
+    systemModel.setGap(0);
+    systemModel.setTiles(0);
+    systemModel.setFps(0);
+    systemModel.setStatus("resumed");
+    systemModel.setDimension(0);
+    systemModel.setDrawContext({
         clear: () => {},
         drawSquare: () => {},
     });
