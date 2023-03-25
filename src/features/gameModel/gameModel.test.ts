@@ -48,3 +48,30 @@ Deno.test("Setters should", () => {
         drawContext: alternativeDrawContext,
     });
 });
+
+Deno.test("Should call the listener for each changed value", () => {
+    const gameModel = new GameModel(defaultModel);
+    const changedProps: (keyof gameModelType)[] = [];
+    gameModel.addOnChangeListener((prop) => {
+        changedProps.push(prop);
+    });
+    gameModel.setModel(fromString(["⬛"]));
+    gameModel.setGap(0);
+    gameModel.setTiles(0);
+    gameModel.setFps(0);
+    gameModel.setStatus("resumed");
+    gameModel.setDimension(0);
+    gameModel.setDrawContext({
+        clear: () => {},
+        drawSquare: () => {},
+    });
+    assertEquals(changedProps, [
+        "model",
+        "gap",
+        "tiles",
+        "fps",
+        "status",
+        "dimension",
+        "drawContext",
+    ]);
+});

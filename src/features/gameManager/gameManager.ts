@@ -1,4 +1,4 @@
-import { GameModelProxy } from "../gameModel/mod.ts";
+import { GameModel } from "../gameModel/mod.ts";
 import { GameController } from "../gameController/mod.ts";
 import { GameRender } from "../gameRender/mod.ts";
 
@@ -6,7 +6,7 @@ export class GameManager {
     private timeoutId = 0;
 
     constructor(
-        private readonly gameModelProxy: GameModelProxy,
+        private readonly gameModel: GameModel,
         private readonly gameController: GameController,
         private readonly gameRender: GameRender,
     ) {
@@ -14,7 +14,7 @@ export class GameManager {
     }
 
     private setup(): void {
-        this.gameModelProxy.addOnChangeListener((prop) => {
+        this.gameModel.addOnChangeListener((prop) => {
             switch (prop) {
                 case "gap":
                 case "tiles":
@@ -31,7 +31,7 @@ export class GameManager {
         if (this.timeoutId) {
             globalThis.clearInterval(this.timeoutId);
         }
-        const model = this.gameModelProxy.getModel();
+        const model = this.gameModel.getModel();
         switch (model.status) {
             case "initial":
                 this.render();

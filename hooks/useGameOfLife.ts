@@ -11,7 +11,6 @@ import {
     GameController,
     GameManager,
     GameModel,
-    GameModelProxy,
     gameModelType,
     GameRender,
 } from "../src/features/mod.ts";
@@ -23,9 +22,6 @@ type gameOfLifeType = {
 };
 
 export function useGameOfLife(): gameOfLifeType {
-    const gameModelProxyRef = useRef<GameModelProxy | undefined>(
-        undefined,
-    );
     const gameControllerRef = useRef<GameController | undefined>(
         undefined,
     );
@@ -49,19 +45,17 @@ export function useGameOfLife(): gameOfLifeType {
             const gameModel = new GameModel(
                 buildModel(drawContext, dimension),
             );
-            const gameModelProxy = new GameModelProxy(gameModel);
             const gameRender = new GameRender(gameModel, drawContext);
-            const gameController = new GameController(gameModelProxy);
+            const gameController = new GameController(gameModel);
             const _gameManager = new GameManager(
-                gameModelProxy,
+                gameModel,
                 gameController,
                 gameRender,
             );
-            gameModelProxy.addOnChangeListener(() =>
-                setModel(gameModelProxy.getModel())
+            gameModel.addOnChangeListener(() =>
+                setModel(gameModel.getModel())
             );
-            setModel(gameModelProxy.getModel());
-            gameModelProxyRef.current = gameModelProxy;
+            setModel(gameModel.getModel());
             gameControllerRef.current = gameController;
         },
         [],

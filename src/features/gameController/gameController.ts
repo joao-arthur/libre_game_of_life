@@ -1,43 +1,43 @@
 import { modelFns } from "../../game/model/mod.ts";
-import { GameModelProxy, gameModelType } from "../gameModel/mod.ts";
+import { GameModel, gameModelType } from "../gameModel/mod.ts";
 
 export class GameController {
-    constructor(private readonly gameModelProxy: GameModelProxy) {}
+    constructor(private readonly gameModel: GameModel) {}
 
     public pause(): void {
-        this.gameModelProxy.setStatus("paused");
+        this.gameModel.setStatus("paused");
     }
 
     public resume(): void {
-        this.gameModelProxy.setStatus("resumed");
+        this.gameModel.setStatus("resumed");
     }
 
     public singleIteration(): void {
-        this.gameModelProxy.setModel(
-            modelFns.iterate(this.gameModelProxy.getModel().model),
+        this.gameModel.setModel(
+            modelFns.iterate(this.gameModel.getModel().model),
         );
-        this.gameModelProxy.setStatus("initial");
+        this.gameModel.setStatus("initial");
     }
 
     public iterate(): void {
-        this.gameModelProxy.setModel(
-            modelFns.iterate(this.gameModelProxy.getModel().model),
+        this.gameModel.setModel(
+            modelFns.iterate(this.gameModel.getModel().model),
         );
     }
 
     public setDimension(dimension: gameModelType["dimension"]): void {
-        this.gameModelProxy.setDimension(dimension);
+        this.gameModel.setDimension(dimension);
     }
 
     public setGap(gap: gameModelType["gap"]): void {
-        this.gameModelProxy.setGap(gap);
+        this.gameModel.setGap(gap);
     }
 
     public setTiles(tiles: gameModelType["tiles"]): void {
-        this.gameModelProxy.setTiles(tiles);
+        this.gameModel.setTiles(tiles);
     }
 
     public setFps(fps: gameModelType["fps"]): void {
-        this.gameModelProxy.setFps(fps);
+        this.gameModel.setFps(fps);
     }
 }

@@ -1,6 +1,8 @@
 import { modelType } from "../../game/model/mod.ts";
 import { drawContextType } from "../../ports/drawContext.ts";
 
+type cbType = (param: keyof gameModelType) => void;
+
 export type gameModelType = {
     readonly model: modelType;
     readonly gap: number;
@@ -12,6 +14,8 @@ export type gameModelType = {
 };
 
 export class GameModel {
+    private readonly onChangeListeners: (cbType)[] = [];
+
     private model: modelType;
     private gap: number;
     private tiles: number;
@@ -32,32 +36,39 @@ export class GameModel {
 
     public setModel(model: gameModelType["model"]): void {
         this.model = model;
+        this.onChange("model");
     }
 
     public setGap(gap: gameModelType["gap"]): void {
         this.gap = gap;
+        this.onChange("gap");
     }
 
     public setTiles(tiles: gameModelType["tiles"]): void {
         this.tiles = tiles;
+        this.onChange("tiles");
     }
 
     public setFps(fps: gameModelType["fps"]): void {
         this.fps = fps;
+        this.onChange("fps");
     }
 
     public setStatus(status: gameModelType["status"]): void {
         this.status = status;
+        this.onChange("status");
     }
 
     public setDimension(dimension: gameModelType["dimension"]): void {
         this.dimension = dimension;
+        this.onChange("dimension");
     }
 
     public setDrawContext(
         drawContext: gameModelType["drawContext"],
     ): void {
         this.drawContext = drawContext;
+        this.onChange("drawContext");
     }
 
     public getModel(): gameModelType {
@@ -70,5 +81,13 @@ export class GameModel {
             dimension: this.dimension,
             drawContext: this.drawContext,
         };
+    }
+
+    public addOnChangeListener(cb: cbType): void {
+        this.onChangeListeners.push(cb);
+    }
+
+    private onChange(param: keyof gameModelType): void {
+        this.onChangeListeners.forEach((cb) => cb(param));
     }
 }
