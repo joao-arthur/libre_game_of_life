@@ -61,7 +61,7 @@ export default function Canvas(): VNode {
                 ref={canvasRef}
             />
             <div className="flex flex-col">
-                <div className="flex flex-col">
+                <div className="flex flex-col my-1">
                     <label for="gap">Gap</label>
                     <div className="flex">
                         <RangeInput
@@ -78,7 +78,7 @@ export default function Canvas(): VNode {
                         </label>
                     </div>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col my-1">
                     <label for="size">
                         Size
                     </label>
@@ -97,13 +97,13 @@ export default function Canvas(): VNode {
                         </label>
                     </div>
                 </div>
-                <div className="flex flex-col">
+                <div className="flex flex-col my-1">
                     <label for="fps">FPS</label>
                     <div className="flex">
                         <RangeInput
                             id="fps"
                             min={1}
-                            max={99999}
+                            max={20}
                             step={1}
                             value={model ? model.fps : 0}
                             setValue={(fps) =>
