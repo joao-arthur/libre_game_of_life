@@ -11,10 +11,10 @@ export class SystemManager {
         private readonly systemController: SystemController,
         private readonly systemRender: SystemRender,
     ) {
-        this.setup();
+        this.manage();
     }
 
-    private setup(): void {
+    private manage(): void {
         this.systemModel.addOnChangeListener((prop) => {
             const model = this.systemModel.getModel();
             switch (model.status) {

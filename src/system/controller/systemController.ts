@@ -13,10 +13,10 @@ export class SystemController {
     }
 
     public singleIteration(): void {
+        this.systemModel.setStatus("paused");
         this.systemModel.setModel(
             modelFns.iterate(this.systemModel.getModel().model),
         );
-        this.systemModel.setStatus("paused");
     }
 
     public iterate(): void {
