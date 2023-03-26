@@ -33,13 +33,10 @@ export default function Canvas(): VNode {
         const y = e.pageY - e.currentTarget.offsetTop;
         const unitSize = model.dimension / model.model.size;
 
-        const xInTiles = absoluteToRelative(x, unitSize);
-        const yInTiles = absoluteToRelative(y, unitSize);
+        const column = absoluteToRelative(x, unitSize);
+        const row = absoluteToRelative(y, unitSize);
 
-        controller?.toggleCell(
-            xInTiles,
-            yInTiles,
-        );
+        controller?.toggleCell({ column, row });
     }
 
     function handleToggle(): void {
@@ -76,17 +73,16 @@ export default function Canvas(): VNode {
                     />
                 </div>
                 <div className="flex flex-col">
-                    <label for="tiles">Tiles: {model?.tiles}</label>
+                    <label for="size">
+                        Size: {model?.model.size}
+                    </label>
                     <RangeInput
-                        id="tiles"
-                        min={10}
+                        id="size"
+                        min={2}
                         max={100}
-                        step={1}
-                        value={model ? model.tiles : 0}
-                        setValue={(tiles) =>
-                            controller?.setTiles(
-                                tiles,
-                            )}
+                        step={2}
+                        value={model ? model.model.size : 0}
+                        setValue={(size) => controller?.setSize(size)}
                     />
                 </div>
                 <div className="flex flex-col">
@@ -94,7 +90,7 @@ export default function Canvas(): VNode {
                     <RangeInput
                         id="fps"
                         min={1}
-                        max={10}
+                        max={20}
                         step={1}
                         value={model ? model.fps : 0}
                         setValue={(fps) => controller?.setFps(fps)}

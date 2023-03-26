@@ -6,7 +6,6 @@ import { SystemController } from "./systemController.ts";
 const defaultModel: systemModelType = {
     model: modelFns.fromString(["⬛"]),
     gap: 10,
-    tiles: 50,
     fps: 1,
     status: "paused",
     dimension: 100,
@@ -49,7 +48,7 @@ Deno.test("iterate", () => {
 Deno.test("toggleCell", () => {
     const systemModel = new SystemModel(defaultModel);
     const systemController = new SystemController(systemModel);
-    systemController.toggleCell(0, 0);
+    systemController.toggleCell({ column: 0, row: 0 });
     assertEquals(
         systemModel.getModel().model,
         modelFns.fromString(["⬜"]),
@@ -63,18 +62,18 @@ Deno.test("setDimension", () => {
     assertEquals(systemModel.getModel().dimension, 9);
 });
 
+Deno.test("setSize", () => {
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.setSize(5);
+    assertEquals(systemModel.getModel().model.size, 5);
+});
+
 Deno.test("setGap", () => {
     const systemModel = new SystemModel(defaultModel);
     const systemController = new SystemController(systemModel);
     systemController.setGap(9);
     assertEquals(systemModel.getModel().gap, 9);
-});
-
-Deno.test("setTiles", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.setTiles(9);
-    assertEquals(systemModel.getModel().tiles, 9);
 });
 
 Deno.test("setFps", () => {

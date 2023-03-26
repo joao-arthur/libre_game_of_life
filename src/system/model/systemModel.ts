@@ -6,7 +6,6 @@ type cbType = (param: keyof systemModelType) => void;
 export type systemModelType = {
     readonly model: modelType;
     readonly gap: number;
-    readonly tiles: number;
     readonly fps: number;
     readonly status: "resumed" | "paused";
     readonly dimension: number;
@@ -18,7 +17,6 @@ export class SystemModel {
 
     private model: modelType;
     private gap: number;
-    private tiles: number;
     private fps: number;
     private status: "resumed" | "paused";
     private dimension: number;
@@ -27,7 +25,6 @@ export class SystemModel {
     constructor(systemModel: systemModelType) {
         this.model = systemModel.model;
         this.gap = systemModel.gap;
-        this.tiles = systemModel.tiles;
         this.fps = systemModel.fps;
         this.status = systemModel.status;
         this.dimension = systemModel.dimension;
@@ -42,11 +39,6 @@ export class SystemModel {
     public setGap(gap: systemModelType["gap"]): void {
         this.gap = gap;
         this.onChange("gap");
-    }
-
-    public setTiles(tiles: systemModelType["tiles"]): void {
-        this.tiles = tiles;
-        this.onChange("tiles");
     }
 
     public setFps(fps: systemModelType["fps"]): void {
@@ -77,7 +69,6 @@ export class SystemModel {
         return {
             model: this.model,
             gap: this.gap,
-            tiles: this.tiles,
             fps: this.fps,
             status: this.status,
             dimension: this.dimension,

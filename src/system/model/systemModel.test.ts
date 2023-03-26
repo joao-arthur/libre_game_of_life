@@ -5,7 +5,6 @@ import { SystemModel, systemModelType } from "./systemModel.ts";
 const defaultModel: systemModelType = {
     model: modelFns.fromString([""]),
     gap: 10,
-    tiles: 50,
     fps: 1,
     status: "paused",
     dimension: 100,
@@ -33,7 +32,6 @@ Deno.test("Setters should", () => {
     const systemModel = new SystemModel(defaultModel);
     systemModel.setModel(modelFns.fromString(["⬛"]));
     systemModel.setGap(0);
-    systemModel.setTiles(0);
     systemModel.setFps(0);
     systemModel.setStatus("resumed");
     systemModel.setDimension(0);
@@ -41,7 +39,6 @@ Deno.test("Setters should", () => {
     assertEquals(systemModel.getModel(), {
         model: modelFns.fromString(["⬛"]),
         gap: 0,
-        tiles: 0,
         fps: 0,
         status: "resumed",
         dimension: 0,
@@ -57,7 +54,6 @@ Deno.test("Should call the listener for each changed value", () => {
     });
     systemModel.setModel(modelFns.fromString(["⬛"]));
     systemModel.setGap(0);
-    systemModel.setTiles(0);
     systemModel.setFps(0);
     systemModel.setStatus("resumed");
     systemModel.setDimension(0);
@@ -68,7 +64,6 @@ Deno.test("Should call the listener for each changed value", () => {
     assertEquals(changedProps, [
         "model",
         "gap",
-        "tiles",
         "fps",
         "status",
         "dimension",

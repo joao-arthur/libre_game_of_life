@@ -35,7 +35,6 @@ export class SystemManager {
                 case "paused":
                     switch (prop) {
                         case "gap":
-                        case "tiles":
                         case "dimension":
                         case "model":
                             this.systemRender.render();

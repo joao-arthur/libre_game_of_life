@@ -1,4 +1,4 @@
-import { cellFns, modelFns } from "../../game/mod.ts";
+import { modelFns, positionType } from "../../game/mod.ts";
 import { SystemModel, systemModelType } from "../model/mod.ts";
 
 export class SystemController {
@@ -26,16 +26,12 @@ export class SystemController {
     }
 
     public toggleCell(
-        column: number,
-        row: number,
+        position: positionType,
     ): void {
         this.systemModel.setModel(
-            modelFns.map(
+            modelFns.toggle(
                 this.systemModel.getModel().model,
-                (pos, current) =>
-                    pos.column === column && pos.row === row
-                        ? cellFns.toggle(current)
-                        : current,
+                position,
             ),
         );
     }
@@ -50,8 +46,13 @@ export class SystemController {
         this.systemModel.setGap(gap);
     }
 
-    public setTiles(tiles: systemModelType["tiles"]): void {
-        this.systemModel.setTiles(tiles);
+    public setSize(size: systemModelType["model"]["size"]): void {
+        this.systemModel.setModel(
+            modelFns.zoom(
+                this.systemModel.getModel().model,
+                size,
+            ),
+        );
     }
 
     public setFps(fps: systemModelType["fps"]): void {

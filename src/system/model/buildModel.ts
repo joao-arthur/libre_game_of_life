@@ -29,9 +29,8 @@ export function buildModel(
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
         ]),
         dimension,
-        gap: 2,
-        tiles: 20,
-        fps: 2,
+        gap: 1,
+        fps: 4,
         status: "paused",
         drawContext,
     };

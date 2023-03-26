@@ -15,6 +15,5 @@
 
 ## TODO
 
-- tiles size
 - presets
 - opengl
