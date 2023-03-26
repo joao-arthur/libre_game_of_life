@@ -74,7 +74,7 @@ export default function Canvas(): VNode {
                                 controller?.setGap(gap)}
                         />
                         <label className="w-6 text-center block">
-                            {model?.gap}
+                            {model ? model.gap : 0}
                         </label>
                     </div>
                 </div>
@@ -93,7 +93,7 @@ export default function Canvas(): VNode {
                                 controller?.setSize(size)}
                         />
                         <label className="w-6 text-center block">
-                            {model?.model.size}
+                            {model ? model.model.size : 0}
                         </label>
                     </div>
                 </div>
@@ -110,13 +110,13 @@ export default function Canvas(): VNode {
                                 controller?.setFps(fps)}
                         />
                         <label className="w-6 text-center block">
-                            {model?.fps}
+                            {model ? model.fps : 0}
                         </label>
                     </div>
                 </div>
                 <span className="my-1">
                     <label>
-                        Iteration: {model?.model.iteration}
+                        Iteration: {model ? model.model.iteration : 0}
                     </label>
                 </span>
                 <Button
