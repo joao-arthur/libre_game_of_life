@@ -10,7 +10,27 @@ const model = fromString([
 
 Deno.test("zoom", () => {
     assertEquals(
-        zoom(model, 5),
+        zoom(model, 1),
+        fromString([
+            "⬜",
+        ]),
+    );
+    assertEquals(
+        zoom(model, 2),
+        fromString([
+            "⬜",
+        ]),
+    );
+    assertEquals(
+        zoom(model, 3),
+        fromString([
+            "⬛⬜⬛",
+            "⬜⬜⬜",
+            "⬜⬛⬜",
+        ]),
+    );
+    assertEquals(
+        zoom(model, 4),
         fromString([
             "⬛⬛⬛⬛⬛",
             "⬛⬛⬜⬛⬛",
@@ -20,9 +40,13 @@ Deno.test("zoom", () => {
         ]),
     );
     assertEquals(
-        zoom(model, 1),
+        zoom(model, 5),
         fromString([
-            "⬜",
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬜⬜⬜⬛",
+            "⬛⬜⬛⬜⬛",
+            "⬛⬛⬛⬛⬛",
         ]),
     );
 });

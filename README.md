@@ -17,3 +17,4 @@
 
 - presets
 - opengl
+- optimize iteration

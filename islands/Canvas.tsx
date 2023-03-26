@@ -62,6 +62,45 @@ export default function Canvas(): VNode {
             />
             <div className="flex flex-col">
                 <div className="flex flex-col my-1">
+                    <label for="gap">Preset</label>
+                    <select>
+                        <optgroup label="Still life">
+                            <option>Square</option>
+                            <option>Bee-hive</option>
+                            <option>Loaf</option>
+                            <option>Tub</option>
+                            <option>Boat</option>
+                            <option>Ship</option>
+                        </optgroup>
+                        <optgroup label="Oscilators">
+                            <option>Blinker</option>
+                            <option>Toad</option>
+                            <option>Beacon</option>
+                            <option>Pulsar</option>
+                            <option>Penta-decathlon</option>
+                        </optgroup>
+                        <optgroup label="Spaceships">
+                            <option>glider</option>
+                            <option>
+                                Light-weight spaceship (LWSS)
+                            </option>
+                            <option>
+                                Middle-weight spaceship (MWSS)
+                            </option>
+                            <option>
+                                Heavy-weight spaceship (LWSS)
+                            </option>
+                        </optgroup>
+                        <optgroup label="Machines">
+                            <option>glider gun</option>
+                        </optgroup>
+                        <optgroup label="Long lasting">
+                            <option>F-pentomino</option>
+                            <option>acorn</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div className="flex flex-col my-1">
                     <label for="gap">Gap</label>
                     <div className="flex">
                         <RangeInput
