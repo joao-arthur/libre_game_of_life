@@ -1,4 +1,4 @@
-import { modelFns } from "../../game/model/mod.ts";
+import { cellFns, modelFns } from "../../game/mod.ts";
 import { SystemModel, systemModelType } from "../model/mod.ts";
 
 export class SystemController {
@@ -22,6 +22,21 @@ export class SystemController {
     public iterate(): void {
         this.systemModel.setModel(
             modelFns.iterate(this.systemModel.getModel().model),
+        );
+    }
+
+    public toggleCell(
+        column: number,
+        row: number,
+    ): void {
+        this.systemModel.setModel(
+            modelFns.map(
+                this.systemModel.getModel().model,
+                (pos, current) =>
+                    pos.column === column && pos.row === row
+                        ? cellFns.toggle(current)
+                        : current,
+            ),
         );
     }
 

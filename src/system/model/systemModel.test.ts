@@ -1,9 +1,9 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { fromString } from "../../game/model/mod.ts";
+import { modelFns } from "../../game/mod.ts";
 import { SystemModel, systemModelType } from "./systemModel.ts";
 
 const defaultModel: systemModelType = {
-    model: fromString([""]),
+    model: modelFns.fromString([""]),
     gap: 10,
     tiles: 50,
     fps: 1,
@@ -31,7 +31,7 @@ Deno.test("Should create with passed arguments", () => {
 
 Deno.test("Setters should", () => {
     const systemModel = new SystemModel(defaultModel);
-    systemModel.setModel(fromString(["⬛"]));
+    systemModel.setModel(modelFns.fromString(["⬛"]));
     systemModel.setGap(0);
     systemModel.setTiles(0);
     systemModel.setFps(0);
@@ -39,7 +39,7 @@ Deno.test("Setters should", () => {
     systemModel.setDimension(0);
     systemModel.setDrawContext(alternativeDrawContext);
     assertEquals(systemModel.getModel(), {
-        model: fromString(["⬛"]),
+        model: modelFns.fromString(["⬛"]),
         gap: 0,
         tiles: 0,
         fps: 0,
@@ -55,7 +55,7 @@ Deno.test("Should call the listener for each changed value", () => {
     systemModel.addOnChangeListener((prop) => {
         changedProps.push(prop);
     });
-    systemModel.setModel(fromString(["⬛"]));
+    systemModel.setModel(modelFns.fromString(["⬛"]));
     systemModel.setGap(0);
     systemModel.setTiles(0);
     systemModel.setFps(0);

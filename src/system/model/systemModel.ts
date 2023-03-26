@@ -1,4 +1,4 @@
-import { modelType } from "../../game/model/mod.ts";
+import { modelType } from "../../game/mod.ts";
 import { drawContextType } from "../../ports/drawContext.ts";
 
 type cbType = (param: keyof systemModelType) => void;

@@ -1,7 +1,7 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
 import { stateType } from "../../cell/mod.ts";
+import { fromString } from "../../model/fromString/mod.ts";
 import { fromModel } from "./fromModel.ts";
-import { fromString } from "../../model/mod.ts";
 
 Deno.test("Should return the neighbors of the cell", () => {
     assertEquals(

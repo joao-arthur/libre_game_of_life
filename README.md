@@ -16,7 +16,5 @@
 ## TODO
 
 - tiles size
-- click to dead/live
 - presets
-- change rules
 - opengl

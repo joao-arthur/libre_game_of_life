@@ -1,5 +1,4 @@
-import { stateType } from "../../game/cell/mod.ts";
-import { modelFns } from "../../game/model/mod.ts";
+import { modelFns, stateType } from "../../game/mod.ts";
 import { SystemModel } from "../model/mod.ts";
 
 export class SystemRender {
@@ -8,20 +7,20 @@ export class SystemRender {
     ) {}
 
     public render(): void {
-        const state = this.systemModel.getModel();
-        const size = state.dimension / state.model.size;
-        state.drawContext.clear({
+        const model = this.systemModel.getModel();
+        const unitSize = model.dimension / model.model.size;
+        model.drawContext.clear({
             x: 0,
             y: 0,
-            size: state.dimension,
+            size: model.dimension,
         });
         modelFns.forEach(
-            state.model,
+            model.model,
             ({ column, row }, cellState) => {
-                state.drawContext.drawSquare({
-                    x: column * size + state.gap,
-                    y: row * size + state.gap,
-                    size: size - state.gap * 2,
+                model.drawContext.drawSquare({
+                    x: column * unitSize + model.gap,
+                    y: row * unitSize + model.gap,
+                    size: unitSize - model.gap * 2,
                 }, this.getSquareColor(cellState));
             },
         );

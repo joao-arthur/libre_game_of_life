@@ -1,10 +1,10 @@
 import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { fromString } from "../../game/model/mod.ts";
+import { modelFns } from "../../game/mod.ts";
 import { SystemModel, systemModelType } from "../model/mod.ts";
 import { SystemController } from "./systemController.ts";
 
 const defaultModel: systemModelType = {
-    model: fromString([""]),
+    model: modelFns.fromString(["⬛"]),
     gap: 10,
     tiles: 50,
     fps: 1,
@@ -44,6 +44,16 @@ Deno.test("iterate", () => {
     systemController.iterate();
     assertEquals(systemModel.getModel().model.iteration, 1);
     assertEquals(systemModel.getModel().status, "paused");
+});
+
+Deno.test("toggleCell", () => {
+    const systemModel = new SystemModel(defaultModel);
+    const systemController = new SystemController(systemModel);
+    systemController.toggleCell(0, 0);
+    assertEquals(
+        systemModel.getModel().model,
+        modelFns.fromString(["⬜"]),
+    );
 });
 
 Deno.test("setDimension", () => {

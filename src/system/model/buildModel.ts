@@ -1,4 +1,4 @@
-import { fromString } from "../../game/model/mod.ts";
+import { modelFns } from "../../game/mod.ts";
 import { systemModelType } from "./systemModel.ts";
 
 export function buildModel(
@@ -6,7 +6,7 @@ export function buildModel(
     dimension: systemModelType["dimension"],
 ): systemModelType {
     return {
-        model: fromString([
+        model: modelFns.fromString([
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",

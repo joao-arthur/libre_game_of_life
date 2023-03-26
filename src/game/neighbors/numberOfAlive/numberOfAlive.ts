@@ -7,5 +7,5 @@ export function numberOfAlive(
 ): aliveNeighborsType {
     return neighbors
         .filter((neighbor) => neighbor === stateType.ALIVE)
-        .length as 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+        .length as aliveNeighborsType;
 }

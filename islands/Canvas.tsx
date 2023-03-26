@@ -4,6 +4,7 @@ import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
 import { useGameOfLife } from "../hooks/useGameOfLife.ts";
+import { absoluteToRelative } from "../src/features/absoluteToRelative/absoluteToRelative.ts";
 
 export default function Canvas(): VNode {
     const {
@@ -30,15 +31,15 @@ export default function Canvas(): VNode {
         }
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
-
         const unitSize = model.dimension / model.model.size;
 
-        const xInTiles = Math.trunc(x / unitSize);
-        const yInTiles = Math.trunc(y / unitSize);
-    }
+        const xInTiles = absoluteToRelative(x, unitSize);
+        const yInTiles = absoluteToRelative(y, unitSize);
 
-    function getToggleLabel(): string {
-        return model?.status === "resumed" ? "pause" : "resume";
+        controller?.toggleCell(
+            xInTiles,
+            yInTiles,
+        );
     }
 
     function handleToggle(): void {
@@ -103,7 +104,9 @@ export default function Canvas(): VNode {
                     <label>Iteration: {model?.model.iteration}</label>
                 </span>
                 <Button
-                    label={getToggleLabel()}
+                    label={model?.status === "resumed"
+                        ? "pause"
+                        : "resume"}
                     onClick={handleToggle}
                 />
                 <Button
