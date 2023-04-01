@@ -23,6 +23,8 @@ export const presetOptions: presetOptionsType = [
     {
         label: "Oscilators",
         options: [
+            { label: "Airforce", value: "airforce" },
+            { label: "AVerage", value: "aVerage" },
             { label: "101", value: "oneZeroOne" },
             { label: "Blinker", value: "blinker" },
             { label: "Toad", value: "toad" },
@@ -61,12 +63,9 @@ export const presetOptions: presetOptionsType = [
     {
         label: "Long lasting",
         options: [
-            {
-                label: "F-pentomino",
-                value: "fPentomino",
-            },
             { label: "Acorn", value: "acorn" },
-            { label: "Acorn", value: "acorn" },
+            { label: "Diehard", value: "diehard" },
+            { label: "F-Pentomino", value: "fPentomino" },
         ],
     },
 ];
