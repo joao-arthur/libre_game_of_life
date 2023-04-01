@@ -1,10 +1,13 @@
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { JSX, VNode } from "preact";
-import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
+import { Select } from "../components/Select.tsx";
+import { presetOptions } from "../components/presetOptions.ts";
+import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { useGameOfLife } from "../hooks/useGameOfLife.ts";
 import { absoluteToRelative } from "../src/features/absoluteToRelative/absoluteToRelative.ts";
+import { presetsKeys } from "../src/game/mod.ts";
 
 export default function Canvas(): VNode {
     const {
@@ -12,6 +15,7 @@ export default function Canvas(): VNode {
         model,
         controller,
     } = useGameOfLife();
+    const [preset, setPreset] = useState<presetsKeys>(undefined!);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimension = useWindowDimension();
@@ -63,42 +67,17 @@ export default function Canvas(): VNode {
             <div className="flex flex-col">
                 <div className="flex flex-col my-1">
                     <label for="gap">Preset</label>
-                    <select>
-                        <optgroup label="Still life">
-                            <option>Square</option>
-                            <option>Bee-hive</option>
-                            <option>Loaf</option>
-                            <option>Tub</option>
-                            <option>Boat</option>
-                            <option>Ship</option>
-                        </optgroup>
-                        <optgroup label="Oscilators">
-                            <option>Blinker</option>
-                            <option>Toad</option>
-                            <option>Beacon</option>
-                            <option>Pulsar</option>
-                            <option>Penta-decathlon</option>
-                        </optgroup>
-                        <optgroup label="Spaceships">
-                            <option>glider</option>
-                            <option>
-                                Light-weight spaceship (LWSS)
-                            </option>
-                            <option>
-                                Middle-weight spaceship (MWSS)
-                            </option>
-                            <option>
-                                Heavy-weight spaceship (LWSS)
-                            </option>
-                        </optgroup>
-                        <optgroup label="Machines">
-                            <option>glider gun</option>
-                        </optgroup>
-                        <optgroup label="Long lasting">
-                            <option>F-pentomino</option>
-                            <option>acorn</option>
-                        </optgroup>
-                    </select>
+                    <Select
+                        id="Preset"
+                        groups={presetOptions}
+                        value={preset}
+                        onChange={(preset) => {
+                            setPreset(preset as presetsKeys);
+                            controller?.setPreset(
+                                preset as presetsKeys,
+                            );
+                        }}
+                    />
                 </div>
                 <div className="flex flex-col my-1">
                     <label for="gap">Gap</label>
@@ -109,7 +88,7 @@ export default function Canvas(): VNode {
                             max={5}
                             step={1}
                             value={model ? model.gap : 0}
-                            setValue={(gap) =>
+                            onChange={(gap) =>
                                 controller?.setGap(gap)}
                         />
                         <label className="w-6 text-center block">
@@ -128,7 +107,7 @@ export default function Canvas(): VNode {
                             max={100}
                             step={2}
                             value={model ? model.model.size : 0}
-                            setValue={(size) =>
+                            onChange={(size) =>
                                 controller?.setSize(size)}
                         />
                         <label className="w-6 text-center block">
@@ -145,7 +124,7 @@ export default function Canvas(): VNode {
                             max={20}
                             step={1}
                             value={model ? model.fps : 0}
-                            setValue={(fps) =>
+                            onChange={(fps) =>
                                 controller?.setFps(fps)}
                         />
                         <label className="w-6 text-center block">

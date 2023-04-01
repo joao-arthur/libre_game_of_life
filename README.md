@@ -17,4 +17,9 @@
 
 - presets
 - opengl
-- optimize iteration
+
+### v2
+
+    - optimize iteration, only need to calculate for alive neighborhoods
+    - infinite tiles, use chuncks or a Map
+    - user drag map

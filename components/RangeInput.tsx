@@ -6,16 +6,16 @@ type props = {
     readonly max: number;
     readonly step: number;
     readonly value: number;
-    readonly setValue: (newValue: number) => void;
+    readonly onChange: (newValue: number) => void;
 };
 
 export function RangeInput(
-    { id, min, max, step, value, setValue }: props,
+    { id, min, max, step, value, onChange }: props,
 ): VNode {
-    function handleSetValue(newValue: number): void {
+    function handleOnChange(newValue: number): void {
         if (newValue > max) return;
         if (newValue < min) return;
-        setValue(newValue);
+        onChange(newValue);
     }
 
     return (
@@ -28,7 +28,7 @@ export function RangeInput(
             step={String(step)}
             value={String(value)}
             onInput={(e) => {
-                handleSetValue(Number(e.currentTarget.value));
+                handleOnChange(Number(e.currentTarget.value));
             }}
         />
     );

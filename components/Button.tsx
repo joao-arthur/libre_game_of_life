@@ -1,7 +1,5 @@
 import { VNode } from "preact";
-import { Next } from "./Icons/Next.tsx";
-import { Pause } from "./Icons/Pause.tsx";
-import { Play } from "./Icons/Play.tsx";
+import { Icon } from "./Icon.tsx";
 
 type props = {
     readonly label: string;
@@ -15,9 +13,7 @@ export function Button({ label, onClick, icon }: props): VNode {
             className="bg-indigo-500 text-white shadow my-2 rounded flex justify-center gap-1"
             onClick={onClick}
         >
-            {icon === "next" ? <Next /> : null}
-            {icon === "pause" ? <Pause /> : null}
-            {icon === "play" ? <Play /> : null}
+            <Icon icon={icon} />
             {label}
         </button>
     );
