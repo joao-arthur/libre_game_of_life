@@ -31,6 +31,7 @@ export function Select(
             id={id}
             name={id}
         >
+            <option value={undefined}></option>
             {groups.map((group) => (
                 <optgroup label={group.label}>
                     {group.options.map((option) => (

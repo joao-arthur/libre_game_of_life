@@ -1,6 +1,5 @@
 import { modelFns, positionType, presets } from "../../game/mod.ts";
-import { SystemModel } from "../model/mod.ts";
-import { presetsKeys, presetsMap } from "../../game/mod.ts";
+import { SystemModel, systemModelType } from "../model/mod.ts";
 
 export class SystemController {
     constructor(private readonly systemModel: SystemModel) {}
@@ -38,13 +37,15 @@ export class SystemController {
     }
 
     public setPreset(
-        preset: presetsKeys,
+        preset: string,
     ): void {
-        const selectedPreset = presetsMap.get(preset);
+        const selectedPreset = presets.find(({ id }) =>
+            id === preset
+        );
         if (selectedPreset === undefined) {
             return;
         }
-        this.systemModel.setModel(selectedPreset);
+        this.systemModel.setModel(selectedPreset.model);
     }
 
     public setDimension(

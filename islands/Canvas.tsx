@@ -3,11 +3,10 @@ import { JSX, VNode } from "preact";
 import { Button } from "../components/Button.tsx";
 import { RangeInput } from "../components/RangeInput.tsx";
 import { Select } from "../components/Select.tsx";
-import { presetOptions } from "../components/presetOptions.ts";
 import { useWindowDimension } from "../hooks/useWindowDimension.ts";
 import { useGameOfLife } from "../hooks/useGameOfLife.ts";
 import { absoluteToRelative } from "../src/features/absoluteToRelative/absoluteToRelative.ts";
-import { presetsKeys } from "../src/game/mod.ts";
+import { buildPresetsOptions } from "../components/buildPresetsOptions.ts";
 
 export default function Canvas(): VNode {
     const {
@@ -15,7 +14,7 @@ export default function Canvas(): VNode {
         model,
         controller,
     } = useGameOfLife();
-    const [preset, setPreset] = useState<presetsKeys>(undefined!);
+    const [preset, setPreset] = useState<string>(undefined!);
 
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimension = useWindowDimension();
@@ -27,9 +26,16 @@ export default function Canvas(): VNode {
         init(canvasRef.current);
     }, []);
 
+    useEffect(() => {
+        if (!controller) return;
+        controller.setPreset("block");
+        setPreset("block");
+    }, [controller]);
+
     function onClick(
         e: JSX.TargetedMouseEvent<HTMLCanvasElement>,
     ): void {
+        if (!controller) return;
         if (!model) {
             return;
         }
@@ -40,7 +46,8 @@ export default function Canvas(): VNode {
         const column = absoluteToRelative(x, unitSize);
         const row = absoluteToRelative(y, unitSize);
 
-        controller?.toggleCell({ column, row });
+        controller.toggleCell({ column, row });
+        setPreset("");
     }
 
     function handleToggle(): void {
@@ -69,13 +76,11 @@ export default function Canvas(): VNode {
                     <label for="gap">Preset</label>
                     <Select
                         id="Preset"
-                        groups={presetOptions}
+                        groups={buildPresetsOptions()}
                         value={preset}
                         onChange={(preset) => {
-                            setPreset(preset as presetsKeys);
-                            controller?.setPreset(
-                                preset as presetsKeys,
-                            );
+                            setPreset(preset);
+                            controller?.setPreset(preset);
                         }}
                     />
                 </div>

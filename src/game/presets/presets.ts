@@ -1,9 +1,22 @@
-import { stillLife } from "./stillLife/mod.ts";
-import { oscilators } from "./oscilators/mod.ts";
-import { spaceShips } from "./spaceShips/mod.ts";
+import { boat } from "./stillLife/boat/boat.ts";
+import { block } from "./stillLife/general/block.ts";
 
-export const presets = {
-    stillLife,
-    oscilators,
-    spaceShips,
-} as const;
+import { blinker } from "./oscillators/general/blinker.ts";
+
+import { rPentomino } from "./methuselahs/general/rPentomino.ts";
+
+import { glider } from "./spaceships/general/glider.ts";
+
+import { gosperGliderGun } from "./gliderGun/general/gosperGliderGun.ts";
+
+import { puffer1 } from "./puffer/general/puffer1.ts";
+
+export const presets = [
+    boat,
+    block,
+    blinker,
+    rPentomino,
+    glider,
+    gosperGliderGun,
+    puffer1,
+] as const;
