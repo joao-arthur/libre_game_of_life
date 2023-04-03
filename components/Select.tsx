@@ -26,6 +26,7 @@ export function Select(
 
     return (
         <select
+            className="rounded px-2 py-1 my-1"
             value={value}
             onChange={(e) => handleOnChange(e.currentTarget.value)}
             id={id}
