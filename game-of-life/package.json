@@ -1,0 +1,21 @@
+{
+    "name": "game-of-life",
+    "author": "joao-arthur",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "prebuild": "tsc --project tsconfig.scripts.json && node ./dist/posts.js",
+        "build": "next build && next export",
+        "start": "next start",
+        "lint": "next lint --fix"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@types/react": "18.0.33",
+        "@typescript-eslint/eslint-plugin": "5.57.1",
+        "@typescript-eslint/parser": "5.57.1",
+        "eslint": "8.37.0",
+        "typescript": "5.0.3"
+    }
+}
