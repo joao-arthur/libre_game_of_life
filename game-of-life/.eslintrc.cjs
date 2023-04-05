@@ -1,8 +1,8 @@
-// eslint-disable-next-line no-undef
 module.exports = {
     env: {
         browser: true,
         es2022: true,
+        node: true,
     },
     extends: [
         'eslint:recommended',
@@ -28,7 +28,9 @@ module.exports = {
             },
         ],
         '@typescript-eslint/indent': ['error', 4],
-        'arrow-parens': ['error', 'as-needed'],
+        '@typescript-eslint/explicit-function-return-type': 'error',
+        '@typescript-eslint/no-extra-parens': 'error',
+        'arrow-parens': ['error', 'always'],
         'operator-linebreak': [
             'error',
             'after',
@@ -42,7 +44,7 @@ module.exports = {
         'no-implicit-globals': 'error',
         'default-case': 'off',
         'no-restricted-syntax': 'off',
-        curly: ['error', 'multi'],
+        curly: ['error', 'all'],
         'nonblock-statement-body-position': ['error', 'below'],
         'object-curly-newline': ['error', {
             ObjectExpression: {
@@ -62,10 +64,18 @@ module.exports = {
             },
         }],
         'linebreak-style': ['error', 'unix'],
-        quotes: ['error', 'single'],
+        quotes: ['error', 'double'],
         semi: ['error', 'always'],
         'eol-last': ['error', 'always'],
         'comma-dangle': ['error', 'always-multiline'],
         'quote-props': ['error', 'as-needed'],
+        'max-len': ['error', {
+            code: 70,
+            tabWidth: 4,
+            ignoreComments: true,
+            ignoreStrings: true,
+        }],
+        'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 1 }],
+        'max-statements-per-line': ['error', { max: 1 }],
     },
 };

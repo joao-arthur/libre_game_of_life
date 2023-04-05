@@ -1,6 +1,6 @@
-import { modelFns } from "../../../model/mod.ts";
-import { methuselahs } from "../../groups.ts";
-import { presetType } from "../../preset.ts";
+import { modelFns } from "../../../model/mod.js";
+import { methuselahs } from "../../groups.js";
+import { presetType } from "../../preset.js";
 
 export const rPentomino: presetType = {
     name: "R-Pentomino",

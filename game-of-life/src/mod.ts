@@ -1,6 +1,6 @@
-export type { modelType, positionType } from "./model/mod.ts";
-export type { aliveNeighborsType } from "./neighbors/mod.ts";
+export type { modelType, positionType } from "./model/mod.js";
+export type { aliveNeighborsType } from "./neighbors/mod.js";
 
-export { cellFns, stateType } from "./cell/mod.ts";
-export { modelFns } from "./model/mod.ts";
-export { presets } from "./presets/mod.ts";
+export { cellFns, stateType } from "./cell/mod.js";
+export { modelFns } from "./model/mod.js";
+export { presets } from "./presets/mod.js";

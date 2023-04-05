@@ -1,8 +1,8 @@
-import { pipe } from "https://deno.land/x/funis@v1.0.2/mod.ts";
-import { cellFns } from "../../cell/mod.ts";
-import { neighborsFns } from "../../neighbors/mod.ts";
-import { map } from "../map/mod.ts";
-import { modelType } from "../model.ts";
+import { pipe } from "https://deno.land/x/funis@v1.0.2/mod.js";
+import { cellFns } from "../../cell/mod.js";
+import { neighborsFns } from "../../neighbors/mod.js";
+import { map } from "../map/mod.js";
+import { modelType } from "../model.js";
 
 export function iterate(
     model: modelType,

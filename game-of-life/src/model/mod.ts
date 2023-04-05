@@ -1,4 +1,4 @@
-export type { modelType } from "./model.ts";
-export type { positionType } from "./position.ts";
+export type { modelType } from "./model.js";
+export type { positionType } from "./position.js";
 
-export { modelFns } from "./modelFns.ts";
+export { modelFns } from "./modelFns.js";

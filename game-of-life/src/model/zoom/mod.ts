@@ -1,1 +1,1 @@
-export { zoom } from "./zoom.ts";
+export { zoom } from "./zoom.js";

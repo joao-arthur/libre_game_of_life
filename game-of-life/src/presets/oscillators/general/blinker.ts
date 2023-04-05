@@ -1,6 +1,6 @@
-import { modelFns } from "../../../model/mod.ts";
-import { oscillators } from "../../groups.ts";
-import { presetType } from "../../preset.ts";
+import { modelFns } from "../../../model/mod.js";
+import { oscillators } from "../../groups.js";
+import { presetType } from "../../preset.js";
 
 export const blinker: presetType = {
     name: "Blinker",

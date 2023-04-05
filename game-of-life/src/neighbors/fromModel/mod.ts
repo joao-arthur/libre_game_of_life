@@ -1,1 +1,1 @@
-export { fromModel } from "./fromModel.ts";
+export { fromModel } from "./fromModel.js";

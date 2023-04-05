@@ -1,11 +1,11 @@
-import { aVerage } from "./aVerage.ts";
-import { airforce } from "./airforce.ts";
-import { beacon } from "./beacon.ts";
-import { blinker } from "./blinker.ts";
-import { oneZeroOne } from "./oneZeroOne.ts";
-import { pentaDecathlon } from "./pentaDecathlon.ts";
-import { pulsar } from "./pulsar.ts";
-import { toad } from "./toad.ts";
+import { aVerage } from "./aVerage.js";
+import { airforce } from "./airforce.js";
+import { beacon } from "./beacon.js";
+import { blinker } from "./blinker.js";
+import { oneZeroOne } from "./oneZeroOne.js";
+import { pentaDecathlon } from "./pentaDecathlon.js";
+import { pulsar } from "./pulsar.js";
+import { toad } from "./toad.js";
 
 export const oscilators = {
     aVerage,

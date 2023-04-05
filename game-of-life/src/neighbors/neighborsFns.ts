@@ -1,4 +1,4 @@
-import { aliveFromModel } from "./aliveFromModel/mod.ts";
+import { aliveFromModel } from "./aliveFromModel/mod.js";
 
 export const neighborsFns = {
     aliveFromModel,

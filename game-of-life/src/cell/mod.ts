@@ -1,2 +1,2 @@
-export { stateType } from "./state.ts";
-export { cellFns } from "./cellFns.ts";
+export { stateType } from "./state.js";
+export { cellFns } from "./cellFns.js";

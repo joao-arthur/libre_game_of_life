@@ -1,6 +1,6 @@
-import { modelFns } from "../../../model/mod.ts";
-import { stillLife } from "../../groups.ts";
-import { presetType } from "../../preset.ts";
+import { modelFns } from "../../../model/mod.js";
+import { stillLife } from "../../groups.js";
+import { presetType } from "../../preset.js";
 
 export const block: presetType = {
     name: "Block",

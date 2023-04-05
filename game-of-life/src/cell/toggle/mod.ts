@@ -1,1 +1,1 @@
-export { toggle } from "./toggle.ts";
+export { toggle } from "./toggle.js";

@@ -1,6 +1,6 @@
-import { modelType } from "../model.ts";
-import { zoomOut } from "../zoomOut/mod.ts";
-import { zoomIn } from "../zoomIn/mod.ts";
+import { modelType } from "../model.js";
+import { zoomOut } from "../zoomOut/mod.js";
+import { zoomIn } from "../zoomIn/mod.js";
 
 export function zoom(model: modelType, newSize: number): modelType {
     if (newSize > model.size) {

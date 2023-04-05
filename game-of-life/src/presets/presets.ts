@@ -1,15 +1,15 @@
-import { boat } from "./stillLife/boat/boat.ts";
-import { block } from "./stillLife/general/block.ts";
+import { boat } from "./stillLife/boat/boat.js";
+import { block } from "./stillLife/general/block.js";
 
-import { blinker } from "./oscillators/general/blinker.ts";
+import { blinker } from "./oscillators/general/blinker.js";
 
-import { rPentomino } from "./methuselahs/general/rPentomino.ts";
+import { rPentomino } from "./methuselahs/general/rPentomino.js";
 
-import { glider } from "./spaceships/general/glider.ts";
+import { glider } from "./spaceships/general/glider.js";
 
-import { gosperGliderGun } from "./gliderGun/general/gosperGliderGun.ts";
+import { gosperGliderGun } from "./gliderGun/general/gosperGliderGun.js";
 
-import { puffer1 } from "./puffer/general/puffer1.ts";
+import { puffer1 } from "./puffer/general/puffer1.js";
 
 export const presets = [
     boat,

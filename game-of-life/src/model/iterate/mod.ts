@@ -1,1 +1,1 @@
-export { iterate } from "./iterate.ts";
+export { iterate } from "./iterate.js";

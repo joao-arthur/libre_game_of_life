@@ -1,7 +1,7 @@
-import { cellFns } from "../../cell/mod.ts";
-import { positionType } from "../position.ts";
-import { modelType } from "../model.ts";
-import { map } from "../map/mod.ts";
+import { cellFns } from "../../cell/mod.js";
+import { positionType } from "../position.js";
+import { modelType } from "../model.js";
+import { map } from "../map/mod.js";
 
 export function toggle(
     model: modelType,

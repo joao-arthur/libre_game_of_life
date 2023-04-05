@@ -1,6 +1,6 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../state.ts";
-import { iterate } from "./iterate.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { stateType } from "../state.js";
+import { iterate } from "./iterate.js";
 
 Deno.test("Any live cell with fewer than two live neighbours dies", () => {
     assertEquals(iterate(stateType.ALIVE, 0), stateType.DEAD);

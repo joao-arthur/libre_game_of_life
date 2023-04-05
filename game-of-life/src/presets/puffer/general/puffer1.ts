@@ -1,6 +1,6 @@
-import { modelFns } from "../../../model/mod.ts";
-import { gliderGun } from "../../groups.ts";
-import { presetType } from "../../preset.ts";
+import { modelFns } from "../../../model/mod.js";
+import { gliderGun } from "../../groups.js";
+import { presetType } from "../../preset.js";
 
 export const puffer1: presetType = {
     name: "Puffer 1",

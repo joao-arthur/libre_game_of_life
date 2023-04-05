@@ -1,10 +1,10 @@
-import { fromString } from "./fromString/mod.ts";
-import { getValue } from "./getValue/mod.ts";
-import { map } from "./map/mod.ts";
-import { forEach } from "./forEach/mod.ts";
-import { iterate } from "./iterate/mod.ts";
-import { toggle } from "./toggle/mod.ts";
-import { zoom } from "./zoom/mod.ts";
+import { fromString } from "./fromString/mod.js";
+import { getValue } from "./getValue/mod.js";
+import { map } from "./map/mod.js";
+import { forEach } from "./forEach/mod.js";
+import { iterate } from "./iterate/mod.js";
+import { toggle } from "./toggle/mod.js";
+import { zoom } from "./zoom/mod.js";
 
 export const modelFns = {
     fromString,

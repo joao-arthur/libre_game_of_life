@@ -1,4 +1,4 @@
-import { stateType } from "../cell/mod.ts";
+import { stateType } from "../cell/mod.js";
 
 export type modelType = {
     readonly size: number;

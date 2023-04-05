@@ -1,15 +1,15 @@
-import { barge } from "./barge.ts";
-import { beeHive } from "./beeHive.ts";
-import { biLoaf } from "./biLoaf.ts";
-import { boat } from "./boat.ts";
-import { circle } from "./circle.ts";
-import { fishHook } from "./fishHook.ts";
-import { loaf } from "./loaf.ts";
-import { longBoat } from "./longBoat.ts";
-import { longShip } from "./longShip.ts";
-import { ship } from "./ship.ts";
-import { square } from "./square.ts";
-import { tub } from "./tub.ts";
+import { barge } from "./barge.js";
+import { beeHive } from "./beeHive.js";
+import { biLoaf } from "./biLoaf.js";
+import { boat } from "./boat.js";
+import { circle } from "./circle.js";
+import { fishHook } from "./fishHook.js";
+import { loaf } from "./loaf.js";
+import { longBoat } from "./longBoat.js";
+import { longShip } from "./longShip.js";
+import { ship } from "./ship.js";
+import { square } from "./square.js";
+import { tub } from "./tub.js";
 
 export const stillLife = {
     barge,

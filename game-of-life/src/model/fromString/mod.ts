@@ -1,1 +1,1 @@
-export { fromString } from "./fromString.ts";
+export { fromString } from "./fromString.js";

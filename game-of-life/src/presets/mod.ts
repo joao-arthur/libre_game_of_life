@@ -1,1 +1,1 @@
-export { presets } from "./presets.ts";
+export { presets } from "./presets.js";

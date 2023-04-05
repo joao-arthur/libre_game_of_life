@@ -1,1 +1,1 @@
-export { forEach } from "./forEach.ts";
+export { forEach } from "./forEach.js";

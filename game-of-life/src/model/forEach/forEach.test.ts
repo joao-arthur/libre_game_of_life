@@ -1,7 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../../cell/mod.ts";
-import { fromString } from "../fromString/mod.ts";
-import { forEach } from "./forEach.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { stateType } from "../../cell/mod.js";
+import { fromString } from "../fromString/mod.js";
+import { forEach } from "./forEach.js";
 
 Deno.test("forEach", () => {
     const values1: stateType[][] = [[]];

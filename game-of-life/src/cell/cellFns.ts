@@ -1,5 +1,5 @@
-import { iterate } from "./iterate/mod.ts";
-import { toggle } from "./toggle/mod.ts";
+import { iterate } from "./iterate/mod.js";
+import { toggle } from "./toggle/mod.js";
 
 export const cellFns = {
     iterate,

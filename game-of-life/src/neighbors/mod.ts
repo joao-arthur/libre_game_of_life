@@ -1,3 +1,3 @@
-export type { aliveNeighborsType } from "./aliveNeighbors.ts";
+export type { aliveNeighborsType } from "./aliveNeighbors.js";
 
-export { neighborsFns } from "./neighborsFns.ts";
+export { neighborsFns } from "./neighborsFns.js";

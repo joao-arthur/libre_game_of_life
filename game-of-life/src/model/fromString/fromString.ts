@@ -1,5 +1,5 @@
-import { stateType } from "../../cell/mod.ts";
-import { modelType } from "../model.ts";
+import { stateType } from "../../cell/mod.js";
+import { modelType } from "../model.js";
 
 export function fromString(stringValue: string[]): modelType {
     return {
@@ -14,7 +14,7 @@ export function fromString(stringValue: string[]): modelType {
                     default:
                         return undefined!;
                 }
-            })
+            }),
         ),
         iteration: 0,
     };

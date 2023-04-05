@@ -1,6 +1,6 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../../cell/state.ts";
-import { numberOfAlive } from "./numberOfAlive.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { stateType } from "../../cell/state.js";
+import { numberOfAlive } from "./numberOfAlive.js";
 
 Deno.test("Should return the number of alive neighbors", () => {
     assertEquals(

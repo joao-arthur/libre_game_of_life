@@ -2,8 +2,8 @@ import {
     modelFns,
     modelType,
     positionType,
-} from "../../model/mod.ts";
-import { neighborsType } from "../neighbors.ts";
+} from "../../model/mod.js";
+import { neighborsType } from "../neighbors.js";
 
 export function fromModel(
     model: modelType,

@@ -1,6 +1,6 @@
-import { stateType } from "../../cell/mod.ts";
-import { modelType } from "../model.ts";
-import { positionType } from "../position.ts";
+import { stateType } from "../../cell/mod.js";
+import { modelType } from "../model.js";
+import { positionType } from "../position.js";
 
 type cbType = (position: positionType, state: stateType) => stateType;
 
@@ -12,8 +12,8 @@ export function map(
         ...model,
         value: model.value.map((row, rowIndex) =>
             row.map((state, columnIndex) =>
-                cb({ row: rowIndex, column: columnIndex }, state)
-            )
+                cb({ row: rowIndex, column: columnIndex }, state),
+            ),
         ),
     };
 }

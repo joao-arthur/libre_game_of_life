@@ -1,1 +1,1 @@
-export { longLasting } from "./longLasting.ts";
+export { longLasting } from "./longLasting.js";

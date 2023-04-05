@@ -1,5 +1,5 @@
-import { fromString } from "../fromString/mod.ts";
-import { modelType } from "../model.ts";
+import { fromString } from "../fromString/mod.js";
+import { modelType } from "../model.js";
 
 export function zoomIn(model: modelType, amount: number): modelType {
     if (amount * 2 >= model.size) {
@@ -11,8 +11,8 @@ export function zoomIn(model: modelType, amount: number): modelType {
             .slice(amount, model.size - amount)
             .map((row) =>
                 row.filter((_, index) =>
-                    index >= amount && model.size - index > amount
-                )
+                    index >= amount && model.size - index > amount,
+                ),
             ),
         iteration: model.iteration,
     };

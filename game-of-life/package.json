@@ -1,21 +1,35 @@
 {
     "name": "game-of-life",
+    "description": "Conway's game of life processor",
     "author": "joao-arthur",
     "version": "1.0.0",
     "private": true,
-    "scripts": {
-        "dev": "next dev",
-        "prebuild": "tsc --project tsconfig.scripts.json && node ./dist/posts.js",
-        "build": "next build && next export",
-        "start": "next start",
-        "lint": "next lint --fix"
+    "type": "module",
+    "engines": {
+        "node": ">=18.7.0"
     },
-    "dependencies": {},
+    "exports": {
+        ".": {
+            "import": "./dist/mod.js",
+            "require": "./dist/mod.js",
+            "types": "./dist/mod.d.js"
+        }
+    },
+    "scripts": {
+        "test": "vitest run",
+        "test:cov": "vitest run --coverage",
+        "lint": "eslint \"./src/**/*.ts\" --fix",
+        "build": "tsc"
+    },
     "devDependencies": {
-        "@types/react": "18.0.33",
-        "@typescript-eslint/eslint-plugin": "5.57.1",
-        "@typescript-eslint/parser": "5.57.1",
-        "eslint": "8.37.0",
-        "typescript": "5.0.3"
+        "@typescript-eslint/eslint-plugin": "^5.57.0",
+        "@typescript-eslint/parser": "^5.57.0",
+        "@vitest/coverage-c8": "^0.29.8",
+        "c8": "^7.13.0",
+        "eslint": "^8.37.0",
+        "eslint-plugin-import": "^2.27.5",
+        "typescript": "^5.0.3",
+        "vite": "^4.2.1",
+        "vitest": "^0.29.8"
     }
 }

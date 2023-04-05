@@ -1,4 +1,4 @@
-import { modelType } from "../model/mod.ts";
+import { modelType } from "../model/mod.js";
 
 export type presetType = {
     readonly name: string;

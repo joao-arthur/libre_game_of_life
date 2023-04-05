@@ -1,6 +1,6 @@
-import { stateType } from "../../cell/mod.ts";
-import { neighborsType } from "../neighbors.ts";
-import { aliveNeighborsType } from "../aliveNeighbors.ts";
+import { stateType } from "../../cell/mod.js";
+import { neighborsType } from "../neighbors.js";
+import { aliveNeighborsType } from "../aliveNeighbors.js";
 
 export function numberOfAlive(
     neighbors: neighborsType,

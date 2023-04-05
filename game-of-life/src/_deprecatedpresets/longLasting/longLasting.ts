@@ -1,6 +1,6 @@
-import { acorn } from "./acorn.ts";
-import { diehard } from "./diehard.ts";
-import { fPentomino } from "./fPentomino.ts";
+import { acorn } from "./acorn.js";
+import { diehard } from "./diehard.js";
+import { fPentomino } from "./fPentomino.js";
 
 export const longLasting = {
     acorn,

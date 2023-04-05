@@ -1,6 +1,6 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { fromString } from "../fromString/mod.ts";
-import { zoomOut } from "./zoomOut.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { fromString } from "../fromString/mod.js";
+import { zoomOut } from "./zoomOut.js";
 
 const model = fromString(["⬜"]);
 

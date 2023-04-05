@@ -1,1 +1,1 @@
-export { aliveFromModel } from "./aliveFromModel.ts";
+export { aliveFromModel } from "./aliveFromModel.js";

@@ -1,8 +1,8 @@
-import { stillLife } from "./stillLife/mod.ts";
-import { oscilators } from "./oscilators/mod.ts";
-import { spaceShips } from "./spaceShips/mod.ts";
-import { longLasting } from "./longLasting/mod.ts";
-import { machines } from "./machines/mod.ts";
+import { stillLife } from "./stillLife/mod.js";
+import { oscilators } from "./oscilators/mod.js";
+import { spaceShips } from "./spaceShips/mod.js";
+import { longLasting } from "./longLasting/mod.js";
+import { machines } from "./machines/mod.js";
 
 export const presetsMap = new Map(
     [
@@ -38,6 +38,6 @@ export const presetsMap = new Map(
 );
 
 type KeyOfMap<M extends Map<unknown, unknown>> = M extends
-    Map<infer K, unknown> ? K : never;
+Map<infer K, unknown> ? K : never;
 
 export type presetsKeys = KeyOfMap<typeof presetsMap>;

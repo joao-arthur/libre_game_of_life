@@ -1,4 +1,4 @@
-import { stateType } from "../state.ts";
+import { stateType } from "../state.js";
 
 export function toggle(
     state: stateType,

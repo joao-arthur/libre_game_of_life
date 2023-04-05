@@ -1,5 +1,5 @@
-import { aliveNeighborsType } from "../../neighbors/aliveNeighbors.ts";
-import { stateType } from "../state.ts";
+import { aliveNeighborsType } from "../../neighbors/aliveNeighbors.js";
+import { stateType } from "../state.js";
 
 export function iterate(
     state: stateType,

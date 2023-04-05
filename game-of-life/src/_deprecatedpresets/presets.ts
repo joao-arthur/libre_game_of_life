@@ -1,6 +1,6 @@
-import { stillLife } from "./stillLife/mod.ts";
-import { oscilators } from "./oscilators/mod.ts";
-import { spaceShips } from "./spaceShips/mod.ts";
+import { stillLife } from "./stillLife/mod.js";
+import { oscilators } from "./oscilators/mod.js";
+import { spaceShips } from "./spaceShips/mod.js";
 
 export const presets = {
     stillLife,

@@ -1,6 +1,6 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { stateType } from "../../cell/mod.ts";
-import { fromString } from "./fromString.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { stateType } from "../../cell/mod.js";
+import { fromString } from "./fromString.js";
 
 Deno.test("fromString", () => {
     assertEquals(

@@ -1,1 +1,1 @@
-export { map } from "./map.ts";
+export { map } from "./map.js";

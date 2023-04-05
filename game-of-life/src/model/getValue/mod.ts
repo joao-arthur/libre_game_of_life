@@ -1,1 +1,1 @@
-export { getValue } from "./getValue.ts";
+export { getValue } from "./getValue.js";

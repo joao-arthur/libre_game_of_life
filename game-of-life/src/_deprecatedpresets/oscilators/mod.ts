@@ -1,1 +1,1 @@
-export { oscilators } from "./oscilators.ts";
+export { oscilators } from "./oscilators.js";

@@ -1,1 +1,1 @@
-export { numberOfAlive } from "./numberOfAlive.ts";
+export { numberOfAlive } from "./numberOfAlive.js";

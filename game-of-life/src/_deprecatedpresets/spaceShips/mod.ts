@@ -1,1 +1,1 @@
-export { spaceShips } from "./spaceShips.ts";
+export { spaceShips } from "./spaceShips.js";

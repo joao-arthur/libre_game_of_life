@@ -1,4 +1,4 @@
-import { gliderGun } from "./gliderGun.ts";
+import { gliderGun } from "./gliderGun.js";
 
 export const machines = {
     gliderGun,

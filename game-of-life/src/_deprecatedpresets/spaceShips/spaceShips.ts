@@ -1,7 +1,7 @@
-import { glider } from "./glider.ts";
-import { hwss } from "./hwss.ts";
-import { lwss } from "./lwss.ts";
-import { mwss } from "./mwss.ts";
+import { glider } from "./glider.js";
+import { hwss } from "./hwss.js";
+import { lwss } from "./lwss.js";
+import { mwss } from "./mwss.js";
 
 export const spaceShips = {
     glider,

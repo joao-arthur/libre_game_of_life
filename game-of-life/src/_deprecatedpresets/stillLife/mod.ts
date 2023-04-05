@@ -1,1 +1,1 @@
-export { stillLife } from "./stillLife.ts";
+export { stillLife } from "./stillLife.js";

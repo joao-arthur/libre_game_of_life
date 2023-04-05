@@ -1,6 +1,6 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { fromString } from "../../model/fromString/mod.ts";
-import { aliveFromModel } from "./aliveFromModel.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { fromString } from "../../model/fromString/mod.js";
+import { aliveFromModel } from "./aliveFromModel.js";
 
 Deno.test("Should return the number of alive neighbors from the model", () => {
     assertEquals(

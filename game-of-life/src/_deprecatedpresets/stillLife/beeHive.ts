@@ -1,4 +1,4 @@
-import { modelFns } from "../../model/mod.ts";
+import { modelFns } from "../../model/mod.js";
 
 export const beeHive = modelFns.fromString([
     "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
