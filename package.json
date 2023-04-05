@@ -1,0 +1,36 @@
+{
+  "name": "game-of-life-app",
+  "author": "joao-arthur",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "tsc --project tsconfig.scripts.json && node ./dist/posts.js",
+    "build": "next build && next export",
+    "start": "next start",
+    "lint": "next lint --fix"
+  },
+  "dependencies": {
+    "classnames": "^2.3.2",
+    "next": "13.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-icons": "^4.8.0",
+    "react-markdown": "^8.0.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
+    "@types/node": "18.15.11",
+    "@types/react": "18.0.33",
+    "@typescript-eslint/eslint-plugin": "5.57.1",
+    "@typescript-eslint/parser": "5.57.1",
+    "autoprefixer": "^10.4.14",
+    "eslint": "8.37.0",
+    "eslint-config-next": "13.2.4",
+    "eslint-plugin-react": "7.32.2",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.3.1",
+    "typescript": "5.0.3"
+  }
+}

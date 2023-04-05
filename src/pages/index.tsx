@@ -8,7 +8,7 @@ import { useGameOfLife } from "../hooks/useGameOfLife.ts";
 import { absoluteToRelative } from "../src/features/absoluteToRelative/absoluteToRelative.ts";
 import { buildPresetsOptions } from "../components/buildPresetsOptions.ts";
 
-export default function Canvas(): VNode {
+export default function Main(): VNode {
     const {
         init,
         model,
@@ -59,7 +59,7 @@ export default function Canvas(): VNode {
     }
 
     return (
-        <>
+  <main class="w-screen h-screen flex">
             <canvas
                 onClick={onClick}
                 className="m-auto"
@@ -157,6 +157,6 @@ export default function Canvas(): VNode {
                     onClick={() => controller?.singleIteration()}
                 />
             </div>
-        </>
+              </main>
     );
 }

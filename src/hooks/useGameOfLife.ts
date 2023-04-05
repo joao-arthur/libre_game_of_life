@@ -4,7 +4,7 @@ import {
     useRef,
     useState,
 } from "preact/hooks";
-import { useWindowDimension } from "../hooks/useWindowDimension.ts";
+import { useWindowDimension } from "./useWindowDimension.ts";
 import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
 import {
     buildModel,
