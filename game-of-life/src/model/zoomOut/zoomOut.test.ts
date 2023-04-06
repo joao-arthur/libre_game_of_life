@@ -1,62 +1,64 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { describe, expect, it } from "vitest";
 import { fromString } from "../fromString/mod.js";
 import { zoomOut } from "./zoomOut.js";
 
 const model = fromString(["⬜"]);
 
-Deno.test("zoomOut", () => {
-    assertEquals(
-        zoomOut(model, 1),
-        fromString([
-            "⬛⬛⬛",
-            "⬛⬜⬛",
-            "⬛⬛⬛",
-        ]),
-    );
-    assertEquals(
-        zoomOut(model, 2),
-        fromString([
-            "⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬛⬛",
-            "⬛⬛⬜⬛⬛",
-            "⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬛⬛",
-        ]),
-    );
-    assertEquals(
-        zoomOut(model, 3),
-        fromString([
-            "⬛⬛⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬜⬛⬛⬛",
-            "⬛⬛⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬛⬛⬛⬛",
-            "⬛⬛⬛⬛⬛⬛⬛",
-        ]),
-    );
-    assertEquals(
-        zoomOut(fromString([""]), 2),
-        fromString([
-            "⬛⬛⬛⬛",
-            "⬛⬛⬛⬛",
-            "⬛⬛⬛⬛",
-            "⬛⬛⬛⬛",
-        ]),
-    );
-    assertEquals(
-        zoomOut(
+describe("zoomOut",()=> {
+    it("zoomOut", () => {
+        expect(
+            zoomOut(model, 1)).toEqual(
             fromString([
-                "⬜⬜",
-                "⬛⬜",
+                "⬛⬛⬛",
+                "⬛⬜⬛",
+                "⬛⬛⬛",
             ]),
-            1,
-        ),
-        fromString([
-            "⬛⬛⬛⬛",
-            "⬛⬜⬜⬛",
-            "⬛⬛⬜⬛",
-            "⬛⬛⬛⬛",
-        ]),
-    );
+        );
+        expect(
+            zoomOut(model, 2)).toEqual(
+            fromString([
+                "⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛",
+                "⬛⬛⬜⬛⬛",
+                "⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛",
+            ]),
+        );
+        expect(
+            zoomOut(model, 3)).toEqual(
+            fromString([
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+            ]),
+        );
+        expect(
+            zoomOut(fromString([""]), 2)).toEqual(
+            fromString([
+                "⬛⬛⬛⬛",
+                "⬛⬛⬛⬛",
+                "⬛⬛⬛⬛",
+                "⬛⬛⬛⬛",
+            ]),
+        );
+        expect(
+            zoomOut(
+                fromString([
+                    "⬜⬜",
+                    "⬛⬜",
+                ]),
+                1,
+            )).toEqual(
+            fromString([
+                "⬛⬛⬛⬛",
+                "⬛⬜⬜⬛",
+                "⬛⬛⬜⬛",
+                "⬛⬛⬛⬛",
+            ]),
+        );
+    });
 });

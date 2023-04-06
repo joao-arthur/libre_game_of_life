@@ -1,8 +1,10 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { describe, expect, it } from "vitest";
 import { stateType } from "../state.js";
 import { toggle } from "./toggle.js";
 
-Deno.test("Should toggle cell", () => {
-    assertEquals(toggle(stateType.ALIVE), stateType.DEAD);
-    assertEquals(toggle(stateType.DEAD), stateType.ALIVE);
+describe("toggle", ()=> {
+    it("Should toggle cell", () => {
+        expect(toggle(stateType.ALIVE)).toBe(stateType.DEAD);
+        expect(toggle(stateType.DEAD)).toBe(stateType.ALIVE);
+    });
 });

@@ -1,54 +1,57 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.js";
+import { describe, expect, it } from "vitest";
 import { stateType } from "../../cell/mod.js";
 import { fromString } from "../fromString/mod.js";
 import { map } from "./map.js";
 
-Deno.test("map", () => {
-    assertEquals(
-        map(
+describe("map", ()=> {
+
+    it("map", () => {
+        expect(
+            map(
+                fromString([
+                    "⬛⬜",
+                    "⬜⬛",
+                    "⬛⬜",
+                ]),
+                ({ row }) => row > 0 ? stateType.DEAD : stateType.ALIVE,
+            )).toEqual(
             fromString([
-                "⬛⬜",
-                "⬜⬛",
-                "⬛⬜",
+                "⬜⬜",
+                "⬛⬛",
+                "⬛⬛",
             ]),
-            ({ row }) => row > 0 ? stateType.DEAD : stateType.ALIVE,
-        ),
-        fromString([
-            "⬜⬜",
-            "⬛⬛",
-            "⬛⬛",
-        ]),
-    );
-    assertEquals(
-        map(
+        );
+        expect(
+            map(
+                fromString([
+                    "⬛⬜⬛",
+                    "⬜⬛⬜",
+                ]),
+                ({ column }) =>
+                    column > 0 ? stateType.DEAD : stateType.ALIVE,
+            )).toEqual(
             fromString([
-                "⬛⬜⬛",
-                "⬜⬛⬜",
+                "⬜⬛⬛",
+                "⬜⬛⬛",
             ]),
-            ({ column }) =>
-                column > 0 ? stateType.DEAD : stateType.ALIVE,
-        ),
-        fromString([
-            "⬜⬛⬛",
-            "⬜⬛⬛",
-        ]),
-    );
-    assertEquals(
-        map(
+        );
+        expect(
+            map(
+                fromString([
+                    "⬛⬜⬛",
+                    "⬜⬛⬜",
+                    "⬛⬜⬛",
+                ]),
+                ({ row, column }) =>
+                    row > 1 || column > 1
+                        ? stateType.DEAD
+                        : stateType.ALIVE,
+            )).toEqual(
             fromString([
-                "⬛⬜⬛",
-                "⬜⬛⬜",
-                "⬛⬜⬛",
+                "⬜⬜⬛",
+                "⬜⬜⬛",
+                "⬛⬛⬛",
             ]),
-            ({ row, column }) =>
-                row > 1 || column > 1
-                    ? stateType.DEAD
-                    : stateType.ALIVE,
-        ),
-        fromString([
-            "⬜⬜⬛",
-            "⬜⬜⬛",
-            "⬛⬛⬛",
-        ]),
-    );
+        );
+    });
 });
