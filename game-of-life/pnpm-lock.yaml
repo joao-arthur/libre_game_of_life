@@ -7,9 +7,13 @@ specifiers:
   c8: ^7.13.0
   eslint: ^8.37.0
   eslint-plugin-import: ^2.27.5
+  funis: 1.0.2
   typescript: ^5.0.3
   vite: ^4.2.1
   vitest: ^0.29.8
+
+dependencies:
+  funis: 1.0.2
 
 devDependencies:
   '@typescript-eslint/eslint-plugin': 5.57.1_jwd5v5vphzanfmajybkjq25ld4
@@ -1231,6 +1235,11 @@ packages:
   /functions-have-names/1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /funis/1.0.2:
+    resolution: {integrity: sha512-OjuODcGEnQ9p63ENl+M7n/pJTjJ1wP1jCo4aqOrHWvlxibkK+TVpAdhHB/qID4dEunE6+kFwKIAhd55cakMKAA==}
+    engines: {node: '>=18.7.0'}
+    dev: false
 
   /get-caller-file/2.0.5:
     resolution: {integrity: sha512-DyFP3BM/3YHTQOCUL/w0OZHR0lpKeGrxotcHWcqNEdnltqFwXVfhEBQ94eIo34AfQpo0rGki4cyIiftY06h2Fg==}

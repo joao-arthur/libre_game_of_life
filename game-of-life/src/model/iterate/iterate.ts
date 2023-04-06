@@ -1,4 +1,4 @@
-import { pipe } from "https://deno.land/x/funis@v1.0.2/mod.js";
+import { pipe } from "funis";
 import { cellFns } from "../../cell/mod.js";
 import { neighborsFns } from "../../neighbors/mod.js";
 import { map } from "../map/mod.js";

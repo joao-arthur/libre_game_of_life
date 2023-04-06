@@ -1,4 +1,4 @@
-import { pipe } from "https://deno.land/x/funis@v1.0.2/mod.js";
+import { pipe } from "funis";
 import { aliveNeighborsType } from "../aliveNeighbors.js";
 import { fromModel } from "../fromModel/mod.js";
 import { modelType } from "../../model/mod.js";
