@@ -11,8 +11,8 @@ export function zoomIn(model: modelType, amount: number): modelType {
             .slice(amount, model.size - amount)
             .map((row) =>
                 row.filter((_, index) =>
-                    index >= amount && model.size - index > amount,
-                ),
+                    index >= amount && model.size - index > amount
+                )
             ),
         iteration: model.iteration,
     };

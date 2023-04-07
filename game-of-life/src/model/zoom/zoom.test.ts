@@ -8,47 +8,50 @@ const model = fromString([
     "⬜⬛⬜",
 ]);
 
-describe("zoom", ()=> {
-    it("zoom", () => {
-        expect(
-            zoom(model, 1)).toEqual(
-            fromString([
-                "⬜",
-            ]),
-        );
-        expect(
-            zoom(model, 2)).toEqual(
-            fromString([
-                "⬜",
-            ]),
-        );
-        expect(
-            zoom(model, 3)).toEqual(
-            fromString([
-                "⬛⬜⬛",
-                "⬜⬜⬜",
-                "⬜⬛⬜",
-            ]),
-        );
-        expect(
-            zoom(model, 4)).toEqual(
-            fromString([
-                "⬛⬛⬛⬛⬛",
-                "⬛⬛⬜⬛⬛",
-                "⬛⬜⬜⬜⬛",
-                "⬛⬜⬛⬜⬛",
-                "⬛⬛⬛⬛⬛",
-            ]),
-        );
-        expect(
-            zoom(model, 5)).toEqual(
-            fromString([
-                "⬛⬛⬛⬛⬛",
-                "⬛⬛⬜⬛⬛",
-                "⬛⬜⬜⬜⬛",
-                "⬛⬜⬛⬜⬛",
-                "⬛⬛⬛⬛⬛",
-            ]),
-        );
-    });
+it("zoom", () => {
+    expect(
+        zoom(model, 1),
+    ).toEqual(
+        fromString([
+            "⬜",
+        ]),
+    );
+    expect(
+        zoom(model, 2),
+    ).toEqual(
+        fromString([
+            "⬜",
+        ]),
+    );
+    expect(
+        zoom(model, 3),
+    ).toEqual(
+        fromString([
+            "⬛⬜⬛",
+            "⬜⬜⬜",
+            "⬜⬛⬜",
+        ]),
+    );
+    expect(
+        zoom(model, 4),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬜⬜⬜⬛",
+            "⬛⬜⬛⬜⬛",
+            "⬛⬛⬛⬛⬛",
+        ]),
+    );
+    expect(
+        zoom(model, 5),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬜⬜⬜⬛",
+            "⬛⬜⬛⬜⬛",
+            "⬛⬛⬛⬛⬛",
+        ]),
+    );
 });

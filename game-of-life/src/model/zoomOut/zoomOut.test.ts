@@ -4,61 +4,64 @@ import { zoomOut } from "./zoomOut.js";
 
 const model = fromString(["⬜"]);
 
-describe("zoomOut",()=> {
-    it("zoomOut", () => {
-        expect(
-            zoomOut(model, 1)).toEqual(
+it("zoomOut", () => {
+    expect(
+        zoomOut(model, 1),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛",
+            "⬛⬜⬛",
+            "⬛⬛⬛",
+        ]),
+    );
+    expect(
+        zoomOut(model, 2),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛",
+        ]),
+    );
+    expect(
+        zoomOut(model, 3),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬜⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛",
+        ]),
+    );
+    expect(
+        zoomOut(fromString([""]), 2),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛⬛",
+            "⬛⬛⬛⬛",
+            "⬛⬛⬛⬛",
+            "⬛⬛⬛⬛",
+        ]),
+    );
+    expect(
+        zoomOut(
             fromString([
-                "⬛⬛⬛",
-                "⬛⬜⬛",
-                "⬛⬛⬛",
+                "⬜⬜",
+                "⬛⬜",
             ]),
-        );
-        expect(
-            zoomOut(model, 2)).toEqual(
-            fromString([
-                "⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬛⬛",
-                "⬛⬛⬜⬛⬛",
-                "⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬛⬛",
-            ]),
-        );
-        expect(
-            zoomOut(model, 3)).toEqual(
-            fromString([
-                "⬛⬛⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬜⬛⬛⬛",
-                "⬛⬛⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬛⬛⬛⬛",
-                "⬛⬛⬛⬛⬛⬛⬛",
-            ]),
-        );
-        expect(
-            zoomOut(fromString([""]), 2)).toEqual(
-            fromString([
-                "⬛⬛⬛⬛",
-                "⬛⬛⬛⬛",
-                "⬛⬛⬛⬛",
-                "⬛⬛⬛⬛",
-            ]),
-        );
-        expect(
-            zoomOut(
-                fromString([
-                    "⬜⬜",
-                    "⬛⬜",
-                ]),
-                1,
-            )).toEqual(
-            fromString([
-                "⬛⬛⬛⬛",
-                "⬛⬜⬜⬛",
-                "⬛⬛⬜⬛",
-                "⬛⬛⬛⬛",
-            ]),
-        );
-    });
+            1,
+        ),
+    ).toEqual(
+        fromString([
+            "⬛⬛⬛⬛",
+            "⬛⬜⬜⬛",
+            "⬛⬛⬜⬛",
+            "⬛⬛⬛⬛",
+        ]),
+    );
 });

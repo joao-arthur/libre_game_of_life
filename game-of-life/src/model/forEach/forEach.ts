@@ -10,7 +10,7 @@ export function forEach(
 ): void {
     model.value.forEach((row, rowIndex) =>
         row.forEach((state, columnIndex) =>
-            cb({ row: rowIndex, column: columnIndex }, state),
-        ),
+            cb({ row: rowIndex, column: columnIndex }, state)
+        )
     );
 }

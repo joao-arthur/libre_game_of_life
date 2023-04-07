@@ -3,7 +3,7 @@ import { stateType } from "../../cell/mod.js";
 import { fromString } from "../fromString/mod.js";
 import { getValue } from "./getValue.js";
 
-describe("getValue", ()=> {
+describe("getValue", () => {
     it("Value out of range", () => {
         expect(
             getValue(
@@ -12,7 +12,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: -1, row: 0 },
-            )).toBe(
+            ),
+        ).toBe(
             undefined,
         );
         expect(
@@ -22,7 +23,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: -1, row: 0 },
-            )).toBe(
+            ),
+        ).toBe(
             undefined,
         );
         expect(
@@ -32,7 +34,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 0, row: -1 },
-            )).toBe(
+            ),
+        ).toBe(
             undefined,
         );
         expect(
@@ -42,7 +45,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 2, row: 0 },
-            )).toBe(
+            ),
+        ).toBe(
             undefined,
         );
         expect(
@@ -52,7 +56,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 0, row: 2 },
-            )).toBe(
+            ),
+        ).toBe(
             undefined,
         );
         expect(
@@ -62,11 +67,12 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 2, row: 2 },
-            )).toBe(
+            ),
+        ).toBe(
             undefined,
         );
     });
-    
+
     it("Value in range", () => {
         expect(
             getValue(
@@ -75,7 +81,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 0, row: 0 },
-            )).toBe(
+            ),
+        ).toBe(
             stateType.DEAD,
         );
         expect(
@@ -85,7 +92,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 0, row: 1 },
-            )).toBe(
+            ),
+        ).toBe(
             stateType.ALIVE,
         );
         expect(
@@ -95,7 +103,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 1, row: 0 },
-            )).toBe(
+            ),
+        ).toBe(
             stateType.DEAD,
         );
         expect(
@@ -105,7 +114,8 @@ describe("getValue", ()=> {
                     "⬜⬜",
                 ]),
                 { column: 1, row: 1 },
-            )).toBe(
+            ),
+        ).toBe(
             stateType.ALIVE,
         );
     });

@@ -12,8 +12,8 @@ export function map(
         ...model,
         value: model.value.map((row, rowIndex) =>
             row.map((state, columnIndex) =>
-                cb({ row: rowIndex, column: columnIndex }, state),
-            ),
+                cb({ row: rowIndex, column: columnIndex }, state)
+            )
         ),
     };
 }

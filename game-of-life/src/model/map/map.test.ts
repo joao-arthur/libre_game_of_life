@@ -3,55 +3,55 @@ import { stateType } from "../../cell/mod.js";
 import { fromString } from "../fromString/mod.js";
 import { map } from "./map.js";
 
-describe("map", ()=> {
-
-    it("map", () => {
-        expect(
-            map(
-                fromString([
-                    "⬛⬜",
-                    "⬜⬛",
-                    "⬛⬜",
-                ]),
-                ({ row }) => row > 0 ? stateType.DEAD : stateType.ALIVE,
-            )).toEqual(
+it("map", () => {
+    expect(
+        map(
             fromString([
-                "⬜⬜",
-                "⬛⬛",
-                "⬛⬛",
+                "⬛⬜",
+                "⬜⬛",
+                "⬛⬜",
             ]),
-        );
-        expect(
-            map(
-                fromString([
-                    "⬛⬜⬛",
-                    "⬜⬛⬜",
-                ]),
-                ({ column }) =>
-                    column > 0 ? stateType.DEAD : stateType.ALIVE,
-            )).toEqual(
+            ({ row }) => row > 0 ? stateType.DEAD : stateType.ALIVE,
+        ),
+    ).toEqual(
+        fromString([
+            "⬜⬜",
+            "⬛⬛",
+            "⬛⬛",
+        ]),
+    );
+    expect(
+        map(
             fromString([
-                "⬜⬛⬛",
-                "⬜⬛⬛",
+                "⬛⬜⬛",
+                "⬜⬛⬜",
             ]),
-        );
-        expect(
-            map(
-                fromString([
-                    "⬛⬜⬛",
-                    "⬜⬛⬜",
-                    "⬛⬜⬛",
-                ]),
-                ({ row, column }) =>
-                    row > 1 || column > 1
-                        ? stateType.DEAD
-                        : stateType.ALIVE,
-            )).toEqual(
+            ({ column }) =>
+                column > 0 ? stateType.DEAD : stateType.ALIVE,
+        ),
+    ).toEqual(
+        fromString([
+            "⬜⬛⬛",
+            "⬜⬛⬛",
+        ]),
+    );
+    expect(
+        map(
             fromString([
-                "⬜⬜⬛",
-                "⬜⬜⬛",
-                "⬛⬛⬛",
+                "⬛⬜⬛",
+                "⬜⬛⬜",
+                "⬛⬜⬛",
             ]),
-        );
-    });
+            ({ row, column }) =>
+                row > 1 || column > 1
+                    ? stateType.DEAD
+                    : stateType.ALIVE,
+        ),
+    ).toEqual(
+        fromString([
+            "⬜⬜⬛",
+            "⬜⬜⬛",
+            "⬛⬛⬛",
+        ]),
+    );
 });
