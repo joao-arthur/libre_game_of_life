@@ -30,6 +30,7 @@ export function RangeInput(
             onInput={(e) => {
                 handleOnChange(Number(e.currentTarget.value));
             }}
+            className="accent-indigo-500"
         />
     );
 }
