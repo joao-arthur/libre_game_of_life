@@ -22,8 +22,8 @@ export class SystemManager {
                     switch (prop) {
                         case "status":
                         case "fps":
-                            globalThis.clearInterval(this.timeoutId);
-                            this.timeoutId = globalThis.setInterval(
+                            window.clearInterval(this.timeoutId);
+                            this.timeoutId = window.setInterval(
                                 () => {
                                     this.systemController.iterate();
                                     this.systemRender.render();
@@ -40,7 +40,7 @@ export class SystemManager {
                             this.systemRender.render();
                             break;
                         case "status":
-                            globalThis.clearInterval(this.timeoutId);
+                            window.clearInterval(this.timeoutId);
                     }
             }
         });

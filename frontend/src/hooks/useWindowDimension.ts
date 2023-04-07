@@ -11,9 +11,9 @@ export function useWindowDimension(): number {
         }
 
         onWindowResize();
-        globalThis.addEventListener("resize", onWindowResize);
+        window.addEventListener("resize", onWindowResize);
         return () => {
-            globalThis.removeEventListener("resize", onWindowResize);
+            window.removeEventListener("resize", onWindowResize);
         };
     }, []);
 

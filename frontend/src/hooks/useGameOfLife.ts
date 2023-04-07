@@ -20,6 +20,9 @@ export function useGameOfLife(): gameOfLifeType {
     const systemControllerRef = useRef<SystemController | undefined>(
         undefined,
     );
+    const systemManagerRef = useRef<SystemManager | undefined>(
+        undefined,
+    );
     const [model, setModel] = useState<systemModelType | undefined>(
         undefined,
     );
@@ -43,7 +46,7 @@ export function useGameOfLife(): gameOfLifeType {
             const systemController = new SystemController(
                 systemModel,
             );
-            const _systemManager = new SystemManager(
+            systemManagerRef.current = new SystemManager(
                 systemModel,
                 systemController,
                 systemRender,
