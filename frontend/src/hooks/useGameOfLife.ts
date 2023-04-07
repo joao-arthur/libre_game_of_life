@@ -1,9 +1,4 @@
-import {
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useWindowDimension } from "./useWindowDimension";
 import { CanvasDrawContext } from "../adapters/canvasDrawContext";
 import {

@@ -7,8 +7,7 @@
     "dev": "next dev",
     "prebuild": "tsc --project tsconfig.scripts.json && node ./dist/posts.js",
     "build": "next build && next export",
-    "start": "next start",
-    "lint": "next lint --fix"
+    "start": "next start"
   },
   "dependencies": {
     "classnames": "^2.3.2",

@@ -7,6 +7,7 @@ type optionType = {
 
 type groupType = {
     readonly label: string;
+    readonly value: string;
     readonly options: optionType[];
 };
 
@@ -34,9 +35,12 @@ export function Select(
         >
             <option value={undefined}></option>
             {groups.map((group) => (
-                <optgroup label={group.label}>
+                <optgroup label={group.label} key={group.value}>
                     {group.options.map((option) => (
-                        <option value={option.value}>
+                        <option
+                            value={option.value}
+                            key={option.value}
+                        >
                             {option.label}
                         </option>
                     ))}

@@ -1,23 +1,20 @@
 import { useEffect, useState } from "react";
 
 export function useWindowDimension(): number {
-    const [dimension, setDimension] = useState(getDimension());
-
-    function onWindowResize(): void {
-        setDimension(getDimension());
-    }
-
-    function getDimension(): number {
-        if(globalThis.window === undefined) {
-            return 0;
-        }
-        return Math.min(window.innerWidth, window.innerHeight);
-    }
+    const [dimension, setDimension] = useState(0);
 
     useEffect(() => {
+        function onWindowResize(): void {
+            setDimension(
+                Math.min(window.innerWidth, window.innerHeight),
+            );
+        }
+
+        onWindowResize();
         globalThis.addEventListener("resize", onWindowResize);
-        return () =>
+        return () => {
             globalThis.removeEventListener("resize", onWindowResize);
+        };
     }, []);
 
     return dimension;

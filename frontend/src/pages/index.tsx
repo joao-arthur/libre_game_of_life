@@ -1,4 +1,4 @@
-import type {ReactElement, MouseEvent} from  'react';
+import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
