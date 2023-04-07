@@ -5,7 +5,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "tsc --project tsconfig.scripts.json && node ./dist/posts.js",
     "build": "next build && next export",
     "start": "next start"
   },
