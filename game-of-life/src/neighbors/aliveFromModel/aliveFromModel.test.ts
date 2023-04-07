@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { expect, it } from "vitest";
 import { fromString } from "../../model/fromString/mod.js";
 import { aliveFromModel } from "./aliveFromModel.js";
 

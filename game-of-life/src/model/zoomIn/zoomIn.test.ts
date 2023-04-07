@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { expect, it } from "vitest";
 import { fromString } from "../fromString/mod.js";
 import { zoomIn } from "./zoomIn.js";
 

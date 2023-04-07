@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { expect, it } from "vitest";
 import { stateType } from "../../cell/mod.js";
 import { fromString } from "./fromString.js";
 
