@@ -1,1 +1,1 @@
-export { SystemRender } from "./systemRender.ts";
+export { SystemRender } from "./systemRender";

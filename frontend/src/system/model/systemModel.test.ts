@@ -1,6 +1,6 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { modelFns } from "../../game/mod.ts";
-import { SystemModel, systemModelType } from "./systemModel.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts";
+import { modelFns } from "../../game/mod";
+import { SystemModel, systemModelType } from "./systemModel";
 
 const defaultModel: systemModelType = {
     model: modelFns.fromString([""]),

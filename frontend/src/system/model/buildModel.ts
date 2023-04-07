@@ -1,5 +1,5 @@
-import { modelFns } from "../../game/mod.ts";
-import { systemModelType } from "./systemModel.ts";
+import { modelFns } from "game-of-life";
+import { systemModelType } from "./systemModel";
 
 export function buildModel(
     drawContext: systemModelType["drawContext"],

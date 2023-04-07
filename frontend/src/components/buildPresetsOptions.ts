@@ -1,5 +1,5 @@
-import { arrays } from "https://deno.land/x/funis@v1.0.2/mod.ts";
-import { presets } from "../src/game/mod.ts";
+import { arrays } from "funis";
+import { presets } from "game-of-life";
 
 type presetOptionsType = {
     readonly label: string;

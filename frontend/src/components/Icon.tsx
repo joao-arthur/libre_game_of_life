@@ -1,13 +1,13 @@
-import { VNode } from "preact";
-import { Next } from "./Icons/Next.tsx";
-import { Pause } from "./Icons/Pause.tsx";
-import { Play } from "./Icons/Play.tsx";
+import type { ReactElement } from "react";
+import { Next } from "./Icons/Next";
+import { Pause } from "./Icons/Pause";
+import { Play } from "./Icons/Play";
 
 type props = {
     readonly icon: "next" | "pause" | "play";
 };
 
-export function Icon({ icon }: props): VNode {
+export function Icon({ icon }: props): ReactElement {
     switch (icon) {
         case "next":
             return <Next />;

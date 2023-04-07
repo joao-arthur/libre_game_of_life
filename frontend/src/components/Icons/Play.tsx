@@ -1,6 +1,6 @@
-import { VNode } from "preact";
+import type { ReactElement } from "react";
 
-export function Play(): VNode {
+export function Play(): ReactElement {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

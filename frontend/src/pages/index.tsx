@@ -1,14 +1,14 @@
-import { useEffect, useRef, useState } from "preact/hooks";
-import { JSX, VNode } from "preact";
-import { Button } from "../components/Button.tsx";
-import { RangeInput } from "../components/RangeInput.tsx";
-import { Select } from "../components/Select.tsx";
-import { useWindowDimension } from "../hooks/useWindowDimension.ts";
-import { useGameOfLife } from "../hooks/useGameOfLife.ts";
-import { absoluteToRelative } from "../src/features/absoluteToRelative/absoluteToRelative.ts";
-import { buildPresetsOptions } from "../components/buildPresetsOptions.ts";
+import type {ReactElement, MouseEvent} from  'react';
+import { useEffect, useRef, useState } from "react";
+import { Button } from "../components/Button";
+import { RangeInput } from "../components/RangeInput";
+import { Select } from "../components/Select";
+import { useWindowDimension } from "../hooks/useWindowDimension";
+import { useGameOfLife } from "../hooks/useGameOfLife";
+import { absoluteToRelative } from "../features/absoluteToRelative/absoluteToRelative";
+import { buildPresetsOptions } from "../components/buildPresetsOptions";
 
-export default function Main(): VNode {
+export default function Main(): ReactElement {
     const {
         init,
         model,
@@ -33,7 +33,7 @@ export default function Main(): VNode {
     }, [controller]);
 
     function onClick(
-        e: JSX.TargetedMouseEvent<HTMLCanvasElement>,
+        e: MouseEvent<HTMLCanvasElement>,
     ): void {
         if (!controller) return;
         if (!model) {
@@ -59,7 +59,7 @@ export default function Main(): VNode {
     }
 
     return (
-  <main class="w-screen h-screen flex">
+        <main className="w-screen h-screen flex">
             <canvas
                 onClick={onClick}
                 className="m-auto"
@@ -73,9 +73,9 @@ export default function Main(): VNode {
             />
             <div className="flex flex-col">
                 <div className="flex flex-col my-1">
-                    <label for="gap">Preset</label>
+                    <label htmlFor="preset">Preset</label>
                     <Select
-                        id="Preset"
+                        id="preset"
                         groups={buildPresetsOptions()}
                         value={preset}
                         onChange={(preset) => {
@@ -85,7 +85,7 @@ export default function Main(): VNode {
                     />
                 </div>
                 <div className="flex flex-col my-1">
-                    <label for="gap">Gap</label>
+                    <label htmlFor="gap">Gap</label>
                     <div className="flex">
                         <RangeInput
                             id="gap"
@@ -102,7 +102,7 @@ export default function Main(): VNode {
                     </div>
                 </div>
                 <div className="flex flex-col my-1">
-                    <label for="size">
+                    <label htmlFor="size">
                         Size
                     </label>
                     <div className="flex">
@@ -121,7 +121,7 @@ export default function Main(): VNode {
                     </div>
                 </div>
                 <div className="flex flex-col my-1">
-                    <label for="fps">FPS</label>
+                    <label htmlFor="fps">FPS</label>
                     <div className="flex">
                         <RangeInput
                             id="fps"
@@ -157,6 +157,6 @@ export default function Main(): VNode {
                     onClick={() => controller?.singleIteration()}
                 />
             </div>
-              </main>
+        </main>
     );
 }

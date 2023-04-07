@@ -1,5 +1,5 @@
-import { modelFns, stateType } from "../../game/mod.ts";
-import { SystemModel } from "../model/mod.ts";
+import { modelFns, stateType } from "game-of-life";
+import { SystemModel } from "../model/mod";
 
 export class SystemRender {
     public constructor(

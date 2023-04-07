@@ -1,1 +1,1 @@
-export { SystemManager } from "./systemManager.ts";
+export { SystemManager } from "./systemManager";

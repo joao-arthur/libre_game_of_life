@@ -1,7 +1,7 @@
-import { SystemModel } from "../model/mod.ts";
-import { SystemController } from "../controller/mod.ts";
-import { SystemRender } from "../render/mod.ts";
-import { fpsToMilis } from "../../features/mod.ts";
+import { SystemModel } from "../model/mod";
+import { SystemController } from "../controller/mod";
+import { SystemRender } from "../render/mod";
+import { fpsToMilis } from "../../features/mod";
 
 export class SystemManager {
     private timeoutId = 0;

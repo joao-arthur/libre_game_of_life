@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { fpsToMilis } from "./fpsToMilis.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts";
+import { fpsToMilis } from "./fpsToMilis";
 
 Deno.test("Should convert fps to milisseconds", () => {
     assertEquals(fpsToMilis(0), Infinity);

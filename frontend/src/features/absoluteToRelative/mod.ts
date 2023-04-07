@@ -1,1 +1,1 @@
-export { absoluteToRelative } from "./absoluteToRelative.ts";
+export { absoluteToRelative } from "./absoluteToRelative";

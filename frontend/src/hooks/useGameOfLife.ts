@@ -3,9 +3,9 @@ import {
     useEffect,
     useRef,
     useState,
-} from "preact/hooks";
-import { useWindowDimension } from "./useWindowDimension.ts";
-import { CanvasDrawContext } from "../src/adapters/canvasDrawContext.ts";
+} from "react";
+import { useWindowDimension } from "./useWindowDimension";
+import { CanvasDrawContext } from "../adapters/canvasDrawContext";
 import {
     buildModel,
     SystemController,
@@ -13,7 +13,7 @@ import {
     SystemModel,
     systemModelType,
     SystemRender,
-} from "../src/system/mod.ts";
+} from "../system/mod";
 
 type gameOfLifeType = {
     readonly init: (canvasElement: HTMLCanvasElement) => void;

@@ -1,4 +1,4 @@
-import { squareType } from "../core/square.ts";
+import { squareType } from "../core/square";
 
 export type drawContextType = {
     readonly clear: (

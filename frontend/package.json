@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "classnames": "^2.3.2",
+    "funis": "1.0.2",
+    "game-of-life": "link:../game-of-life",
     "next": "13.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -22,13 +24,7 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/node": "18.15.11",
     "@types/react": "18.0.33",
-    "@typescript-eslint/eslint-plugin": "5.57.1",
-    "@typescript-eslint/parser": "5.57.1",
     "autoprefixer": "^10.4.14",
-    "eslint": "8.37.0",
-    "eslint-config-next": "13.2.4",
-    "eslint-plugin-react": "7.32.2",
-    "eslint-plugin-react-hooks": "4.6.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.3.1",
     "typescript": "5.0.3"

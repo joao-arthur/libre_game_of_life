@@ -1,4 +1,4 @@
-import { VNode } from "preact";
+import type { ReactElement } from "react";
 
 type optionType = {
     readonly value: string;
@@ -19,7 +19,7 @@ type props = {
 
 export function Select(
     { id, groups, value, onChange }: props,
-): VNode {
+): ReactElement {
     function handleOnChange(newValue: string): void {
         onChange(newValue);
     }

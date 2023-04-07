@@ -1,5 +1,5 @@
-import { squareType } from "../core/square.ts";
-import { drawContextType } from "../ports/drawContext.ts";
+import { squareType } from "../core/square";
+import { drawContextType } from "../ports/drawContext";
 
 export class CanvasDrawContext implements drawContextType {
     public constructor(

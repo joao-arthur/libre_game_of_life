@@ -1,1 +1,1 @@
-export { SystemController } from "./systemController.ts";
+export { SystemController } from "./systemController";

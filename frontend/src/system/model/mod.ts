@@ -1,4 +1,4 @@
-export type { systemModelType } from "./systemModel.ts";
+export type { systemModelType } from "./systemModel";
 
-export { SystemModel } from "./systemModel.ts";
-export { buildModel } from "./buildModel.ts";
+export { SystemModel } from "./systemModel";
+export { buildModel } from "./buildModel";

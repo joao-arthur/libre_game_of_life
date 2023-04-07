@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts.ts";
-import { absoluteToRelative } from "./absoluteToRelative.ts";
+import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts";
+import { absoluteToRelative } from "./absoluteToRelative";
 
 Deno.test("Should transform the absolute value to relative", () => {
     assertEquals(absoluteToRelative(0, 30), 0);

@@ -1,5 +1,5 @@
-import { modelFns, positionType, presets } from "../../game/mod.ts";
-import { SystemModel, systemModelType } from "../model/mod.ts";
+import { modelFns, positionType, presets } from "game-of-life";
+import { SystemModel, systemModelType } from "../model/mod";
 
 export class SystemController {
     constructor(private readonly systemModel: SystemModel) {}

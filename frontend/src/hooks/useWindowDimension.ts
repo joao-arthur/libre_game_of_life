@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState } from "react";
 
 export function useWindowDimension(): number {
     const [dimension, setDimension] = useState(getDimension());
@@ -8,6 +8,9 @@ export function useWindowDimension(): number {
     }
 
     function getDimension(): number {
+        if(globalThis.window === undefined) {
+            return 0;
+        }
         return Math.min(window.innerWidth, window.innerHeight);
     }
 

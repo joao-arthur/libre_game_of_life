@@ -1,4 +1,4 @@
-import { VNode } from "preact";
+import type { ReactElement } from "react";
 
 type props = {
     readonly id: string;
@@ -11,7 +11,7 @@ type props = {
 
 export function RangeInput(
     { id, min, max, step, value, onChange }: props,
-): VNode {
+): ReactElement {
     function handleOnChange(newValue: number): void {
         if (newValue > max) return;
         if (newValue < min) return;

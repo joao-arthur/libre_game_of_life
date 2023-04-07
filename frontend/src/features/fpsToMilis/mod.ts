@@ -1,1 +1,1 @@
-export { fpsToMilis } from "./fpsToMilis.ts";
+export { fpsToMilis } from "./fpsToMilis";
