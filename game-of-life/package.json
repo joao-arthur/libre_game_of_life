@@ -11,7 +11,6 @@
     "exports": {
         ".": {
             "import": "./dist/mod.js",
-            "require": "./dist/mod.js",
             "types": "./dist/mod.d.js"
         }
     },
