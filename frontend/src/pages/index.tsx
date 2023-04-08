@@ -90,7 +90,7 @@ export default function Main(): ReactElement {
                         <RangeInput
                             id="gap"
                             min={0}
-                            max={5}
+                            max={3}
                             step={1}
                             value={model ? model.gap : 0}
                             onChange={(gap) =>
