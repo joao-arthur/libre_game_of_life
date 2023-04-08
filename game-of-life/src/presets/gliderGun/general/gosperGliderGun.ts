@@ -1,13 +1,10 @@
 import { modelFns } from "../../../model/mod.js";
-import { gliderGun } from "../../groups.js";
 import { presetType } from "../../preset.js";
 
 export const gosperGliderGun: presetType = {
     name: "Gosper glider gun",
     id: "gosperGliderGun",
     discover: { name: "Bill Gosper", year: 1970 },
-    group: gliderGun.group,
-    subGroup: gliderGun.subGroup.general,
     model: modelFns.fromString([
         "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
         "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
