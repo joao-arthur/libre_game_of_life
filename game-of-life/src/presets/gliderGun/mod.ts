@@ -1,1 +1,1 @@
-export { gliderGun } from "./gliderGun.js";
+export { gliderGun } from "./group.js";

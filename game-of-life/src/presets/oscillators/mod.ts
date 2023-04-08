@@ -1,1 +1,1 @@
-export { oscillators } from "./oscillators.js";
+export { oscillators } from "./group.js";

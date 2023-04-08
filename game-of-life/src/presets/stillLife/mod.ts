@@ -1,1 +1,1 @@
-export { stillLife } from "./stillLife.js";
+export { stillLife } from "./group.js";

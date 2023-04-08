@@ -1,1 +1,1 @@
-export { spaceships } from "./spaceships.js";
+export { spaceships } from "./group.js";
