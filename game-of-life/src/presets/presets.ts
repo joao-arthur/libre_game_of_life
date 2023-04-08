@@ -1,19 +1,12 @@
 import { modelType } from "../mod.js";
+import { stillLife } from "./stillLife/mod.js";
+import { oscillators } from "./oscillators/mod.js";
+import { methuselahs } from "./methuselahs/mod.js";
+import { spaceships } from "./spaceships/mod.js";
+import { gliderGun } from "./gliderGun/mod.js";
+import { puffer } from "./puffer/mod.js";
 
-import { boat } from "./stillLife/boat/boat.js";
-import { block } from "./stillLife/general/block.js";
-
-import { blinker } from "./oscillators/general/blinker.js";
-
-import { rPentomino } from "./methuselahs/general/rPentomino.js";
-
-import { glider } from "./spaceships/general/glider.js";
-
-import { gosperGliderGun } from "./gliderGun/general/gosperGliderGun.js";
-
-import { puffer1 } from "./puffer/general/puffer1.js";
-
-type presetsType = {
+type presetsGroupsType = {
     readonly group: {
         readonly name: string;
         readonly id: string;
@@ -33,80 +26,11 @@ type presetsType = {
     }[];
 }[];
 
-export const presets: presetsType = [
-    {
-        group: { name: "StillLife", id: "stillLife" },
-        subGroups: [
-            {
-                name: "Ship",
-                id: "ship",
-                items: [],
-            },
-            {
-                name: "Boat",
-                id: "boat",
-                items: [boat],
-            },
-            {
-                name: "Loaf",
-                id: "loaf",
-                items: [],
-            },
-            {
-                name: "General",
-                id: "general",
-                items: [block],
-            },
-        ],
-    },
-    {
-        group: { name: "Oscillators", id: "oscillators" },
-        subGroups: [
-            {
-                name: "General",
-                id: "general",
-                items: [blinker],
-            },
-        ],
-    },
-    {
-        group: { name: "Methuselahs", id: "methuselahs" },
-        subGroups: [
-            {
-                name: "General",
-                id: "general",
-                items: [rPentomino],
-            },
-        ],
-    },
-    {
-        group: { name: "Spaceships", id: "spaceships" },
-        subGroups: [
-            {
-                name: "General",
-                id: "general",
-                items: [glider],
-            },
-        ],
-    },
-    {
-        group: { name: "Glider gun", id: "gliderGun" },
-        subGroups: [
-            {
-                name: "General",
-                id: "general",
-                items: [gosperGliderGun],
-            },
-        ],
-    },
-    {
-        group: { name: "Puffer", id: "puffer" },
-        subGroups: [
-            {
-                name: "General",
-                id: "general",
-                items: [puffer1],
-            },
-        ],
-    },
+export const presets: presetsGroupsType = [
+    stillLife,
+    oscillators,
+    methuselahs,
+    spaceships,
+    gliderGun,
+    puffer,
 ];
