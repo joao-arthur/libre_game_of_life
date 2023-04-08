@@ -1,6 +1,6 @@
 # game-of-life
 
-`canvas` / `opengl` implementation of the conway's game of life.
+`canvas` implementation of the conway's game of life.
 
 ## Conway's game of life rules
 
