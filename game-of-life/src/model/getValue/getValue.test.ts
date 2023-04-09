@@ -11,66 +11,36 @@ describe("getValue", () => {
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: -1, row: 0 },
+                { x: -100, y: -100 },
             ),
-        ).toBe(
-            undefined,
-        );
+        ).toBe(stateType.DEAD);
         expect(
             getValue(
                 fromString([
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: -1, row: 0 },
+                { x: -100, y: 100 },
             ),
-        ).toBe(
-            undefined,
-        );
+        ).toBe(stateType.DEAD);
         expect(
             getValue(
                 fromString([
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: 0, row: -1 },
+                { x: 100, y: -100 },
             ),
-        ).toBe(
-            undefined,
-        );
+        ).toBe(stateType.DEAD);
         expect(
             getValue(
                 fromString([
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: 2, row: 0 },
+                { x: 100, y: 100 },
             ),
-        ).toBe(
-            undefined,
-        );
-        expect(
-            getValue(
-                fromString([
-                    "⬛⬛",
-                    "⬜⬜",
-                ]),
-                { column: 0, row: 2 },
-            ),
-        ).toBe(
-            undefined,
-        );
-        expect(
-            getValue(
-                fromString([
-                    "⬛⬛",
-                    "⬜⬜",
-                ]),
-                { column: 2, row: 2 },
-            ),
-        ).toBe(
-            undefined,
-        );
+        ).toBe(stateType.DEAD);
     });
 
     it("Value in range", () => {
@@ -80,43 +50,35 @@ describe("getValue", () => {
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: 0, row: 0 },
+                { x: 1, y: 1 },
             ),
-        ).toBe(
-            stateType.DEAD,
-        );
+        ).toBe(stateType.DEAD);
         expect(
             getValue(
                 fromString([
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: 0, row: 1 },
+                { x: -1, y: 1 },
             ),
-        ).toBe(
-            stateType.ALIVE,
-        );
+        ).toBe(stateType.DEAD);
         expect(
             getValue(
                 fromString([
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: 1, row: 0 },
+                { x: -1, y: -1 },
             ),
-        ).toBe(
-            stateType.DEAD,
-        );
+        ).toBe(stateType.ALIVE);
         expect(
             getValue(
                 fromString([
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { column: 1, row: 1 },
+                { x: 1, y: -1 },
             ),
-        ).toBe(
-            stateType.ALIVE,
-        );
+        ).toBe(stateType.ALIVE);
     });
 });

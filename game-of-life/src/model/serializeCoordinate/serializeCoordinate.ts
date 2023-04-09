@@ -1,10 +1,7 @@
-type coordinateType = {
-    readonly x: number;
-    readonly y: number;
-};
+import { cartesianPointType } from "../../core/cartesianPlane/mod.js";
 
 export function serializeCoordinate(
-    { x, y }: coordinateType,
+    { x, y }: cartesianPointType,
 ): string {
     return `(x: ${x}, y: ${y})`;
 }
