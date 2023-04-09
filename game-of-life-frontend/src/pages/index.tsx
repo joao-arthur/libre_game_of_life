@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactElement } from "react";
+import type { MouseEvent, ReactElement, WheelEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { cartesianPlane, modelFns } from "game-of-life-engine";
 import { getUnitSize } from "../system/mod";
@@ -62,6 +62,18 @@ export default function Main(): ReactElement {
         }
     }
 
+    function handleWheel(e: WheelEvent) {
+        if (!model) return;
+        if (!controller) return;
+
+        const delta = e.deltaY > 0 ? 2 : -2;
+        const newSize = modelFns.getSize(model.model) + delta;
+        if (newSize > 120) return;
+        if (newSize < 2) return;
+
+        controller.setSize(newSize);
+    }
+
     return (
         <main className="w-screen h-screen flex">
             <canvas
@@ -69,6 +81,7 @@ export default function Main(): ReactElement {
                 className="m-auto"
                 width={dimension}
                 height={dimension}
+                onWheel={handleWheel}
                 style={{
                     width: dimension,
                     height: dimension,
