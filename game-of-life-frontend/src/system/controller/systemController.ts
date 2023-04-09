@@ -68,12 +68,11 @@ export class SystemController {
         );
     }
 
-    public move(): void {
+    public move(delta: cartesianPointType): void {
         this.systemModel.setModel(
             modelFns.move(
                 this.systemModel.getModel().model,
-                {deltaX}
-                newSize,
+                delta,
             ),
         );
     }

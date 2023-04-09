@@ -86,6 +86,15 @@ describe("describe", () => {
         expect(length).toBe(4);
     });
 
+    it("move", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        const oldX1 = systemModel.getModel().model.position.x1;
+        systemController.move({ x: 1, y: 0 });
+        const newX1 = systemModel.getModel().model.position.x1;
+        expect(newX1 - 1).toBe(oldX1);
+    });
+
     it("setGap", () => {
         const systemModel = new SystemModel(defaultModel);
         const systemController = new SystemController(systemModel);
