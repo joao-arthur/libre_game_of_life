@@ -3,6 +3,8 @@ type coordinateType = {
     readonly y: number;
 };
 
-export function serializeCoordinate({ x, y }: coordinateType) {
-    return `(x: ${x}, y: ${y})` as const;
+export function serializeCoordinate(
+    { x, y }: coordinateType,
+): string {
+    return `(x: ${x}, y: ${y})`;
 }

@@ -2,38 +2,38 @@ import { arrayPositionType } from "../../array/arrayPosition.js";
 import { cartesianPointType } from "../cartesianPoint.js";
 import { getQuadrant } from "../getQuadrant/getQuadrant.js";
 
-type paramsType = {
-    readonly position: arrayPositionType;
-    readonly length: number;
-};
-
 export function indexToPoint(
-    params: paramsType,
+    position: arrayPositionType,
+    length: number,
 ): cartesianPointType {
-    const halfLength = params.length / 2;
-    const col = params.position.col;
-    const row = params.position.row;
+    const half = length / 2;
+    const col = position.col;
+    const row = position.row;
+    const quadrant = getQuadrant(position, length);
 
-    switch (getQuadrant(params)) {
-        case "1":
+    const baseX = -Math.floor(half) + col;
+    const baseY = Math.ceil(half) - row;
+
+    switch (quadrant) {
+        case 1:
             return {
-                x: -halfLength + col + 1,
-                y: halfLength - row,
+                x: baseX + 1,
+                y: baseY,
             };
-        case "2":
+        case 2:
             return {
-                x: -halfLength + col,
-                y: halfLength - row,
+                x: baseX,
+                y: baseY,
             };
-        case "3":
+        case 3:
             return {
-                x: -halfLength + col,
-                y: halfLength - row - 1,
+                x: baseX,
+                y: baseY - 1,
             };
-        case "4":
+        case 4:
             return {
-                x: -halfLength + col + 1,
-                y: halfLength - row - 1,
+                x: baseX + 1,
+                y: baseY - 1,
             };
     }
 }

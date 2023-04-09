@@ -1,5 +1,5 @@
-import { relativeToAbsolute } from "./relativeToAbsolute/mod.js";
+import { indexToPoint } from "./indexToPoint/mod.js";
 
 export const cartesianPlane = {
-    relativeToAbsolute,
+    indexToPoint,
 } as const;

@@ -1,28 +1,26 @@
 import { arrayPositionType } from "../../array/arrayPosition.js";
 
-type paramsType = {
-    readonly position: arrayPositionType;
-    readonly length: number;
-};
-
-type quadrantType = "1" | "2" | "3" | "4";
+type quadrantType = 1 | 2 | 3 | 4;
 
 export function getQuadrant(
-    { position: { row, col }, length }: paramsType,
+    position: arrayPositionType,
+    length: number,
 ): quadrantType {
-    const halfLength = length / 2;
+    const half = length / 2;
+    const rowAfterHalf = position.row >= half;
+    const colAfterHalf = position.col >= Math.floor(half);
 
-    if (row >= halfLength) {
-        if (col >= halfLength) {
-            return "4";
+    if (rowAfterHalf) {
+        if (colAfterHalf) {
+            return 4;
         } else {
-            return "3";
+            return 3;
         }
     } else {
-        if (col >= halfLength) {
-            return "1";
+        if (colAfterHalf) {
+            return 1;
         } else {
-            return "2";
+            return 2;
         }
     }
 }
