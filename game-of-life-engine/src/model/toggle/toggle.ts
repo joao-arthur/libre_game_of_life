@@ -2,7 +2,7 @@ import { maps } from "funis";
 import {
     cartesianPlane,
     cartesianPointType,
-} from "../../core/cartesianPlane/mod.js";
+} from "../../cartesianPlane/mod.js";
 import { stateType } from "../../cell/mod.js";
 import { modelType } from "../model.js";
 

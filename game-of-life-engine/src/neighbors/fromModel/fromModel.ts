@@ -1,4 +1,4 @@
-import { cartesianPointType } from "../../core/cartesianPlane/cartesianPoint.js";
+import { cartesianPointType } from "../../cartesianPlane/mod.js";
 import { modelFns, modelType } from "../../model/mod.js";
 import { neighborsType } from "../neighbors.js";
 

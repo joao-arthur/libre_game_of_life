@@ -68,6 +68,16 @@ export class SystemController {
         );
     }
 
+    public move(): void {
+        this.systemModel.setModel(
+            modelFns.move(
+                this.systemModel.getModel().model,
+                {deltaX}
+                newSize,
+            ),
+        );
+    }
+
     public setFps(fps: systemModelType["fps"]): void {
         this.systemModel.setFps(fps);
     }

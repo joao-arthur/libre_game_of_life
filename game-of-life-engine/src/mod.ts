@@ -1,5 +1,5 @@
-export type { cartesianPointType } from "./core/cartesianPlane/mod.js";
-export { cartesianPlane } from "./core/cartesianPlane/mod.js";
+export type { cartesianPointType } from "./cartesianPlane/mod.js";
+export { cartesianPlane } from "./cartesianPlane/mod.js";
 
 export type { aliveNeighborsType } from "./neighbors/mod.js";
 

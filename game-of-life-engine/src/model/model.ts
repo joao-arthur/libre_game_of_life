@@ -1,5 +1,5 @@
 import { stateType } from "../cell/mod.js";
-import { rectangleType } from "../core/cartesianPlane/mod.js";
+import { rectangleType } from "../cartesianPlane/mod.js";
 
 /*{
     value: the alive cells position,

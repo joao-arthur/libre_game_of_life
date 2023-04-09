@@ -1,5 +1,5 @@
 import { arrays, maps } from "funis";
-import { cartesianPlane } from "../../core/cartesianPlane/cartesianPlane.js";
+import { cartesianPlane } from "../../cartesianPlane/cartesianPlane.js";
 import { modelType } from "../model.js";
 import { neighborsFns } from "../../neighbors/mod.js";
 import { cellFns, stateType } from "../../cell/mod.js";
