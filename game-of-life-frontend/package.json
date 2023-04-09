@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && next export",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage"
   },
   "dependencies": {
     "classnames": "^2.3.2",
     "funis": "1.0.2",
-    "game-of-life": "link:../game-of-life",
-    "next": "13.2.4",
+    "game-of-life-engine": "link:../game-of-life-engine",
+    "next": "13.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.8.0",
@@ -22,9 +24,12 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/node": "18.15.11",
     "@types/react": "18.0.33",
+    "@vitest/coverage-c8": "^0.30.0",
     "autoprefixer": "^10.4.14",
+    "c8": "^7.13.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.3.1",
-    "typescript": "5.0.3"
+    "typescript": "5.0.4",
+    "vitest": "^0.30.0"
   }
 }

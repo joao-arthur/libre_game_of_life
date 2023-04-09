@@ -1,12 +1,13 @@
 import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
+import { cartesianPlane, modelFns } from "game-of-life-engine";
+import { getUnitSize } from "../system/mod";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
 import { Select } from "../components/Select";
+import { buildPresetsOptions } from "../components/buildPresetsOptions";
 import { useWindowDimension } from "../hooks/useWindowDimension";
 import { useGameOfLife } from "../hooks/useGameOfLife";
-import { absoluteToRelative } from "../features/absoluteToRelative/absoluteToRelative";
-import { buildPresetsOptions } from "../components/buildPresetsOptions";
 
 export default function Main(): ReactElement {
     const {
@@ -41,12 +42,18 @@ export default function Main(): ReactElement {
         }
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
-        const unitSize = model.dimension / model.model.size;
+        const modelSize = modelFns.getSize(model.model);
+        const unitSize = getUnitSize(model.model, model.dimension);
 
-        const column = absoluteToRelative(x, unitSize);
-        const row = absoluteToRelative(y, unitSize);
+        const col = cartesianPlane.absoluteToRelative(x, unitSize);
+        const row = cartesianPlane.absoluteToRelative(y, unitSize);
 
-        controller.toggleCell({ column, row });
+        const point = cartesianPlane.indexToPoint(
+            { col, row },
+            modelSize,
+        );
+
+        controller.toggleCell(point);
         setPreset("");
     }
 

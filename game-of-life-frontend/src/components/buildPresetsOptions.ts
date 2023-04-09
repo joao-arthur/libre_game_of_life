@@ -1,5 +1,4 @@
-import { arrays } from "funis";
-import { presets } from "game-of-life";
+import { presetGroups } from "game-of-life-engine";
 
 type presetOptionsType = {
     readonly label: string;
@@ -11,14 +10,13 @@ type presetOptionsType = {
 }[];
 
 export function buildPresetsOptions(): presetOptionsType {
-    return arrays
-        .groupToEntries(presets, (preset) => preset.group.name)
-        .map(([groupName, groupItems]) => ({
-            label: groupName,
-            value: groupName,
-            options: groupItems.map((item) => ({
+    return presetGroups.map((group) => ({
+        label: group.group.name,
+        value: group.group.id,
+        options: group.subGroups.flatMap((subGroup) => subGroup.items)
+            .map((item) => ({
                 label: item.name,
                 value: item.id,
             })),
-        }));
+    }));
 }

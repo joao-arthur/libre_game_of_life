@@ -1,14 +1,14 @@
 import { arrayPositionType } from "../../array/arrayPosition.js";
 import { cartesianPointType } from "../cartesianPoint.js";
 
-export function indexToPoint(
-    position: arrayPositionType,
+export function pointToIndex(
+    point: cartesianPointType,
     length: number,
-): cartesianPointType {
+): arrayPositionType {
     const half = Math.floor(length / 2);
 
     return {
-        x: -half + position.col,
-        y: half - position.row,
+        col: half + point.x,
+        row: half - point.y,
     };
 }

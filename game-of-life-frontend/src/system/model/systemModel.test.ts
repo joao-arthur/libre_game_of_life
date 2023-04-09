@@ -1,5 +1,5 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts";
-import { modelFns } from "../../game/mod";
+import { describe, expect, it } from "vitest";
+import { modelFns } from "game-of-life-engine";
 import { SystemModel, systemModelType } from "./systemModel";
 
 const defaultModel: systemModelType = {
@@ -23,50 +23,52 @@ const alternativeDrawContext: systemModelType["drawContext"] = {
     },
 };
 
-Deno.test("Should create with passed arguments", () => {
-    const systemModel = new SystemModel(defaultModel);
-    assertEquals(systemModel.getModel(), defaultModel);
-});
+describe("SystemModel", () => {
+    it("Should create with passed arguments", () => {
+        const systemModel = new SystemModel(defaultModel);
+        expect(systemModel.getModel()).toEqual(defaultModel);
+    });
 
-Deno.test("Setters should", () => {
-    const systemModel = new SystemModel(defaultModel);
-    systemModel.setModel(modelFns.fromString(["⬛"]));
-    systemModel.setGap(0);
-    systemModel.setFps(0);
-    systemModel.setStatus("resumed");
-    systemModel.setDimension(0);
-    systemModel.setDrawContext(alternativeDrawContext);
-    assertEquals(systemModel.getModel(), {
-        model: modelFns.fromString(["⬛"]),
-        gap: 0,
-        fps: 0,
-        status: "resumed",
-        dimension: 0,
-        drawContext: alternativeDrawContext,
+    it("Setters should", () => {
+        const systemModel = new SystemModel(defaultModel);
+        systemModel.setModel(modelFns.fromString(["⬛"]));
+        systemModel.setGap(0);
+        systemModel.setFps(0);
+        systemModel.setStatus("resumed");
+        systemModel.setDimension(0);
+        systemModel.setDrawContext(alternativeDrawContext);
+        expect(systemModel.getModel()).toEqual({
+            model: modelFns.fromString(["⬛"]),
+            gap: 0,
+            fps: 0,
+            status: "resumed",
+            dimension: 0,
+            drawContext: alternativeDrawContext,
+        });
     });
-});
 
-Deno.test("Should call the listener for each changed value", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const changedProps: (keyof systemModelType)[] = [];
-    systemModel.addOnChangeListener((prop) => {
-        changedProps.push(prop);
+    it("Should call the listener for each changed value", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const changedProps: (keyof systemModelType)[] = [];
+        systemModel.addOnChangeListener((prop) => {
+            changedProps.push(prop);
+        });
+        systemModel.setModel(modelFns.fromString(["⬛"]));
+        systemModel.setGap(0);
+        systemModel.setFps(0);
+        systemModel.setStatus("resumed");
+        systemModel.setDimension(0);
+        systemModel.setDrawContext({
+            clear: () => {},
+            drawSquare: () => {},
+        });
+        expect(changedProps).toEqual([
+            "model",
+            "gap",
+            "fps",
+            "status",
+            "dimension",
+            "drawContext",
+        ]);
     });
-    systemModel.setModel(modelFns.fromString(["⬛"]));
-    systemModel.setGap(0);
-    systemModel.setFps(0);
-    systemModel.setStatus("resumed");
-    systemModel.setDimension(0);
-    systemModel.setDrawContext({
-        clear: () => {},
-        drawSquare: () => {},
-    });
-    assertEquals(changedProps, [
-        "model",
-        "gap",
-        "fps",
-        "status",
-        "dimension",
-        "drawContext",
-    ]);
 });

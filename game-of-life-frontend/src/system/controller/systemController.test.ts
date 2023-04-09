@@ -1,6 +1,7 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts";
-import { modelFns } from "../../game/mod";
+import { describe, expect, it } from "vitest";
+import { modelFns } from "game-of-life-engine";
 import { SystemModel, systemModelType } from "../model/mod";
+import { buildPresetsItems } from "../buildPresetsItems";
 import { SystemController } from "./systemController";
 
 const defaultModel: systemModelType = {
@@ -15,70 +16,87 @@ const defaultModel: systemModelType = {
     },
 };
 
-Deno.test("pause", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.pause();
-    assertEquals(systemModel.getModel().status, "paused");
-});
+describe("describe", () => {
+    it("pause", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.pause();
+        expect(systemModel.getModel().status).toBe("paused");
+    });
 
-Deno.test("resume", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.resume();
-    assertEquals(systemModel.getModel().status, "resumed");
-});
+    it("resume", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.resume();
+        expect(systemModel.getModel().status).toBe("resumed");
+    });
 
-Deno.test("singleIteration", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.singleIteration();
-    assertEquals(systemModel.getModel().model.iteration, 1);
-    assertEquals(systemModel.getModel().status, "paused");
-});
+    it("singleIteration", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.singleIteration();
+        expect(systemModel.getModel().model.iteration).toBe(1);
+        expect(systemModel.getModel().status).toBe("paused");
+    });
 
-Deno.test("iterate", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.iterate();
-    assertEquals(systemModel.getModel().model.iteration, 1);
-    assertEquals(systemModel.getModel().status, "paused");
-});
+    it("iterate", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.iterate();
+        expect(systemModel.getModel().model.iteration).toBe(1);
+        expect(systemModel.getModel().status).toBe("paused");
+    });
 
-Deno.test("toggleCell", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.toggleCell({ column: 0, row: 0 });
-    assertEquals(
-        systemModel.getModel().model,
-        modelFns.fromString(["⬜"]),
-    );
-});
+    it("toggleCell", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.toggleCell({ x: 0, y: 0 });
+        expect(systemModel.getModel().model).toEqual(
+            modelFns.fromString(["⬜"]),
+        );
+    });
 
-Deno.test("setDimension", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.setDimension(9);
-    assertEquals(systemModel.getModel().dimension, 9);
-});
+    it("setDimension", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.setDimension(9);
+        expect(systemModel.getModel().dimension).toBe(9);
+    });
 
-Deno.test("setSize", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.setSize(5);
-    assertEquals(systemModel.getModel().model.size, 5);
-});
+    it("setPreset", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.setPreset("blinker");
+        const blinker = buildPresetsItems().find(({ id }) =>
+            id === "blinker"
+        )!;
+        expect(
+            systemModel.getModel().model.value,
+        ).toEqual(
+            blinker.model.value,
+        );
+    });
 
-Deno.test("setGap", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.setGap(9);
-    assertEquals(systemModel.getModel().gap, 9);
-});
+    it("setSize", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.setSize(5);
+        const { x2, x1 } = systemModel.getModel().model.position;
+        const length = x2 - x1;
+        expect(length).toBe(4);
+    });
 
-Deno.test("setFps", () => {
-    const systemModel = new SystemModel(defaultModel);
-    const systemController = new SystemController(systemModel);
-    systemController.setFps(9);
-    assertEquals(systemModel.getModel().fps, 9);
+    it("setGap", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.setGap(9);
+        expect(systemModel.getModel().gap).toBe(9);
+    });
+
+    it("setFps", () => {
+        const systemModel = new SystemModel(defaultModel);
+        const systemController = new SystemController(systemModel);
+        systemController.setFps(9);
+        expect(systemModel.getModel().fps).toBe(9);
+    });
 });

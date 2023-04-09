@@ -1,4 +1,5 @@
-import { modelFns, positionType, presets } from "game-of-life";
+import { buildPresetsItems } from "../buildPresetsItems";
+import { cartesianPointType, modelFns } from "game-of-life-engine";
 import { SystemModel, systemModelType } from "../model/mod";
 
 export class SystemController {
@@ -26,12 +27,12 @@ export class SystemController {
     }
 
     public toggleCell(
-        position: positionType,
+        point: cartesianPointType,
     ): void {
         this.systemModel.setModel(
             modelFns.toggle(
                 this.systemModel.getModel().model,
-                position,
+                point,
             ),
         );
     }
@@ -39,7 +40,7 @@ export class SystemController {
     public setPreset(
         preset: string,
     ): void {
-        const selectedPreset = presets.find(({ id }) =>
+        const selectedPreset = buildPresetsItems().find(({ id }) =>
             id === preset
         );
         if (selectedPreset === undefined) {
@@ -58,11 +59,11 @@ export class SystemController {
         this.systemModel.setGap(gap);
     }
 
-    public setSize(size: systemModelType["model"]["size"]): void {
+    public setSize(newSize: number): void {
         this.systemModel.setModel(
             modelFns.zoom(
                 this.systemModel.getModel().model,
-                size,
+                newSize,
             ),
         );
     }

@@ -1,1 +1,0 @@
-export { absoluteToRelative } from "./absoluteToRelative";

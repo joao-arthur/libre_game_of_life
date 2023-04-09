@@ -1,4 +1,9 @@
-import { modelFns, stateType } from "game-of-life";
+import {
+    cartesianPlane,
+    modelFns,
+    stateType,
+} from "game-of-life-engine";
+import { getUnitSize } from "../getUnitSize/mod";
 import { SystemModel } from "../model/mod";
 
 export class SystemRender {
@@ -8,17 +13,25 @@ export class SystemRender {
 
     public render(): void {
         const model = this.systemModel.getModel();
-        const unitSize = model.dimension / model.model.size;
+        const length = model.model.position.x2 -
+            model.model.position.x1;
+        const unitSize = getUnitSize(model.model, model.dimension);
         model.drawContext.clear({
             x: 0,
             y: 0,
             size: model.dimension,
         });
+
         modelFns.forEach(
             model.model,
-            ({ column, row }, cellState) => {
+            (point, cellState) => {
+                const { col, row } = cartesianPlane.pointToIndex(
+                    point,
+                    length,
+                );
+
                 model.drawContext.drawSquare({
-                    x: column * unitSize + model.gap,
+                    x: col * unitSize + model.gap,
                     y: row * unitSize + model.gap,
                     size: unitSize - model.gap * 2,
                 }, this.getSquareColor(cellState));

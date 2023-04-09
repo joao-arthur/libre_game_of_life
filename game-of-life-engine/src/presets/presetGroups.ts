@@ -6,7 +6,7 @@ import { spaceships } from "./spaceships/mod.js";
 import { gliderGun } from "./gliderGun/mod.js";
 import { puffer } from "./puffer/mod.js";
 
-export const presets: readonly presetGroupType[] = [
+export const presetGroups: readonly presetGroupType[] = [
     stillLife,
     oscillators,
     methuselahs,

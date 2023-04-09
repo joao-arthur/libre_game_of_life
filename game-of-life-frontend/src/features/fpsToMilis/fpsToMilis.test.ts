@@ -1,13 +1,13 @@
-import { assertEquals } from "https://deno.land/std@0.171.0/testing/asserts";
+import { expect, it } from "vitest";
 import { fpsToMilis } from "./fpsToMilis";
 
-Deno.test("Should convert fps to milisseconds", () => {
-    assertEquals(fpsToMilis(0), Infinity);
-    assertEquals(fpsToMilis(1), 1000);
-    assertEquals(fpsToMilis(5), 200);
-    assertEquals(fpsToMilis(10), 100);
-    assertEquals(fpsToMilis(50), 20);
-    assertEquals(fpsToMilis(100), 10);
-    assertEquals(fpsToMilis(500), 2);
-    assertEquals(fpsToMilis(1000), 1);
+it("fpsToMilis", () => {
+    expect(fpsToMilis(0)).toBe(Infinity);
+    expect(fpsToMilis(1)).toBe(1000);
+    expect(fpsToMilis(5)).toBe(200);
+    expect(fpsToMilis(10)).toBe(100);
+    expect(fpsToMilis(50)).toBe(20);
+    expect(fpsToMilis(100)).toBe(10);
+    expect(fpsToMilis(500)).toBe(2);
+    expect(fpsToMilis(1000)).toBe(1);
 });
