@@ -9,8 +9,6 @@ export function zoom(model: modelType, newSize: number): modelType {
     const x2Raw = halfX + (newSize / 2);
     const y2Raw = halfY + (newSize / 2);
 
-
-
     const differentQuadrantX = Math.sign(x1Raw) !== Math.sign(x2Raw);
     const differentQuadrantY = Math.sign(y1Raw) !== Math.sign(y2Raw);
 

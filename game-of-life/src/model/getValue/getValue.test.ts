@@ -50,7 +50,7 @@ describe("getValue", () => {
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { x: 1, y: 1 },
+                { x: 0, y: 1 },
             ),
         ).toBe(stateType.DEAD);
         expect(
@@ -68,7 +68,7 @@ describe("getValue", () => {
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { x: -1, y: -1 },
+                { x: -1, y: 0 },
             ),
         ).toBe(stateType.ALIVE);
         expect(
@@ -77,7 +77,7 @@ describe("getValue", () => {
                     "⬛⬛",
                     "⬜⬜",
                 ]),
-                { x: 1, y: -1 },
+                { x: 0, y: 0 },
             ),
         ).toBe(stateType.ALIVE);
     });

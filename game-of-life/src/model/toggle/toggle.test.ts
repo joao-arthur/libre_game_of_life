@@ -26,7 +26,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(toggle(model, { x: 1, y: -1 })).toEqual(
+    expect(toggle(model, { x: 0, y: 0 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬛⬛⬛",
@@ -34,7 +34,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(toggle(model, { x: 2, y: -2 })).toEqual(
+    expect(toggle(model, { x: 1, y: -1 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬛⬛⬛",
@@ -42,7 +42,7 @@ it("toggle", () => {
             "⬜⬜⬜⬛",
         ]),
     );
-    expect(toggle(model, { x: 2, y: 2 })).toEqual(
+    expect(toggle(model, { x: 1, y: 2 })).toEqual(
         fromString([
             "⬛⬛⬛⬜",
             "⬛⬛⬛⬛",
@@ -50,7 +50,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(toggle(model, { x: -2, y: -2 })).toEqual(
+    expect(toggle(model, { x: -2, y: -1 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬛⬛⬛",

@@ -14,14 +14,14 @@ it("fromModel", () => {
         ),
     ).toEqual(
         [
-            undefined,
-            undefined,
-            undefined,
+            stateType.DEAD,
+            stateType.DEAD,
+            stateType.DEAD,
 
-            undefined,
+            stateType.DEAD,
             stateType.ALIVE,
 
-            undefined,
+            stateType.DEAD,
             stateType.DEAD,
             stateType.ALIVE,
         ],

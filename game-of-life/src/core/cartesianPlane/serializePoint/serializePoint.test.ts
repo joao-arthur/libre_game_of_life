@@ -1,7 +1,7 @@
-import { describe, expect } from "vitest";
+import { expect, it } from "vitest";
 import { serializePoint } from "./serializePoint.js";
 
-describe("serializePoint", () => {
+it("serializePoint", () => {
     expect(serializePoint({ x: 0, y: 0 })).toBe("(x: 0, y: 0)");
     expect(serializePoint({ x: -1, y: -1 })).toBe("(x: -1, y: -1)");
     expect(serializePoint({ x: 1, y: 1 })).toBe("(x: 1, y: 1)");
