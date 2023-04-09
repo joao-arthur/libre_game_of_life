@@ -10,7 +10,7 @@ export function iterate(
 ): modelType {
     const iteratingPoints = maps
         .keys(model.value)
-        .map((key) => cartesianPlane.deserializePoint(key))
+        .map(cartesianPlane.deserializePoint)
         .flatMap((point) => [
             { x: point.x - 1, y: point.y + 1 },
             { x: point.x, y: point.y + 1 },

@@ -44,15 +44,12 @@ export default function Main(): ReactElement {
         const y = e.pageY - e.currentTarget.offsetTop;
         const modelSize = modelFns.getSize(model.model);
         const unitSize = getUnitSize(model.model, model.dimension);
-
         const col = cartesianPlane.absoluteToRelative(x, unitSize);
         const row = cartesianPlane.absoluteToRelative(y, unitSize);
-
         const point = cartesianPlane.indexToPoint(
             { col, row },
             modelSize,
         );
-
         controller.toggleCell(point);
         setPreset("");
     }
@@ -97,7 +94,7 @@ export default function Main(): ReactElement {
                         <RangeInput
                             id="gap"
                             min={0}
-                            max={3}
+                            max={2}
                             step={1}
                             value={model ? model.gap : 0}
                             onChange={(gap) =>
@@ -116,14 +113,18 @@ export default function Main(): ReactElement {
                         <RangeInput
                             id="size"
                             min={2}
-                            max={100}
+                            max={120}
                             step={2}
-                            value={model ? model.model.size : 0}
+                            value={model
+                                ? modelFns.getSize(model.model)
+                                : 0}
                             onChange={(size) =>
                                 controller?.setSize(size)}
                         />
                         <label className="w-6 text-center block">
-                            {model ? model.model.size : 0}
+                            {model
+                                ? modelFns.getSize(model.model)
+                                : 0}
                         </label>
                     </div>
                 </div>
@@ -133,7 +134,7 @@ export default function Main(): ReactElement {
                         <RangeInput
                             id="fps"
                             min={1}
-                            max={20}
+                            max={30}
                             step={1}
                             value={model ? model.fps : 0}
                             onChange={(fps) =>

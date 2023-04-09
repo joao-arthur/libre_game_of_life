@@ -11,5 +11,6 @@
     "deno.inlayHints.variableTypes.suppressWhenTypeMatchesName": false,
     "editor.defaultFormatter": "denoland.vscode-deno",
     "editor.formatOnPaste": false,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
