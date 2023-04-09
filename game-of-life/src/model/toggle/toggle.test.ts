@@ -10,9 +10,7 @@ const model = fromString([
 ]);
 
 it("toggle", () => {
-    expect(
-        toggle(model, { column: 0, row: 0 }),
-    ).toEqual(
+    expect(toggle(model, { x: -2, y: 2 })).toEqual(
         fromString([
             "⬜⬛⬛⬛",
             "⬛⬛⬛⬛",
@@ -20,9 +18,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(
-        toggle(model, { column: 1, row: 1 }),
-    ).toEqual(
+    expect(toggle(model, { x: -1, y: 1 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬜⬛⬛",
@@ -30,9 +26,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(
-        toggle(model, { column: 2, row: 2 }),
-    ).toEqual(
+    expect(toggle(model, { x: 1, y: -1 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬛⬛⬛",
@@ -40,9 +34,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(
-        toggle(model, { column: 3, row: 3 }),
-    ).toEqual(
+    expect(toggle(model, { x: 2, y: -2 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬛⬛⬛",
@@ -50,9 +42,7 @@ it("toggle", () => {
             "⬜⬜⬜⬛",
         ]),
     );
-    expect(
-        toggle(model, { column: 3, row: 0 }),
-    ).toEqual(
+    expect(toggle(model, { x: 2, y: 2 })).toEqual(
         fromString([
             "⬛⬛⬛⬜",
             "⬛⬛⬛⬛",
@@ -60,9 +50,7 @@ it("toggle", () => {
             "⬜⬜⬜⬜",
         ]),
     );
-    expect(
-        toggle(model, { column: 0, row: 3 }),
-    ).toEqual(
+    expect(toggle(model, { x: -2, y: -2 })).toEqual(
         fromString([
             "⬛⬛⬛⬛",
             "⬛⬛⬛⬛",

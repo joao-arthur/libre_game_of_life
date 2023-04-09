@@ -1,9 +1,8 @@
-import { stateType } from "../../cell/mod.js";
 import {
     cartesianPlane,
     cartesianPointType,
 } from "../../core/cartesianPlane/mod.js";
-import { serializeCoordinate } from "../serializeCoordinate/mod.js";
+import { stateType } from "../../cell/mod.js";
 import { modelType } from "../model.js";
 
 export function fromString(stringValue: string[]): modelType {
@@ -27,7 +26,7 @@ export function fromString(stringValue: string[]): modelType {
 
     const entries: [string, stateType.ALIVE][] = aliveCells.map(
         (aliveCell) => [
-            serializeCoordinate(aliveCell),
+            cartesianPlane.serializePoint(aliveCell),
             stateType.ALIVE,
         ],
     );

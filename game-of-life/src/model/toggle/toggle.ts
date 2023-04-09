@@ -1,17 +1,25 @@
-import { cellFns } from "../../cell/mod.js";
-import { positionType } from "../position.js";
+import { maps } from "funis";
+import {
+    cartesianPlane,
+    cartesianPointType,
+} from "../../core/cartesianPlane/mod.js";
+import { stateType } from "../../cell/mod.js";
 import { modelType } from "../model.js";
-import { map } from "../map/mod.js";
 
 export function toggle(
     model: modelType,
-    position: positionType,
+    point: cartesianPointType,
 ): modelType {
-    return map(
-        model,
-        ({ column, row }, current) =>
-            column === position.column && row === position.row
-                ? cellFns.toggle(current)
-                : current,
-    );
+    const key = cartesianPlane.serializePoint(point);
+    const current = maps.entries(model.value);
+
+    const entries = model.value.has(key)
+        ? current.filter(([valueKey]) => valueKey !== key)
+        : current.concat([[key, stateType.ALIVE]]);
+
+    return {
+        value: new Map(entries),
+        iteration: model.iteration,
+        position: model.position,
+    };
 }
