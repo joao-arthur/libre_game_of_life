@@ -1,16 +1,16 @@
 import { pipe } from "funis";
+import { cartesianPointType } from "../../core/cartesianPlane/cartesianPoint.js";
 import { aliveNeighborsType } from "../aliveNeighbors.js";
 import { fromModel } from "../fromModel/mod.js";
 import { modelType } from "../../model/mod.js";
 import { numberOfAlive } from "../numberOfAlive/mod.js";
-import { positionType } from "../../model/position.js";
 
 export function aliveFromModel(
     model: modelType,
-    position: positionType,
+    point: cartesianPointType,
 ): aliveNeighborsType {
     return pipe(
-        () => fromModel(model, position),
+        () => fromModel(model, point),
         (neighbors) => numberOfAlive(neighbors),
     )(undefined);
 }

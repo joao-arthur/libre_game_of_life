@@ -9,7 +9,7 @@ it("aliveFromModel", () => {
                 "⬛⬜",
                 "⬛⬜",
             ]),
-            { column: 0, row: 0 },
+            { x: -1, y: 1 },
         ),
     ).toBe(2);
 });
