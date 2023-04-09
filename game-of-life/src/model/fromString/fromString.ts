@@ -25,18 +25,22 @@ export function fromString(stringValue: string[]): modelType {
                 .map((entry) => entry as cartesianPointType),
     );
 
-    const entries: [string, stateType][] = aliveCells.map(
+    const entries: [string, stateType.ALIVE][] = aliveCells.map(
         (aliveCell) => [
             serializeCoordinate(aliveCell),
             stateType.ALIVE,
         ],
     );
-    const value: Map<string, stateType> = new Map(entries);
+    const value = new Map(entries);
 
     return {
         value,
         iteration: 0,
-        position: { x: 0, y: 0 },
-        size: 20,
+        position: {
+            x1: -10,
+            y1: -10,
+            x2: 10,
+            y2: 10,
+        },
     };
 }
