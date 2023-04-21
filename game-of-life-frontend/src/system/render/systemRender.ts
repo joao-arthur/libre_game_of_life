@@ -31,6 +31,14 @@ export class SystemRender {
             }
         }
 
+        const diffX =
+            (model.model.position.x1 + model.model.position.x2) / 2;
+        const diffY =
+            (model.model.position.y1 + model.model.position.y2) / 2;
+
+        const deltaX = diffX * unitSize;
+        const deltaY = diffY * unitSize;
+
         maps.keys(model.model.value)
             .map(cartesianPlane.deserializePoint)
             .forEach((point) => {
@@ -39,8 +47,8 @@ export class SystemRender {
                     length,
                 );
                 model.drawContext.drawSquare({
-                    x: col * unitSize + model.gap,
-                    y: row * unitSize + model.gap,
+                    x: col * unitSize + model.gap - deltaX,
+                    y: row * unitSize + model.gap + deltaY,
                     size: unitSize - model.gap * 2,
                 }, this.ALIVE_COLOR);
             });
