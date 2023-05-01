@@ -1,7 +1,7 @@
-import { presetType } from "./preset.js";
+import { Preset } from "./preset.js";
 
-export type presetSubGroupType = {
+export type PresetSubGroup = {
     readonly name: string;
     readonly id: string;
-    readonly items: readonly presetType[];
+    readonly items: readonly Preset[];
 };

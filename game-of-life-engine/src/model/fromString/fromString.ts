@@ -1,11 +1,11 @@
 import {
-    cartesianPlane,
-    cartesianPointType,
+    cartesianPlaneFns,
+    CartesianPoint,
 } from "../../cartesianPlane/mod.js";
-import { stateType } from "../../cell/mod.js";
-import { modelType } from "../model.js";
+import { State } from "../../cell/mod.js";
+import { Model } from "../model.js";
 
-export function fromString(stringValue: string[]): modelType {
+export function fromString(stringValue: string[]): Model {
     const length = stringValue.length;
 
     const aliveCells = stringValue.flatMap(
@@ -14,20 +14,20 @@ export function fromString(stringValue: string[]): modelType {
                 .split("")
                 .map((colValue, col) =>
                     colValue === "⬜"
-                        ? cartesianPlane.indexToPoint(
+                        ? cartesianPlaneFns.indexToPoint(
                             { row, col },
                             length,
                         )
                         : undefined
                 )
                 .filter((entry) => entry !== undefined)
-                .map((entry) => entry as cartesianPointType),
+                .map((entry) => entry as CartesianPoint),
     );
 
-    const entries: [string, stateType.ALIVE][] = aliveCells.map(
+    const entries: [string, State.ALIVE][] = aliveCells.map(
         (aliveCell) => [
-            cartesianPlane.serializePoint(aliveCell),
-            stateType.ALIVE,
+            cartesianPlaneFns.serializePoint(aliveCell),
+            State.ALIVE,
         ],
     );
     const value = new Map(entries);

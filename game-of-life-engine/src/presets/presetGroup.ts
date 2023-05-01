@@ -1,9 +1,9 @@
-import { presetSubGroupType } from "./presetSubGroup.js";
+import { PresetSubGroup } from "./presetSubGroup.js";
 
-export type presetGroupType = {
+export type PresetGroup = {
     readonly group: {
         readonly name: string;
         readonly id: string;
     };
-    readonly subGroups: readonly presetSubGroupType[];
+    readonly subGroups: readonly PresetSubGroup[];
 };

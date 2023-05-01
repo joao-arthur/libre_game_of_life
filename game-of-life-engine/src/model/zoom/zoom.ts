@@ -1,6 +1,6 @@
-import { modelType } from "../model.js";
+import { Model } from "../model.js";
 
-export function zoom(model: modelType, newSize: number): modelType {
+export function zoom(model: Model, newSize: number): Model {
     const halfNewSize = newSize / 2;
     const halfX = (model.position.x1 + model.position.x2) / 2;
     const halfY = (model.position.y1 + model.position.y2) / 2;

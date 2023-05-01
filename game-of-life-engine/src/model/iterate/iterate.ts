@@ -1,16 +1,16 @@
 import { arrays, maps } from "funis";
-import { cartesianPlane } from "../../cartesianPlane/cartesianPlane.js";
-import { modelType } from "../model.js";
+import { cartesianPlaneFns } from "../../cartesianPlane/mod.js";
+import { Model } from "../model.js";
 import { neighborsFns } from "../../neighbors/mod.js";
-import { cellFns, stateType } from "../../cell/mod.js";
+import { cellFns, State } from "../../cell/mod.js";
 import { getValue } from "../getValue/mod.js";
 
 export function iterate(
-    model: modelType,
-): modelType {
+    model: Model,
+): Model {
     const iteratingPoints = maps
         .keys(model.value)
-        .map(cartesianPlane.deserializePoint)
+        .map(cartesianPlaneFns.deserializePoint)
         .flatMap((point) => [
             { x: point.x - 1, y: point.y + 1 },
             { x: point.x, y: point.y + 1 },
@@ -23,8 +23,8 @@ export function iterate(
             { x: point.x + 1, y: point.y - 1 },
         ]);
     const uniquePoints = arrays
-        .unique(iteratingPoints.map(cartesianPlane.serializePoint))
-        .map(cartesianPlane.deserializePoint);
+        .unique(iteratingPoints.map(cartesianPlaneFns.serializePoint))
+        .map(cartesianPlaneFns.deserializePoint);
     const entries = uniquePoints
         .map((point) => {
             const state = getValue(model, point);
@@ -33,12 +33,12 @@ export function iterate(
                 point,
             );
             const newCell = cellFns.iterate(state, neighbors);
-            return newCell === stateType.ALIVE
-                ? [cartesianPlane.serializePoint(point), newCell]
+            return newCell === State.ALIVE
+                ? [cartesianPlaneFns.serializePoint(point), newCell]
                 : undefined;
         })
         .filter((value) => value !== undefined)
-        .map((value) => value as [string, stateType.ALIVE]);
+        .map((value) => value as [string, State.ALIVE]);
 
     return {
         value: new Map(entries),

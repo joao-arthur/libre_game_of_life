@@ -1,10 +1,10 @@
-import { arrayPositionType } from "../../array/arrayPosition.js";
-import { cartesianPointType } from "../cartesianPoint.js";
+import { ArrayPosition } from "../../array/arrayPosition.js";
+import { CartesianPoint } from "../cartesianPoint.js";
 
 export function indexToPoint(
-    position: arrayPositionType,
+    position: ArrayPosition,
     length: number,
-): cartesianPointType {
+): CartesianPoint {
     const half = Math.floor(length / 2);
 
     return {

@@ -1,8 +1,8 @@
 import { expect, it } from "vitest";
-import { modelType } from "../model.js";
+import { Model } from "../model.js";
 import { move } from "./move.js";
 
-function build(position: modelType["position"]): modelType {
+function build(position: Model["position"]): Model {
     return { value: new Map(), iteration: 0, position };
 }
 

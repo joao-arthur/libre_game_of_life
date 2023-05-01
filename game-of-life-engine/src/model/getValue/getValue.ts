@@ -1,15 +1,15 @@
 import {
-    cartesianPlane,
-    cartesianPointType,
+    cartesianPlaneFns,
+    CartesianPoint,
 } from "../../cartesianPlane/mod.js";
-import { stateType } from "../../cell/mod.js";
-import { modelType } from "../model.js";
+import { State } from "../../cell/mod.js";
+import { Model } from "../model.js";
 
 export function getValue(
-    model: modelType,
-    point: cartesianPointType,
-): stateType {
-    return model.value.has(cartesianPlane.serializePoint(point))
-        ? stateType.ALIVE
-        : stateType.DEAD;
+    model: Model,
+    point: CartesianPoint,
+): State {
+    return model.value.has(cartesianPlaneFns.serializePoint(point))
+        ? State.ALIVE
+        : State.DEAD;
 }

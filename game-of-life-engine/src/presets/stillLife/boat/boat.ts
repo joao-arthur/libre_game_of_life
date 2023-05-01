@@ -1,7 +1,7 @@
 import { modelFns } from "../../../model/mod.js";
-import { presetType } from "../../preset.js";
+import { Preset } from "../../preset.js";
 
-export const boat: presetType = {
+export const boat: Preset = {
     name: "Boat",
     id: "boat",
     discover: { name: "JHC group", year: 1970 },

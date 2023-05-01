@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { stateType } from "../../cell/state.js";
+import { State } from "../../cell/state.js";
 import { numberOfAlive } from "./numberOfAlive.js";
 
 it("numberOfAlive", () => {
@@ -17,37 +17,37 @@ it("numberOfAlive", () => {
     ).toBe(0);
     expect(
         numberOfAlive([
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
         ]),
     ).toBe(0);
     expect(
         numberOfAlive([
-            stateType.ALIVE,
-            stateType.ALIVE,
-            stateType.ALIVE,
-            stateType.ALIVE,
-            stateType.ALIVE,
-            stateType.ALIVE,
-            stateType.ALIVE,
-            stateType.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
+            State.ALIVE,
         ]),
     ).toBe(8);
     expect(
         numberOfAlive([
-            stateType.ALIVE,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
+            State.ALIVE,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
             undefined,
         ]),
     ).toBe(1);

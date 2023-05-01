@@ -1,7 +1,7 @@
-import { presetGroupType } from "../presetGroup.js";
+import { PresetGroup } from "../presetGroup.js";
 import { general } from "./general/mod.js";
 
-export const puffer: presetGroupType = {
+export const puffer: PresetGroup = {
     group: { name: "Puffer", id: "puffer" },
     subGroups: [
         general,

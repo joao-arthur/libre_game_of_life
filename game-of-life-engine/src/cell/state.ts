@@ -1,4 +1,4 @@
-export enum stateType {
+export enum State {
     DEAD,
     ALIVE,
 }

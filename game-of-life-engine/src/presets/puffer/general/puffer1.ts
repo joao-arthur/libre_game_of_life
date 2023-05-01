@@ -1,7 +1,7 @@
 import { modelFns } from "../../../model/mod.js";
-import { presetType } from "../../preset.js";
+import { Preset } from "../../preset.js";
 
-export const puffer1: presetType = {
+export const puffer1: Preset = {
     name: "Puffer 1",
     id: "puffer1",
     discover: { name: "Bill Gosper", year: 1971 },

@@ -4,7 +4,7 @@ import { serializePoint } from "./serializePoint/mod.js";
 import { deserializePoint } from "./deserializePoint/mod.js";
 import { absoluteToRelative } from "./absoluteToRelative/mod.js";
 
-export const cartesianPlane = {
+export const cartesianPlaneFns = {
     indexToPoint,
     pointToIndex,
     serializePoint,

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { stateType } from "../../cell/mod.js";
+import { State } from "../../cell/mod.js";
 import { fromString } from "../../model/fromString/mod.js";
 import { fromModel } from "./fromModel.js";
 
@@ -14,16 +14,16 @@ it("fromModel", () => {
         ),
     ).toEqual(
         [
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.DEAD,
+            State.DEAD,
+            State.DEAD,
+            State.DEAD,
 
-            stateType.DEAD,
-            stateType.ALIVE,
+            State.DEAD,
+            State.ALIVE,
 
-            stateType.DEAD,
-            stateType.DEAD,
-            stateType.ALIVE,
+            State.DEAD,
+            State.DEAD,
+            State.ALIVE,
         ],
     );
     expect(
@@ -37,16 +37,16 @@ it("fromModel", () => {
         ),
     ).toEqual(
         [
-            stateType.DEAD,
-            stateType.ALIVE,
-            stateType.ALIVE,
+            State.DEAD,
+            State.ALIVE,
+            State.ALIVE,
 
-            stateType.DEAD,
-            stateType.ALIVE,
+            State.DEAD,
+            State.ALIVE,
 
-            stateType.DEAD,
-            stateType.ALIVE,
-            stateType.DEAD,
+            State.DEAD,
+            State.ALIVE,
+            State.DEAD,
         ],
     );
 });

@@ -1,8 +1,8 @@
 import { expect, it } from "vitest";
-import { stateType } from "../state.js";
+import { State } from "../state.js";
 import { toggle } from "./toggle.js";
 
 it("toggle", () => {
-    expect(toggle(stateType.ALIVE)).toBe(stateType.DEAD);
-    expect(toggle(stateType.DEAD)).toBe(stateType.ALIVE);
+    expect(toggle(State.ALIVE)).toBe(State.DEAD);
+    expect(toggle(State.DEAD)).toBe(State.ALIVE);
 });

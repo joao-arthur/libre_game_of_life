@@ -1,6 +1,6 @@
-import { presetSubGroupType } from "../../presetSubGroup.js";
+import { PresetSubGroup } from "../../presetSubGroup.js";
 
-export const loaf: presetSubGroupType = {
+export const loaf: PresetSubGroup = {
     name: "Loaf",
     id: "loaf",
     items: [],

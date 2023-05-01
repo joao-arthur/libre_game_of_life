@@ -1,7 +1,7 @@
-import { presetGroupType } from "../presetGroup.js";
+import { PresetGroup } from "../presetGroup.js";
 import { general } from "./general/mod.js";
 
-export const methuselahs: presetGroupType = {
+export const methuselahs: PresetGroup = {
     group: { name: "Methuselahs", id: "methuselahs" },
     subGroups: [
         general,

@@ -1,7 +1,7 @@
 import { modelFns } from "../../../model/mod.js";
-import { presetType } from "../../preset.js";
+import { Preset } from "../../preset.js";
 
-export const blinker: presetType = {
+export const blinker: Preset = {
     name: "Blinker",
     id: "blinker",
     discover: { name: "John Conway", year: 1969 },

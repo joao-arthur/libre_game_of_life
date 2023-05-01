@@ -1,7 +1,7 @@
-import { cartesianPointType } from "../cartesianPoint.js";
+import { CartesianPoint } from "../cartesianPoint.js";
 
 export function serializePoint(
-    point: cartesianPointType,
+    point: CartesianPoint,
 ): string {
     return `(x: ${point.x}, y: ${point.y})`;
 }

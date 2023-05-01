@@ -1,7 +1,7 @@
 import { modelFns } from "../../../model/mod.js";
-import { presetType } from "../../preset.js";
+import { Preset } from "../../preset.js";
 
-export const rPentomino: presetType = {
+export const rPentomino: Preset = {
     name: "R-Pentomino",
     id: "rPentomino",
     discover: { name: "John Conway", year: 1969 },

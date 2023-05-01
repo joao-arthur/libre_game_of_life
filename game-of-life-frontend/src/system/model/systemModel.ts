@@ -1,10 +1,10 @@
-import { modelType } from "game-of-life-engine";
+import { Model } from "game-of-life-engine";
 import { drawContextType } from "../../ports/drawContext";
 
 type cbType = (param: keyof systemModelType) => void;
 
 export type systemModelType = {
-    readonly model: modelType;
+    readonly model: Model;
     readonly gap: number;
     readonly fps: number;
     readonly status: "resumed" | "paused";
@@ -15,7 +15,7 @@ export type systemModelType = {
 export class SystemModel {
     private readonly onChangeListeners: (cbType)[] = [];
 
-    private model: modelType;
+    private model: Model;
     private gap: number;
     private fps: number;
     private status: "resumed" | "paused";

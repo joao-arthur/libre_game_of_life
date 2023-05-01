@@ -1,10 +1,10 @@
-import { cartesianPointType } from "../../cartesianPlane/mod.js";
-import { modelType } from "../model.js";
+import { CartesianPoint } from "../../cartesianPlane/mod.js";
+import { Model } from "../model.js";
 
 export function move(
-    model: modelType,
-    delta: cartesianPointType,
-): modelType {
+    model: Model,
+    delta: CartesianPoint,
+): Model {
     return {
         value: model.value,
         iteration: model.iteration,

@@ -1,7 +1,7 @@
 import { modelFns } from "../../../model/mod.js";
-import { presetType } from "../../preset.js";
+import { Preset } from "../../preset.js";
 
-export const glider: presetType = {
+export const glider: Preset = {
     name: "Glider",
     id: "glider",
     discover: { name: "Richard K. Guy", year: 1969 },

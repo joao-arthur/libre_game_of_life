@@ -1,3 +1,3 @@
-export type { presetType } from "./preset.js";
+export type { Preset } from "./preset.js";
 
 export { presetGroups } from "./presetGroups.js";

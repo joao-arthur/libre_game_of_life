@@ -1,7 +1,7 @@
 import { modelFns } from "../../../model/mod.js";
-import { presetType } from "../../preset.js";
+import { Preset } from "../../preset.js";
 
-export const block: presetType = {
+export const block: Preset = {
     name: "Block",
     id: "block",
     discover: { name: "John Conway", year: 1969 },

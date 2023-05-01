@@ -1,12 +1,12 @@
-import { stateType } from "../cell/mod.js";
+import { State } from "../cell/mod.js";
 
-export type neighborsType = readonly [
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
-    stateType | undefined,
+export type Neighbors = readonly [
+    State | undefined,
+    State | undefined,
+    State | undefined,
+    State | undefined,
+    State | undefined,
+    State | undefined,
+    State | undefined,
+    State | undefined,
 ];

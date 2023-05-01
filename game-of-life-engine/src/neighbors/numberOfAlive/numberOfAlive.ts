@@ -1,11 +1,11 @@
-import { stateType } from "../../cell/mod.js";
-import { neighborsType } from "../neighbors.js";
-import { aliveNeighborsType } from "../aliveNeighbors.js";
+import { State } from "../../cell/mod.js";
+import { Neighbors } from "../neighbors.js";
+import { AliveNeighbors } from "../aliveNeighbors.js";
 
 export function numberOfAlive(
-    neighbors: neighborsType,
-): aliveNeighborsType {
+    neighbors: Neighbors,
+): AliveNeighbors {
     return neighbors
-        .filter((neighbor) => neighbor === stateType.ALIVE)
-        .length as aliveNeighborsType;
+        .filter((neighbor) => neighbor === State.ALIVE)
+        .length as AliveNeighbors;
 }

@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { zoom } from "./zoom.js";
-import { modelType } from "../model.js";
+import { Model } from "../model.js";
 
-function build(position: modelType["position"]): modelType {
+function build(position: Model["position"]): Model {
     return { value: new Map(), iteration: 0, position };
 }
 

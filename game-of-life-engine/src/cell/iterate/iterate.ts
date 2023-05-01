@@ -1,18 +1,18 @@
-import { aliveNeighborsType } from "../../neighbors/aliveNeighbors.js";
-import { stateType } from "../state.js";
+import { AliveNeighbors } from "../../neighbors/aliveNeighbors.js";
+import { State } from "../state.js";
 
 export function iterate(
-    state: stateType,
-    numberOfAliveNeighbors: aliveNeighborsType,
-): stateType {
+    state: State,
+    numberOfAliveNeighbors: AliveNeighbors,
+): State {
     switch (state) {
-        case stateType.ALIVE:
+        case State.ALIVE:
             return [2, 3].includes(numberOfAliveNeighbors)
-                ? stateType.ALIVE
-                : stateType.DEAD;
-        case stateType.DEAD:
+                ? State.ALIVE
+                : State.DEAD;
+        case State.DEAD:
             return [3].includes(numberOfAliveNeighbors)
-                ? stateType.ALIVE
-                : stateType.DEAD;
+                ? State.ALIVE
+                : State.DEAD;
     }
 }

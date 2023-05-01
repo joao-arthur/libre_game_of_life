@@ -1,12 +1,12 @@
-import { stateType } from "../state.js";
+import { State } from "../state.js";
 
 export function toggle(
-    state: stateType,
-): stateType {
+    state: State,
+): State {
     switch (state) {
-        case stateType.ALIVE:
-            return stateType.DEAD;
-        case stateType.DEAD:
-            return stateType.ALIVE;
+        case State.ALIVE:
+            return State.DEAD;
+        case State.DEAD:
+            return State.ALIVE;
     }
 }

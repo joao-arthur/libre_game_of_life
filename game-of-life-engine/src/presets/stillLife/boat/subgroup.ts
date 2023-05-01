@@ -1,7 +1,7 @@
-import { presetSubGroupType } from "../../presetSubGroup.js";
+import { PresetSubGroup } from "../../presetSubGroup.js";
 import { boat as boatPreset } from "./boat.js";
 
-export const boat: presetSubGroupType = {
+export const boat: PresetSubGroup = {
     name: "Boat",
     id: "boat",
     items: [boatPreset],

@@ -1,8 +1,8 @@
-import { cartesianPointType } from "../cartesianPoint.js";
+import { CartesianPoint } from "../cartesianPoint.js";
 
 export function deserializePoint(
     point: string,
-): cartesianPointType {
+): CartesianPoint {
     const [x, y] = point
         .replace("(", "")
         .replace("x: ", "")
