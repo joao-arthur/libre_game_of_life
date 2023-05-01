@@ -1,6 +1,5 @@
 import { maps } from "funis";
-import { cartesianPlane, modelFns } from "game-of-life-engine";
-import { getUnitSize } from "../getUnitSize/mod";
+import { cartesianPlaneFns, modelFns } from "game-of-life-engine";
 import { SystemModel } from "../model/mod";
 
 export class SystemRender {
@@ -13,43 +12,33 @@ export class SystemRender {
 
     public render(): void {
         const model = this.systemModel.getModel();
-        const length = modelFns.getSize(model.model);
-        const unitSize = getUnitSize(model.model, model.dimension);
-        model.drawContext.clear({
+        const length = modelFns.getLength(model.model);
+        const cellSize = modelFns.getCellSize(
+            model.model,
+            model.dimension,
+        );
+        const middleCell = modelFns.getMiddleCell(
+            model.model,
+            model.dimension,
+        );
+
+        model.drawContext.drawSquare({
             x: 0,
             y: 0,
             size: model.dimension,
-        });
-
-        for (let col = 0; col < length; col++) {
-            for (let row = 0; row < length; row++) {
-                model.drawContext.drawSquare({
-                    x: col * unitSize + model.gap,
-                    y: row * unitSize + model.gap,
-                    size: unitSize - model.gap * 2,
-                }, this.DEAD_COLOR);
-            }
-        }
-
-        const diffX =
-            (model.model.position.x1 + model.model.position.x2) / 2;
-        const diffY =
-            (model.model.position.y1 + model.model.position.y2) / 2;
-
-        const deltaX = diffX * unitSize;
-        const deltaY = diffY * unitSize;
+        }, this.DEAD_COLOR);
 
         maps.keys(model.model.value)
-            .map(cartesianPlane.deserializePoint)
+            .map(cartesianPlaneFns.deserializePoint)
             .forEach((point) => {
-                const { col, row } = cartesianPlane.pointToIndex(
+                const { col, row } = cartesianPlaneFns.pointToIndex(
                     point,
                     length,
                 );
                 model.drawContext.drawSquare({
-                    x: col * unitSize + model.gap - deltaX,
-                    y: row * unitSize + model.gap + deltaY,
-                    size: unitSize - model.gap * 2,
+                    x: col * cellSize + model.gap - middleCell.x,
+                    y: row * cellSize + model.gap + middleCell.y,
+                    size: cellSize - model.gap * 2,
                 }, this.ALIVE_COLOR);
             });
     }

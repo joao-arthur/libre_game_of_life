@@ -2,6 +2,7 @@ import { fromString } from "./fromString/mod.js";
 import { getValue } from "./getValue/mod.js";
 import { getLength } from "./getLength/mod.js";
 import { getCellSize } from "./getCellSize/mod.js";
+import { getMiddleCell } from "./getMiddleCell/mod.js";
 import { getMiddlePoint } from "./getMiddlePoint/mod.js";
 import { iterate } from "./iterate/mod.js";
 import { toggle } from "./toggle/mod.js";
@@ -13,6 +14,7 @@ export const modelFns = {
     getValue,
     getLength,
     getCellSize,
+    getMiddleCell,
     getMiddlePoint,
     iterate,
     toggle,
