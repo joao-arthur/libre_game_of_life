@@ -1,12 +1,14 @@
 import { State } from "../cell/mod.js";
 
+export type Neighbor = State | undefined;
+
 export type Neighbors = readonly [
-    State | undefined,
-    State | undefined,
-    State | undefined,
-    State | undefined,
-    State | undefined,
-    State | undefined,
-    State | undefined,
-    State | undefined,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
 ];

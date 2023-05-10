@@ -1,4 +1,4 @@
-import { maps } from "funis";
+import { map } from "funis";
 import { cartesianPlaneFns, modelFns } from "game-of-life-engine";
 import { SystemModel } from "../model/mod";
 
@@ -28,7 +28,7 @@ export class SystemRender {
             size: model.dimension,
         }, this.DEAD_COLOR);
 
-        maps.keys(model.model.value)
+        map.keys(model.model.value)
             .map(cartesianPlaneFns.deserializePoint)
             .forEach((point) => {
                 const { col, row } = cartesianPlaneFns.pointToIndex(

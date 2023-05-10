@@ -1,4 +1,4 @@
-import { maps } from "funis";
+import { map } from "funis";
 import {
     cartesianPlaneFns,
     CartesianPoint,
@@ -11,7 +11,7 @@ export function toggle(
     point: CartesianPoint,
 ): Model {
     const key = cartesianPlaneFns.serializePoint(point);
-    const current = maps.entries(model.value);
+    const current = map.entries(model.value);
 
     const entries = model.value.has(key)
         ? current.filter(([valueKey]) => valueKey !== key)

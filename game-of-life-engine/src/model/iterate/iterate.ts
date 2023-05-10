@@ -1,4 +1,4 @@
-import { arrays, maps } from "funis";
+import { arr, map } from "funis";
 import { cartesianPlaneFns } from "../../cartesianPlane/mod.js";
 import { Model } from "../model.js";
 import { neighborsFns } from "../../neighbors/mod.js";
@@ -8,7 +8,7 @@ import { getValue } from "../getValue/mod.js";
 export function iterate(
     model: Model,
 ): Model {
-    const iteratingPoints = maps
+    const iteratingPoints = map
         .keys(model.value)
         .map(cartesianPlaneFns.deserializePoint)
         .flatMap((point) => [
@@ -22,7 +22,7 @@ export function iterate(
             { x: point.x, y: point.y - 1 },
             { x: point.x + 1, y: point.y - 1 },
         ]);
-    const uniquePoints = arrays
+    const uniquePoints = arr
         .unique(iteratingPoints.map(cartesianPlaneFns.serializePoint))
         .map(cartesianPlaneFns.deserializePoint);
     const entries = uniquePoints

@@ -3,12 +3,12 @@ lockfileVersion: 5.4
 specifiers:
   '@vitest/coverage-c8': ^0.30.0
   c8: ^7.13.0
-  funis: 1.0.2
+  funis: 1.1.0
   typescript: ^5.0.4
   vitest: ^0.30.0
 
 dependencies:
-  funis: 1.0.2
+  funis: 1.1.0
 
 devDependencies:
   '@vitest/coverage-c8': 0.30.0_vitest@0.30.0
@@ -557,8 +557,8 @@ packages:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
     dev: true
 
-  /funis/1.0.2:
-    resolution: {integrity: sha512-OjuODcGEnQ9p63ENl+M7n/pJTjJ1wP1jCo4aqOrHWvlxibkK+TVpAdhHB/qID4dEunE6+kFwKIAhd55cakMKAA==}
+  /funis/1.1.0:
+    resolution: {integrity: sha512-I/VVzZSR08OJsDgeRIxe95+PoFGE6Q+JdkkZrZlB4ioYvgdfIu+MsB15YJ+7d7mpETImXMsNAK8Uh9kmsf8PBg==}
     engines: {node: '>=18.7.0'}
     dev: false
 

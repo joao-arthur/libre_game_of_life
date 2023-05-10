@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "classnames": "^2.3.2",
-    "funis": "1.0.2",
+    "funis": "1.1.0",
     "game-of-life-engine": "link:../game-of-life-engine",
     "next": "13.3.0",
     "react": "18.2.0",

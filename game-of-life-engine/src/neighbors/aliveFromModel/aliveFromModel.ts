@@ -1,4 +1,4 @@
-import { pipe } from "funis";
+import { std } from "funis";
 import { CartesianPoint } from "../../cartesianPlane/mod.js";
 import { AliveNeighbors } from "../aliveNeighbors.js";
 import { fromModel } from "../fromModel/mod.js";
@@ -9,7 +9,7 @@ export function aliveFromModel(
     model: Model,
     point: CartesianPoint,
 ): AliveNeighbors {
-    return pipe(
+    return std.pipe(
         () => fromModel(model, point),
         (neighbors) => numberOfAlive(neighbors),
     )(undefined);
