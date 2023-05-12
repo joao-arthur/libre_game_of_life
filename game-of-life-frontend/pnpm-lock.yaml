@@ -8,7 +8,7 @@ specifiers:
   autoprefixer: ^10.4.14
   c8: ^7.13.0
   classnames: ^2.3.2
-  funis: 1.1.0
+  funis: 1.1.1
   game-of-life-engine: link:../game-of-life-engine
   next: 13.3.0
   postcss: ^8.4.21
@@ -22,7 +22,7 @@ specifiers:
 
 dependencies:
   classnames: 2.3.2
-  funis: 1.1.0
+  funis: 1.1.1
   game-of-life-engine: link:../game-of-life-engine
   next: 13.3.0_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
@@ -938,8 +938,8 @@ packages:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
     dev: true
 
-  /funis/1.1.0:
-    resolution: {integrity: sha512-I/VVzZSR08OJsDgeRIxe95+PoFGE6Q+JdkkZrZlB4ioYvgdfIu+MsB15YJ+7d7mpETImXMsNAK8Uh9kmsf8PBg==}
+  /funis/1.1.1:
+    resolution: {integrity: sha512-rB/5P+sE9mMDooQwp4+sD6VsQUBKELFgdG5G+rfD2LHLFyVjJORo686NX+RrSYEU3Y68PGcpLW0H3X1mOVJZoA==}
     engines: {node: '>=18.7.0'}
     dev: false
 

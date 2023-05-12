@@ -21,7 +21,7 @@
         "build": "tsc"
     },
     "dependencies": {
-        "funis": "1.1.0"
+        "funis": "1.1.1"
     },
     "devDependencies": {
         "@vitest/coverage-c8": "^0.30.0",
