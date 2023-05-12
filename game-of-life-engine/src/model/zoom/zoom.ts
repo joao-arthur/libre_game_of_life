@@ -1,3 +1,4 @@
+import { num } from "funis";
 import { Model } from "../model.js";
 
 export function zoom(model: Model, newSize: number): Model {
@@ -14,10 +15,10 @@ export function zoom(model: Model, newSize: number): Model {
         value: model.value,
         iteration: model.iteration,
         position: {
-            x1: x1 === -0 ? 0 : x1,
-            y1: y1 === -0 ? 0 : y1,
-            x2: x2 === -0 ? 0 : x2,
-            y2: y2 === -0 ? 0 : y2,
+            x1: num.normalizeZero(x1),
+            y1: num.normalizeZero(y1),
+            x2: num.normalizeZero(x2),
+            y2: num.normalizeZero(y2),
         },
     };
 }

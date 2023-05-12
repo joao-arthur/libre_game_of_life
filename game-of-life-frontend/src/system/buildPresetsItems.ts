@@ -1,6 +1,6 @@
-import { presetGroups, presetType } from "game-of-life-engine";
+import { Preset, presetGroups } from "game-of-life-engine";
 
-export function buildPresetsItems(): presetType[] {
+export function buildPresetsItems(): Preset[] {
     return presetGroups.flatMap((group) =>
         group.subGroups.flatMap((subGroup) => subGroup.items)
     );

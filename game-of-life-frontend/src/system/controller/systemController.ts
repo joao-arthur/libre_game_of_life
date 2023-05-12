@@ -1,5 +1,5 @@
 import { buildPresetsItems } from "../buildPresetsItems";
-import { cartesianPointType, modelFns } from "game-of-life-engine";
+import { CartesianPoint, modelFns } from "game-of-life-engine";
 import { SystemModel, systemModelType } from "../model/mod";
 
 export class SystemController {
@@ -27,7 +27,7 @@ export class SystemController {
     }
 
     public toggleCell(
-        point: cartesianPointType,
+        point: CartesianPoint,
     ): void {
         this.systemModel.setModel(
             modelFns.toggle(
@@ -68,7 +68,7 @@ export class SystemController {
         );
     }
 
-    public move(delta: cartesianPointType): void {
+    public move(delta: CartesianPoint): void {
         this.systemModel.setModel(
             modelFns.move(
                 this.systemModel.getModel().model,
