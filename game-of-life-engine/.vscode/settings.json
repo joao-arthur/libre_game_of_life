@@ -1,8 +1,0 @@
-{
-    "deno.enable": false,
-    "deno.lint": true,
-    "editor.defaultFormatter": "denoland.vscode-deno",
-    "editor.formatOnPaste": false,
-    "editor.formatOnSave": true,
-    "typescript.tsdk": "node_modules/typescript/lib"
-}
