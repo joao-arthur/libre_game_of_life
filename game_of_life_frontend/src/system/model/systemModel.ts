@@ -1,4 +1,4 @@
-import { Model } from "game-of-life-engine";
+import { Model } from "game_of_life_engine";
 import { drawContextType } from "../../ports/drawContext";
 
 type cbType = (param: keyof systemModelType) => void;

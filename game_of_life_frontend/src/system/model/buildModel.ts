@@ -1,4 +1,4 @@
-import { modelFns } from "game-of-life-engine";
+import { modelFns } from "game_of_life_engine";
 import { systemModelType } from "./systemModel";
 
 export function buildModel(

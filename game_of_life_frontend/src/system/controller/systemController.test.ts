@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { modelFns } from "game-of-life-engine";
+import { modelFns } from "game_of_life_engine";
 import { SystemModel, systemModelType } from "../model/mod";
 import { buildPresetsItems } from "../buildPresetsItems";
 import { SystemController } from "./systemController";

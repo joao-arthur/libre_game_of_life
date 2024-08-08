@@ -9,7 +9,7 @@ specifiers:
   c8: ^7.13.0
   classnames: ^2.3.2
   funis: 1.1.1
-  game-of-life-engine: link:../game-of-life-engine
+  game_of_life_engine: link:../game_of_life_engine
   next: 13.3.0
   postcss: ^8.4.21
   react: 18.2.0
@@ -23,7 +23,7 @@ specifiers:
 dependencies:
   classnames: 2.3.2
   funis: 1.1.1
-  game-of-life-engine: link:../game-of-life-engine
+  game_of_life_engine: link:../game_of_life_engine
   next: 13.3.0_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0

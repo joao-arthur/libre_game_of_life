@@ -1,5 +1,5 @@
 import { buildPresetsItems } from "../buildPresetsItems";
-import { CartesianPoint, modelFns } from "game-of-life-engine";
+import { CartesianPoint, modelFns } from "game_of_life_engine";
 import { SystemModel, systemModelType } from "../model/mod";
 
 export class SystemController {

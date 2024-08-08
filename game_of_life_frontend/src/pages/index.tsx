@@ -1,6 +1,6 @@
 import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
-import { cartesianPlaneFns, modelFns } from "game-of-life-engine";
+import { cartesianPlaneFns, modelFns } from "game_of_life_engine";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
 import { Select } from "../components/Select";

@@ -1,4 +1,4 @@
-import { presetGroups } from "game-of-life-engine";
+import { presetGroups } from "game_of_life_engine";
 
 type presetOptionsType = {
     readonly label: string;

@@ -1,5 +1,5 @@
 {
-    "name": "game-of-life-engine",
+    "name": "game_of_life_engine",
     "description": "Conway's game of life engine",
     "author": "joao-arthur",
     "version": "1.0.0",

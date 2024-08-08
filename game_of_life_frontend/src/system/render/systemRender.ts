@@ -1,5 +1,5 @@
 import { map } from "funis";
-import { cartesianPlaneFns, modelFns } from "game-of-life-engine";
+import { cartesianPlaneFns, modelFns } from "game_of_life_engine";
 import { SystemModel } from "../model/mod";
 
 export class SystemRender {
