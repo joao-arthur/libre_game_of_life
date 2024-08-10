@@ -1,9 +1,7 @@
-use std::fmt;
-
 #[derive(Debug, PartialEq)]
 pub struct ArrPos {
     pub row: i64,
-    pub col: i64
+    pub col: i64,
 }
 
 #[derive(Debug, PartialEq)]
@@ -56,7 +54,6 @@ pub fn point_to_index(point: Point, length: i64) -> ArrPos {
     }
 }
 
-
 #[cfg(test)]
 mod test {
     use super::*;
@@ -90,70 +87,274 @@ mod test {
     }
 
     #[test]
-    fn test_index_to_point() {
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 0 }, 1), Point { x: 0, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 0 }, 3), Point { x: -1, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 1 }, 3), Point { x: 0, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 2 }, 3), Point { x: 1, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 0 }, 3), Point { x: -1, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 1 }, 3), Point { x: 0, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 2 }, 3), Point { x: 1, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 0 }, 3), Point { x: -1, y: -1 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 1 }, 3), Point { x: 0, y: -1 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 2 }, 3), Point { x: 1, y: -1 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 0 }, 2), Point { x: -1, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 1 }, 2), Point { x: 0, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 0 }, 2), Point { x: -1, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 1 }, 2), Point { x: 0, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 0 }, 4), Point { x: -2, y: 2 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 1 }, 4), Point { x: -1, y: 2 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 2 }, 4), Point { x: 0, y: 2 });
-        assert_eq!(index_to_point(ArrPos { row: 0, col: 3 }, 4), Point { x: 1, y: 2 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 0 }, 4), Point { x: -2, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 1 }, 4), Point { x: -1, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 2 }, 4), Point { x: 0, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 1, col: 3 }, 4), Point { x: 1, y: 1 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 0 }, 4), Point { x: -2, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 1 }, 4), Point { x: -1, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 2 }, 4), Point { x: 0, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 2, col: 3 }, 4), Point { x: 1, y: 0 });
-        assert_eq!(index_to_point(ArrPos { row: 3, col: 0 }, 4), Point { x: -2, y: -1 });
-        assert_eq!(index_to_point(ArrPos { row: 3, col: 1 }, 4), Point { x: -1, y: -1 });
-        assert_eq!(index_to_point(ArrPos { row: 3, col: 2 }, 4), Point { x: 0, y: -1 });
-        assert_eq!(index_to_point(ArrPos { row: 3, col: 3 }, 4), Point { x: 1, y: -1 });
+    fn test_index_to_point_1x1_grid() {
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 0 }, 1),
+            Point { x: 0, y: 0 }
+        );
     }
 
     #[test]
-    fn test_point_to_index() {
-        assert_eq!(point_to_index(Point { x: 0, y: 0 }, 1), ArrPos { row: 0, col: 0 });
-        assert_eq!(point_to_index(Point { x: -1, y: 1 }, 3), ArrPos { row: 0, col: 0 });
-        assert_eq!(point_to_index(Point { x: 0, y: 1 }, 3), ArrPos { row: 0, col: 1 });
-        assert_eq!(point_to_index(Point { x: 1, y: 1 }, 3), ArrPos { row: 0, col: 2 });
-        assert_eq!(point_to_index(Point { x: -1, y: 0 }, 3), ArrPos { row: 1, col: 0 });
-        assert_eq!(point_to_index(Point { x: 0, y: 0 }, 3), ArrPos { row: 1, col: 1 });
-        assert_eq!(point_to_index(Point { x: 1, y: 0 }, 3), ArrPos { row: 1, col: 2 });
-        assert_eq!(point_to_index(Point { x: -1, y: -1 }, 3), ArrPos { row: 2, col: 0 });
-        assert_eq!(point_to_index(Point { x: 0, y: -1 }, 3), ArrPos { row: 2, col: 1 });
-        assert_eq!(point_to_index(Point { x: 1, y: -1 }, 3), ArrPos { row: 2, col: 2 });
-        assert_eq!(point_to_index(Point { x: -1, y: 1 }, 2), ArrPos { row: 0, col: 0 });
-        assert_eq!(point_to_index(Point { x: 0, y: 1 }, 2), ArrPos { row: 0, col: 1 });
-        assert_eq!(point_to_index(Point { x: -1, y: 0 }, 2), ArrPos { row: 1, col: 0 });
-        assert_eq!(point_to_index(Point { x: 0, y: 0 }, 2), ArrPos { row: 1, col: 1 });
-        assert_eq!(point_to_index(Point { x: -2, y: 2 }, 4), ArrPos { row: 0, col: 0 });
-        assert_eq!(point_to_index(Point { x: -1, y: 2 }, 4), ArrPos { row: 0, col: 1 });
-        assert_eq!(point_to_index(Point { x: 0, y: 2 }, 4), ArrPos { row: 0, col: 2 });
-        assert_eq!(point_to_index(Point { x: 1, y: 2 }, 4), ArrPos { row: 0, col: 3 });
-        assert_eq!(point_to_index(Point { x: -2, y: 1 }, 4), ArrPos { row: 1, col: 0 });
-        assert_eq!(point_to_index(Point { x: -1, y: 1 }, 4), ArrPos { row: 1, col: 1 });
-        assert_eq!(point_to_index(Point { x: 0, y: 1 }, 4), ArrPos { row: 1, col: 2 });
-        assert_eq!(point_to_index(Point { x: 1, y: 1 }, 4), ArrPos { row: 1, col: 3 });
-        assert_eq!(point_to_index(Point { x: -2, y: 0 }, 4), ArrPos { row: 2, col: 0 });
-        assert_eq!(point_to_index(Point { x: -1, y: 0 }, 4), ArrPos { row: 2, col: 1 });
-        assert_eq!(point_to_index(Point { x: 0, y: 0 }, 4), ArrPos { row: 2, col: 2 });
-        assert_eq!(point_to_index(Point { x: 1, y: 0 }, 4), ArrPos { row: 2, col: 3 });
-        assert_eq!(point_to_index(Point { x: -2, y: -1 }, 4), ArrPos { row: 3, col: 0 });
-        assert_eq!(point_to_index(Point { x: -1, y: -1 }, 4), ArrPos { row: 3, col: 1 });
-        assert_eq!(point_to_index(Point { x: 0, y: -1 }, 4), ArrPos { row: 3, col: 2 });
-        assert_eq!(point_to_index(Point { x: 1, y: -1 }, 4), ArrPos { row: 3, col: 3 }); 
+    fn test_index_to_point_2x2_grid() {
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 0 }, 2),
+            Point { x: -1, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 1 }, 2),
+            Point { x: 0, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 0 }, 2),
+            Point { x: -1, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 1 }, 2),
+            Point { x: 0, y: 0 }
+        );
+    }
+
+    #[test]
+    fn test_index_to_point_3x3_grid() {
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 0 }, 3),
+            Point { x: -1, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 1 }, 3),
+            Point { x: 0, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 2 }, 3),
+            Point { x: 1, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 0 }, 3),
+            Point { x: -1, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 1 }, 3),
+            Point { x: 0, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 2 }, 3),
+            Point { x: 1, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 0 }, 3),
+            Point { x: -1, y: -1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 1 }, 3),
+            Point { x: 0, y: -1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 2 }, 3),
+            Point { x: 1, y: -1 }
+        );
+    }
+
+    #[test]
+    fn test_index_to_point_4x4_grid() {
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 0 }, 4),
+            Point { x: -2, y: 2 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 1 }, 4),
+            Point { x: -1, y: 2 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 2 }, 4),
+            Point { x: 0, y: 2 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 0, col: 3 }, 4),
+            Point { x: 1, y: 2 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 0 }, 4),
+            Point { x: -2, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 1 }, 4),
+            Point { x: -1, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 2 }, 4),
+            Point { x: 0, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 1, col: 3 }, 4),
+            Point { x: 1, y: 1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 0 }, 4),
+            Point { x: -2, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 1 }, 4),
+            Point { x: -1, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 2 }, 4),
+            Point { x: 0, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 2, col: 3 }, 4),
+            Point { x: 1, y: 0 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 3, col: 0 }, 4),
+            Point { x: -2, y: -1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 3, col: 1 }, 4),
+            Point { x: -1, y: -1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 3, col: 2 }, 4),
+            Point { x: 0, y: -1 }
+        );
+        assert_eq!(
+            index_to_point(ArrPos { row: 3, col: 3 }, 4),
+            Point { x: 1, y: -1 }
+        );
+    }
+
+    #[test]
+    fn test_point_to_index_1x1_grid() {
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 0 }, 1),
+            ArrPos { row: 0, col: 0 }
+        );
+    }
+
+    #[test]
+    fn test_point_to_index_2x2_grid() {
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 1 }, 2),
+            ArrPos { row: 0, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 1 }, 2),
+            ArrPos { row: 0, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 0 }, 2),
+            ArrPos { row: 1, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 0 }, 2),
+            ArrPos { row: 1, col: 1 }
+        );
+    }
+
+    #[test]
+    fn test_point_to_index_3x3_grid() {
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 1 }, 3),
+            ArrPos { row: 0, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 1 }, 3),
+            ArrPos { row: 0, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: 1 }, 3),
+            ArrPos { row: 0, col: 2 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 0 }, 3),
+            ArrPos { row: 1, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 0 }, 3),
+            ArrPos { row: 1, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: 0 }, 3),
+            ArrPos { row: 1, col: 2 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: -1 }, 3),
+            ArrPos { row: 2, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: -1 }, 3),
+            ArrPos { row: 2, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: -1 }, 3),
+            ArrPos { row: 2, col: 2 }
+        );
+    }
+
+    #[test]
+    fn test_point_to_index_4x4_grid() {
+        assert_eq!(
+            point_to_index(Point { x: -2, y: 2 }, 4),
+            ArrPos { row: 0, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 2 }, 4),
+            ArrPos { row: 0, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 2 }, 4),
+            ArrPos { row: 0, col: 2 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: 2 }, 4),
+            ArrPos { row: 0, col: 3 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -2, y: 1 }, 4),
+            ArrPos { row: 1, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 1 }, 4),
+            ArrPos { row: 1, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 1 }, 4),
+            ArrPos { row: 1, col: 2 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: 1 }, 4),
+            ArrPos { row: 1, col: 3 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -2, y: 0 }, 4),
+            ArrPos { row: 2, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: 0 }, 4),
+            ArrPos { row: 2, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: 0 }, 4),
+            ArrPos { row: 2, col: 2 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: 0 }, 4),
+            ArrPos { row: 2, col: 3 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -2, y: -1 }, 4),
+            ArrPos { row: 3, col: 0 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: -1, y: -1 }, 4),
+            ArrPos { row: 3, col: 1 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 0, y: -1 }, 4),
+            ArrPos { row: 3, col: 2 }
+        );
+        assert_eq!(
+            point_to_index(Point { x: 1, y: -1 }, 4),
+            ArrPos { row: 3, col: 3 }
+        );
     }
 }
