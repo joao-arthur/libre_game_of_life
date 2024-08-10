@@ -10,13 +10,6 @@ pub struct Point {
     pub y: i64,
 }
 
-pub struct Rect {
-    pub x1: i64,
-    pub y1: i64,
-    pub x2: i64,
-    pub y2: i64,
-}
-
 pub fn serialize_point(point: &Point) -> String {
     format!("({}, {})", point.x, point.y).to_string()
 }
