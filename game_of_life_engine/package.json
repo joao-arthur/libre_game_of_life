@@ -21,12 +21,11 @@
         "build": "tsc"
     },
     "dependencies": {
-        "funis": "1.1.1"
+        "funis": "1.2.0"
     },
     "devDependencies": {
-        "@vitest/coverage-c8": "^0.30.0",
-        "c8": "^7.13.0",
-        "typescript": "^5.0.4",
-        "vitest": "^0.30.0"
+        "@vitest/coverage-v8": "2.0.5",
+        "typescript": "5.5.4",
+        "vitest": "2.0.5"
     }
 }
