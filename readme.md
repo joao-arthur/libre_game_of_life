@@ -1,14 +1,20 @@
 # game-of-life
 
-`canvas` implementation of the conway's game of life.
+## License
 
-## Conway's game of life rules
+Game Of Life - a FOSS implementation of Conway's Game Of Life.
 
-- Any live cell with fewer than two live neighbours dies, as if by
-  underpopulation.
-- Any live cell with two or three live neighbours lives on to the next
-  generation.
-- Any live cell with more than three live neighbours dies, as if by
-  overpopulation.
-- Any dead cell with exactly three live neighbours becomes a live
-  cell, as if by reproduction.
+Copyright (C) 2024 João Arthur
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
