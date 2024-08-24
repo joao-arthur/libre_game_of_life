@@ -18,7 +18,7 @@ type Props = {
     readonly onChange: (newValue: string) => void;
 };
 
-export function Select({ id, groups, value, onChange }: Props,): ReactElement {
+export function Select({ id, groups, value, onChange }: Props): ReactElement {
     function handleOnChange(newValue: string): void {
         onChange(newValue);
     }

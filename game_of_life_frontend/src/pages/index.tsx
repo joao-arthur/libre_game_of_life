@@ -1,10 +1,16 @@
 import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
-import { cartesianPlaneFns, modelFns } from "game_of_life_frontend_core";
+import {
+    absoluteToRelative,
+    getModelCellSize,
+    getModelLength,
+    getModelMiddlePoint,
+    indexToPoint,
+} from "game_of_life_engine";
+import { buildPresetsOptions } from "game_of_life_frontend_core";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
 import { Select } from "../components/Select";
-import { buildPresetsOptions } from "../components/buildPresetsOptions";
 import { useWindowDimension } from "../hooks/useWindowDimension";
 import { useGameOfLife } from "../hooks/useGameOfLife";
 
@@ -64,19 +70,19 @@ export default function Main(): ReactElement {
         };
     }, [controller, model, controller]);
 
-    function onClick(e: MouseEvent<HTMLCanvasElement>,): void {
+    function onClick(e: MouseEvent<HTMLCanvasElement>): void {
         if (!controller) return;
         if (!model) {
             return;
         }
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
-        const length = modelFns.getLength(model.model);
-        const middlePoint = modelFns.getMiddlePoint(model.model);
-        const cellSize = modelFns.getCellSize(model.model,model.dimension,);
-        const col = cartesianPlaneFns.absoluteToRelative(x, cellSize);
-        const row = cartesianPlaneFns.absoluteToRelative(y, cellSize);
-        const point = cartesianPlaneFns.indexToPoint({ col, row },length,);
+        const length = getModelLength(model.model);
+        const middlePoint = getModelMiddlePoint(model.model);
+        const cellSize = getModelCellSize(model.model, model.dimension);
+        const col = absoluteToRelative(x, cellSize);
+        const row = absoluteToRelative(y, cellSize);
+        const point = indexToPoint({ col, row }, length);
         const cell = {
             x: point.x + middlePoint.x,
             y: point.y + middlePoint.y,
@@ -98,7 +104,7 @@ export default function Main(): ReactElement {
     function zoom(offset: number) {
         if (!model) return;
         if (!controller) return;
-        const newSize = modelFns.getLength(model.model) + offset;
+        const newSize = getModelLength(model.model) + offset;
         if (newSize < 2) return;
         if (newSize > 120) return;
         controller.setSize(newSize);
@@ -147,8 +153,7 @@ export default function Main(): ReactElement {
                             max={2}
                             step={1}
                             value={model ? model.gap : 0}
-                            onChange={(gap) =>
-                                controller?.setGap(gap)}
+                            onChange={(gap) => controller?.setGap(gap)}
                         />
                         <label className="w-8 text-center block">
                             {model ? model.gap : 0}
@@ -162,29 +167,14 @@ export default function Main(): ReactElement {
                     <div className="flex">
                         <RangeInput
                             id="size"
-                            min={2 + (model
-                                ? modelFns.getLength(model.model) %
-                                            2 === 0
-                                    ? 0
-                                    : 1
-                                : 0)}
-                            max={200 + (model
-                                ? modelFns.getLength(model.model) %
-                                            2 === 0
-                                    ? 0
-                                    : 1
-                                : 0)}
+                            min={2 + (model ? getModelLength(model.model) % 2 === 0 ? 0 : 1 : 0)}
+                            max={200 + (model ? getModelLength(model.model) % 2 === 0 ? 0 : 1 : 0)}
                             step={2}
-                            value={model
-                                ? modelFns.getLength(model.model)
-                                : 0}
-                            onChange={(size) =>
-                                controller?.setSize(size)}
+                            value={model ? getModelLength(model.model) : 0}
+                            onChange={(size) => controller?.setSize(size)}
                         />
                         <label className="w-8 text-center block">
-                            {model
-                                ? modelFns.getLength(model.model)
-                                : 0}
+                            {model ? getModelLength(model.model) : 0}
                         </label>
                     </div>
                 </div>
@@ -197,8 +187,7 @@ export default function Main(): ReactElement {
                             max={60}
                             step={1}
                             value={model ? model.fps : 0}
-                            onChange={(fps) =>
-                                controller?.setFps(fps)}
+                            onChange={(fps) => controller?.setFps(fps)}
                         />
                         <label className="w-8 text-center block">
                             {model ? model.fps : 0}
@@ -207,16 +196,12 @@ export default function Main(): ReactElement {
                 </div>
                 <span className="my-1">
                     <label>
-                        Iteration: {model ? model.model.iteration : 0}
+                        Iteration: {model ? model.model.iter : 0}
                     </label>
                 </span>
                 <Button
-                    icon={model?.status === "resumed"
-                        ? "pause"
-                        : "play"}
-                    label={model?.status === "resumed"
-                        ? "PAUSE"
-                        : "RESUME"}
+                    icon={model?.status === "resumed" ? "pause" : "play"}
+                    label={model?.status === "resumed" ? "PAUSE" : "RESUME"}
                     onClick={handleToggle}
                 />
                 <Button

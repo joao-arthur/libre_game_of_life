@@ -9,7 +9,7 @@ type Props = {
     readonly onChange: (newValue: number) => void;
 };
 
-export function RangeInput({ id, min, max, step, value, onChange }: Props,): ReactElement {
+export function RangeInput({ id, min, max, step, value, onChange }: Props): ReactElement {
     function handleOnChange(newValue: number): void {
         if (newValue > max) return;
         if (newValue < min) return;

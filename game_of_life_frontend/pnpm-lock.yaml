@@ -14,6 +14,9 @@ importers:
       funis:
         specifier: 1.2.0
         version: 1.2.0
+      game_of_life_engine:
+        specifier: link:../game_of_life_engine
+        version: link:../game_of_life_engine
       game_of_life_frontend_core:
         specifier: link:../game_of_life_frontend_core
         version: link:../game_of_life_frontend_core
