@@ -1,4 +1,4 @@
-import { assert, it } from "vitest";
+import { assert, test } from "vitest";
 import { State } from "./cell.js";
 import { pointFrom, rectFrom } from "./cartesianPlane.js";
 import {
@@ -16,7 +16,7 @@ import {
     zoomModel,
 } from "./model.js";
 
-it("modelDefault", () => {
+test("modelDefault", () => {
     assert.deepStrictEqual(
         modelDefault(),
         {
@@ -27,7 +27,7 @@ it("modelDefault", () => {
     );
 });
 
-it("modelFromPos", () => {
+test("modelFromPos", () => {
     assert.deepStrictEqual(
         modelFromPos(rectFrom(-30, 48, -2, 178)),
         {
@@ -38,7 +38,7 @@ it("modelFromPos", () => {
     );
 });
 
-it("modelFromString", () => {
+test("modelFromString", () => {
     const modelEmpty = modelFromString([""]);
     const modelModel1x1Dead = modelFromString(["⬛"]);
     const modelModel1x1Alive = modelFromString(["⬜"]);
@@ -78,7 +78,7 @@ it("modelFromString", () => {
     );
 });
 
-it("getModelCellSize", () => {
+test("getModelCellSize", () => {
     const m = modelFromPos(rectFrom(1, 1, 10, 10));
     assert.deepStrictEqual(getModelCellSize(m, 100), 10);
     assert.deepStrictEqual(getModelCellSize(m, 90), 9);
@@ -86,14 +86,14 @@ it("getModelCellSize", () => {
     assert.deepStrictEqual(getModelCellSize(m, 10), 1);
 });
 
-it("getModelLength", () => {
+test("getModelLength", () => {
     assert.deepStrictEqual(getModelLength(modelFromPos(rectFrom(-10, -10, 10, 10))), 21);
     assert.deepStrictEqual(getModelLength(modelFromPos(rectFrom(1, 1, 10, 10))), 10);
     assert.deepStrictEqual(getModelLength(modelFromPos(rectFrom(4, 4, 5, 5))), 2);
     assert.deepStrictEqual(getModelLength(modelFromPos(rectFrom(5, 5, 5, 5))), 1);
 });
 
-it("getModelMiddleCell", () => {
+test("getModelMiddleCell", () => {
     assert.deepStrictEqual(
         getModelMiddleCell(modelFromPos(rectFrom(-10, -10, 10, 10)), 100),
         pointFrom(0, 0),
@@ -112,7 +112,7 @@ it("getModelMiddleCell", () => {
     );
 });
 
-it("getModelMiddlePoint", () => {
+test("getModelMiddlePoint", () => {
     assert.deepStrictEqual(
         getModelMiddlePoint(modelFromPos(rectFrom(-10, -10, 10, 10))),
         pointFrom(0, 0),
@@ -131,7 +131,7 @@ it("getModelMiddlePoint", () => {
     );
 });
 
-it("getModelValue", () => {
+test("getModelValue", () => {
     const m = modelFromString([
         "⬛⬛",
         "⬜⬜",
@@ -168,7 +168,7 @@ it("getModelValue", () => {
     assert.deepStrictEqual(getModelValue(m, pointFrom(2, 2)), State.DEAD);
 });
 
-it("iterateModel", () => {
+test("iterateModel", () => {
     const model1x1iter0 = modelFromString(["⬜"]);
     const model1x1iter1 = modelFromString(["⬛"]);
 
@@ -245,7 +245,7 @@ it("iterateModel", () => {
     assert.deepStrictEqual(iterateModel(model3x3_5_iter0), { ...model3x3_5_iter1, iter: 1 });
 });
 
-it("moveModel", () => {
+test("moveModel", () => {
     const m = modelFromPos(rectFrom(-10, -10, 10, 10));
     assert.deepStrictEqual(moveModel(m, pointFrom(1, 0)), modelFromPos(rectFrom(-9, -10, 11, 10)));
     assert.deepStrictEqual(moveModel(m, pointFrom(-1, 0)), modelFromPos(rectFrom(-11, -10, 9, 10)));
@@ -263,7 +263,7 @@ it("moveModel", () => {
     );
 });
 
-it("toggleModel", () => {
+test("toggleModel", () => {
     const model = modelFromString([
         "⬛⬛⬛⬛",
         "⬛⬛⬛⬛",
@@ -314,7 +314,7 @@ it("toggleModel", () => {
     assert.deepStrictEqual(toggleModel(model, pointFrom(-2, -1)), modelToggle6);
 });
 
-it("zoom odd size", () => {
+test("zoom odd size", () => {
     const m = modelFromPos(rectFrom(-10, -10, 10, 10));
     assert.deepStrictEqual(zoomModel(m, 1), modelFromPos(rectFrom(0, 0, 0, 0)));
     assert.deepStrictEqual(zoomModel(m, 2), modelFromPos(rectFrom(-1, -1, 0, 0)));
@@ -324,7 +324,7 @@ it("zoom odd size", () => {
     assert.deepStrictEqual(zoomModel(m, 23), modelFromPos(rectFrom(-11, -11, 11, 11)));
 });
 
-it("zoom even size", () => {
+test("zoom even size", () => {
     const m = modelFromPos(rectFrom(10, 10, 19, 19));
     assert.deepStrictEqual(zoomModel(m, 1), modelFromPos(rectFrom(14, 14, 14, 14)));
     assert.deepStrictEqual(zoomModel(m, 2), modelFromPos(rectFrom(14, 14, 15, 15)));

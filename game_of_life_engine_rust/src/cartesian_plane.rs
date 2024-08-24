@@ -10,7 +10,13 @@ pub struct Point {
     pub y: i64,
 }
 
-pub fn serialize_point(point: &Point) -> String {
+impl Point {
+    pub fn from(x: i64, y: i64) -> Self {
+        Point { x, y }
+    }
+}
+
+pub fn serialize_point(point: Point) -> String {
     format!("({}, {})", point.x, point.y).to_string()
 }
 
@@ -52,9 +58,14 @@ mod test {
     use super::*;
 
     #[test]
+    fn test_point() {
+        assert_eq!(Point::from(-23, 38), Point { x: -23, y: 38 });
+    }
+
+    #[test]
     fn test_serialize_point() {
-        assert_eq!(serialize_point(&Point { x: -3, y: 1954 }), "(-3, 1954)");
-        assert_eq!(serialize_point(&Point { x: 42, y: -23823 }), "(42, -23823)");
+        assert_eq!(serialize_point(Point { x: -3, y: 1954 }), "(-3, 1954)");
+        assert_eq!(serialize_point(Point { x: 42, y: -23823 }), "(42, -23823)");
     }
 
     #[test]

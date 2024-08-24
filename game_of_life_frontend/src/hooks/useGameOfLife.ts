@@ -1,31 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useWindowDimension } from "./useWindowDimension";
-import { CanvasDrawContext } from "../adapters/canvasDrawContext";
-import {
+import { 
+    CanvasDrawContext
     buildModel,
     SystemController,
     SystemManager,
     SystemModel,
     systemModelType,
     SystemRender,
-} from "../system/mod";
+ } from "game_of_life_frontend_core";
+import { useWindowDimension } from "./useWindowDimension";
 
-type gameOfLifeType = {
+type GameOfLife = {
     readonly init: (canvasElement: HTMLCanvasElement) => void;
     readonly model: systemModelType | undefined;
     readonly controller: SystemController | undefined;
 };
 
-export function useGameOfLife(): gameOfLifeType {
-    const systemControllerRef = useRef<SystemController | undefined>(
-        undefined,
-    );
-    const systemManagerRef = useRef<SystemManager | undefined>(
-        undefined,
-    );
-    const [model, setModel] = useState<systemModelType | undefined>(
-        undefined,
-    );
+export function useGameOfLife(): GameOfLife {
+    const systemControllerRef = useRef<SystemController | undefined>(undefined,);
+    const systemManagerRef = useRef<SystemManager | undefined>(undefined,);
+    const [model, setModel] = useState<systemModelType | undefined>(undefined,);
     const dimension = useWindowDimension();
 
     useEffect(() => {

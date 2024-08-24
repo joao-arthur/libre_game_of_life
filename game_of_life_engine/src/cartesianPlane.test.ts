@@ -1,4 +1,4 @@
-import { assert, it } from "vitest";
+import { assert, test } from "vitest";
 import { arrPosFrom } from "./array.js";
 import {
     absoluteToRelative,
@@ -11,40 +11,40 @@ import {
     serializePoint,
 } from "./cartesianPlane.js";
 
-it("rectFrom", () => {
+test("rectFrom", () => {
     assert.deepStrictEqual(rectFrom(20, -13, 874, -174), { x1: 20, y1: -13, x2: 874, y2: -174 });
 });
 
-it("pointFrom", () => {
+test("pointFrom", () => {
     assert.deepStrictEqual(pointFrom(20, -13), { x: 20, y: -13 });
 });
 
-it("deserializePoint", () => {
+test("deserializePoint", () => {
     assert.deepStrictEqual(deserializePoint("(0, 0)"), pointFrom(0, 0));
     assert.deepStrictEqual(deserializePoint("(-1, -1)"), pointFrom(-1, -1));
     assert.deepStrictEqual(deserializePoint("(1, 1)"), pointFrom(1, 1));
     assert.deepStrictEqual(deserializePoint("(3, 6)"), pointFrom(3, 6));
 });
 
-it("serializePoint", () => {
+test("serializePoint", () => {
     assert.deepStrictEqual(serializePoint({ x: 0, y: 0 }), "(0, 0)");
     assert.deepStrictEqual(serializePoint({ x: -1, y: -1 }), "(-1, -1)");
     assert.deepStrictEqual(serializePoint({ x: 1, y: 1 }), "(1, 1)");
     assert.deepStrictEqual(serializePoint({ x: 3, y: 6 }), "(3, 6)");
 });
 
-it("indexToPoint 1x1 grid", () => {
+test("indexToPoint 1x1 grid", () => {
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 0), 1), pointFrom(0, 0));
 });
 
-it("indexToPoint 2x2 grid", () => {
+test("indexToPoint 2x2 grid", () => {
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 0), 2), pointFrom(-1, 1));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 1), 2), pointFrom(0, 1));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(1, 0), 2), pointFrom(-1, 0));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(1, 1), 2), pointFrom(0, 0));
 });
 
-it("indexToPoint 3x3 grid", () => {
+test("indexToPoint 3x3 grid", () => {
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 0), 3), pointFrom(-1, 1));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 1), 3), pointFrom(0, 1));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 2), 3), pointFrom(1, 1));
@@ -56,7 +56,7 @@ it("indexToPoint 3x3 grid", () => {
     assert.deepStrictEqual(indexToPoint(arrPosFrom(2, 2), 3), pointFrom(1, -1));
 });
 
-it("indexToPoint 4x4 grid", () => {
+test("indexToPoint 4x4 grid", () => {
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 0), 4), pointFrom(-2, 2));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 1), 4), pointFrom(-1, 2));
     assert.deepStrictEqual(indexToPoint(arrPosFrom(0, 2), 4), pointFrom(0, 2));
@@ -75,18 +75,18 @@ it("indexToPoint 4x4 grid", () => {
     assert.deepStrictEqual(indexToPoint(arrPosFrom(3, 3), 4), pointFrom(1, -1));
 });
 
-it("pointToIndex 1x1 grid", () => {
+test("pointToIndex 1x1 grid", () => {
     assert.deepStrictEqual(pointToIndex({ x: 0, y: 0 }, 1), arrPosFrom(0, 0));
 });
 
-it("pointToIndex 2x2 grid", () => {
+test("pointToIndex 2x2 grid", () => {
     assert.deepStrictEqual(pointToIndex(pointFrom(-1, 1), 2), arrPosFrom(0, 0));
     assert.deepStrictEqual(pointToIndex(pointFrom(0, 1), 2), arrPosFrom(0, 1));
     assert.deepStrictEqual(pointToIndex(pointFrom(-1, 0), 2), arrPosFrom(1, 0));
     assert.deepStrictEqual(pointToIndex(pointFrom(0, 0), 2), arrPosFrom(1, 1));
 });
 
-it("pointToIndex 3x3 grid", () => {
+test("pointToIndex 3x3 grid", () => {
     assert.deepStrictEqual(pointToIndex(pointFrom(-1, 1), 3), arrPosFrom(0, 0));
     assert.deepStrictEqual(pointToIndex(pointFrom(0, 1), 3), arrPosFrom(0, 1));
     assert.deepStrictEqual(pointToIndex(pointFrom(1, 1), 3), arrPosFrom(0, 2));
@@ -98,7 +98,7 @@ it("pointToIndex 3x3 grid", () => {
     assert.deepStrictEqual(pointToIndex(pointFrom(1, -1), 3), arrPosFrom(2, 2));
 });
 
-it("pointToIndex 4x4 grid", () => {
+test("pointToIndex 4x4 grid", () => {
     assert.deepStrictEqual(pointToIndex(pointFrom(-2, 2), 4), arrPosFrom(0, 0));
     assert.deepStrictEqual(pointToIndex(pointFrom(-1, 2), 4), arrPosFrom(0, 1));
     assert.deepStrictEqual(pointToIndex(pointFrom(0, 2), 4), arrPosFrom(0, 2));
@@ -117,7 +117,7 @@ it("pointToIndex 4x4 grid", () => {
     assert.deepStrictEqual(pointToIndex(pointFrom(1, -1), 4), arrPosFrom(3, 3));
 });
 
-it("absoluteToRelative", () => {
+test("absoluteToRelative", () => {
     assert.deepStrictEqual(absoluteToRelative(0, 30), 0);
     assert.deepStrictEqual(absoluteToRelative(10, 30), 0);
     assert.deepStrictEqual(absoluteToRelative(20, 30), 0);
@@ -126,7 +126,7 @@ it("absoluteToRelative", () => {
     assert.deepStrictEqual(absoluteToRelative(300, 30), 10);
 });
 
-it("relativeToAbsolute", () => {
+test("relativeToAbsolute", () => {
     assert.deepStrictEqual(relativeToAbsolute(0, 30), 0);
     assert.deepStrictEqual(relativeToAbsolute(1, 30), 30);
     assert.deepStrictEqual(relativeToAbsolute(10, 30), 300);

@@ -1,26 +1,24 @@
 import type { ReactElement } from "react";
 
-type optionType = {
+type Option = {
     readonly value: string;
     readonly label: string;
 };
 
-type groupType = {
+type Group = {
     readonly label: string;
     readonly value: string;
-    readonly options: optionType[];
+    readonly options: Option[];
 };
 
-type props = {
+type Props = {
     readonly id: string;
-    readonly groups: readonly groupType[];
+    readonly groups: readonly Group[];
     readonly value: string;
     readonly onChange: (newValue: string) => void;
 };
 
-export function Select(
-    { id, groups, value, onChange }: props,
-): ReactElement {
+export function Select({ id, groups, value, onChange }: Props,): ReactElement {
     function handleOnChange(newValue: string): void {
         onChange(newValue);
     }

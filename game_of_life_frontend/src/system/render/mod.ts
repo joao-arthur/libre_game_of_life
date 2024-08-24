@@ -1,1 +1,0 @@
-export { SystemRender } from "./systemRender";

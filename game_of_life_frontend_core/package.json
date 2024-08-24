@@ -1,6 +1,6 @@
 {
-    "name": "game_of_life_engine",
-    "description": "Conway's game of life engine",
+    "name": "game_of_life_frontend_core",
+    "description": "Conway's game of life frontend core",
     "author": "joao-arthur",
     "version": "1.0.0",
     "private": true,
@@ -22,7 +22,8 @@
         "test:cov": "vitest run --coverage"
     },
     "dependencies": {
-        "funis": "1.2.0"
+        "funis": "1.2.0",
+        "game_of_life_engine": "link:../game_of_life_engine"
     },
     "devDependencies": {
         "@vitest/coverage-v8": "2.0.5",

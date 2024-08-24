@@ -1,4 +1,4 @@
-import { assert, it } from "vitest";
+import { assert, test } from "vitest";
 import { modelFromString } from "./model.js";
 import { State } from "./cell.js";
 import { pointFrom } from "./cartesianPlane.js";
@@ -8,7 +8,7 @@ import {
     numberOfAliveNeighbors,
 } from "./neighbors.js";
 
-it("aliveNeighborsFromModel", () => {
+test("aliveNeighborsFromModel", () => {
     const model2x2 = modelFromString([
         "⬛⬜",
         "⬛⬜",
@@ -16,7 +16,7 @@ it("aliveNeighborsFromModel", () => {
     assert.deepStrictEqual(aliveNeighborsFromModel(model2x2, pointFrom(-1, 1)), 2);
 });
 
-it("neighborsFromModel", () => {
+test("neighborsFromModel", () => {
     const model2x2 = modelFromString([
         "⬛⬜",
         "⬛⬜",
@@ -55,7 +55,7 @@ it("neighborsFromModel", () => {
     );
 });
 
-it("numberOfAliveNeighbors", () => {
+test("numberOfAliveNeighbors", () => {
     assert.deepStrictEqual(
         numberOfAliveNeighbors([
             undefined,

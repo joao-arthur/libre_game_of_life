@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 
-type props = {
+type Props = {
     readonly id: string;
     readonly min: number;
     readonly max: number;
@@ -9,9 +9,7 @@ type props = {
     readonly onChange: (newValue: number) => void;
 };
 
-export function RangeInput(
-    { id, min, max, step, value, onChange }: props,
-): ReactElement {
+export function RangeInput({ id, min, max, step, value, onChange }: Props,): ReactElement {
     function handleOnChange(newValue: number): void {
         if (newValue > max) return;
         if (newValue < min) return;

@@ -1,6 +1,6 @@
 import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
-import { cartesianPlaneFns, modelFns } from "game_of_life_engine";
+import { cartesianPlaneFns, modelFns } from "game_of_life_frontend_core";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
 import { Select } from "../components/Select";
@@ -64,9 +64,7 @@ export default function Main(): ReactElement {
         };
     }, [controller, model, controller]);
 
-    function onClick(
-        e: MouseEvent<HTMLCanvasElement>,
-    ): void {
+    function onClick(e: MouseEvent<HTMLCanvasElement>,): void {
         if (!controller) return;
         if (!model) {
             return;
@@ -75,16 +73,10 @@ export default function Main(): ReactElement {
         const y = e.pageY - e.currentTarget.offsetTop;
         const length = modelFns.getLength(model.model);
         const middlePoint = modelFns.getMiddlePoint(model.model);
-        const cellSize = modelFns.getCellSize(
-            model.model,
-            model.dimension,
-        );
+        const cellSize = modelFns.getCellSize(model.model,model.dimension,);
         const col = cartesianPlaneFns.absoluteToRelative(x, cellSize);
         const row = cartesianPlaneFns.absoluteToRelative(y, cellSize);
-        const point = cartesianPlaneFns.indexToPoint(
-            { col, row },
-            length,
-        );
+        const point = cartesianPlaneFns.indexToPoint({ col, row },length,);
         const cell = {
             x: point.x + middlePoint.x,
             y: point.y + middlePoint.y,
