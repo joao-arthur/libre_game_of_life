@@ -35,8 +35,6 @@ fn from_Model(
         getValue(model, { x: point.x + 1, y: point.y - 1 }),
     ];
 }
-
-
 */
 
 #[cfg(test)]

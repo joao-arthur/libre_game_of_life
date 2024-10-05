@@ -37,7 +37,6 @@ pub fn absolute_to_relative(value: i64, unit_size: i64) -> i64 {
 
 pub fn index_to_point(position: ArrPos, length: i64) -> Point {
     let half = length / 2;
-
     Point {
         x: -half + position.col,
         y: half - position.row,
@@ -46,7 +45,6 @@ pub fn index_to_point(position: ArrPos, length: i64) -> Point {
 
 pub fn point_to_index(point: Point, length: i64) -> ArrPos {
     let half = length / 2;
-
     ArrPos {
         col: half + point.x,
         row: half - point.y,

@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    cartesian_plane::{index_to_point, serialize_point, ArrPos, Point},
-    cell::State,
+    cartesian_plane::{index_to_point, ArrPos, Point},
+    cell::{toggle, State},
 };
 
 #[derive(Debug, PartialEq)]
@@ -27,9 +27,16 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn from(pos: Rect) -> Self {
+    pub fn from_pos(pos: Rect) -> Self {
         Model {
             pos,
+            ..Default::default()
+        }
+    }
+
+    pub fn from_value(value: HashMap<Point, State>) -> Self {
+        Model {
+            value,
             ..Default::default()
         }
     }
@@ -47,7 +54,6 @@ impl Default for Model {
 
 pub fn from_string(model_as_str: Vec<String>) -> Model {
     let mut value = HashMap::<Point, State>::new();
-
     let len = model_as_str.len() as i64;
     let row_iter = model_as_str.iter().enumerate();
     for (row, row_str) in row_iter {
@@ -169,21 +175,14 @@ pub fn move_in_plane(model: Model, delta: Point) -> Model {
     }
 }
 
-// pub fn toggle_cell(model: Model,point: Point,) -> Model {
-//     let key = serialize_point(point);
-//     let current = map.entries(model.value);
-//
-//     let entries = if model.value.contains(key) {
-//         current.filter(([valueKey]) => valueKey !== key)
-//     } else {
-//         current.concat([[key, State::ALIVE]]);
-//     }
-//
-//     return {
-//         value: new Map(entries),
-//         iter: model.iter,
-//         pos: model.pos,
-//     };
+// pub fn toggle_cell(model: Model, point: Point) -> Model {
+//     let new_map: HashMap<Point, State> = HashMap::new();
+//     new_map.extend(model.value.iter().cloned());
+//     new_map.insert(
+//         point,
+//         toggle(*model.value.get(&point).unwrap_or(&State::DEAD)),
+//     );
+//     Model::from_value(new_map)
 // }
 
 pub fn zoom(model: Model, new_size: i64) -> Model {
@@ -232,11 +231,29 @@ mod test {
             }
         );
         assert_eq!(
-            Model::from(Rect::from(-23, 38, 198, 7)),
+            Model::from_pos(Rect::from(-23, 38, 198, 7)),
             Model {
                 value: HashMap::new(),
                 iter: 0,
                 pos: Rect::from(-23, 38, 198, 7)
+            }
+        );
+        assert_eq!(
+            Model::from_value(HashMap::from([
+                (Point::from(-1, -1), State::ALIVE),
+                (Point::from(-1, 1), State::ALIVE),
+                (Point::from(1, -1), State::ALIVE),
+                (Point::from(1, 1), State::ALIVE),
+            ])),
+            Model {
+                value: HashMap::from([
+                    (Point::from(-1, -1), State::ALIVE),
+                    (Point::from(-1, 1), State::ALIVE),
+                    (Point::from(1, -1), State::ALIVE),
+                    (Point::from(1, 1), State::ALIVE),
+                ]),
+                iter: 0,
+                pos: Rect::from(0, 0, 0, 0)
             }
         );
     }
@@ -245,7 +262,7 @@ mod test {
     fn test_from_string() {
         assert_eq!(
             from_string(vec!["".to_string()]),
-            Model::from(Rect::from(-10, -10, 10, 10))
+            Model::from_pos(Rect::from(-10, -10, 10, 10))
         );
         assert_eq!(
             from_string(vec!["⬛".to_string()]),
@@ -258,9 +275,7 @@ mod test {
         assert_eq!(
             from_string(vec!["⬜".to_string()]),
             Model {
-                value: vec![(Point::from(0, 0), State::ALIVE)]
-                    .into_iter()
-                    .collect(),
+                value: HashMap::from([(Point::from(0, 0), State::ALIVE)]),
                 iter: 0,
                 pos: Rect::from(-10, -10, 10, 10),
             }
@@ -274,13 +289,11 @@ mod test {
                 "⬛⬛⬛⬛".to_string(),
             ]),
             Model {
-                value: vec![
+                value: HashMap::from([
                     (Point::from(1, 2), State::ALIVE),
                     (Point::from(-2, 1), State::ALIVE),
                     (Point::from(0, 0), State::ALIVE),
-                ]
-                .into_iter()
-                .collect(),
+                ]),
                 iter: 0,
                 pos: Rect::from(-10, -10, 10, 10),
             }
@@ -289,10 +302,13 @@ mod test {
 
     #[test]
     fn test_get_length() {
-        assert_eq!(get_length(&Model::from(Rect::from(-10, -10, 10, 10))), 21);
-        assert_eq!(get_length(&Model::from(Rect::from(1, 1, 10, 10))), 10);
-        assert_eq!(get_length(&Model::from(Rect::from(4, 4, 5, 5))), 2);
-        assert_eq!(get_length(&Model::from(Rect::from(5, 5, 5, 5))), 1);
+        assert_eq!(
+            get_length(&Model::from_pos(Rect::from(-10, -10, 10, 10))),
+            21
+        );
+        assert_eq!(get_length(&Model::from_pos(Rect::from(1, 1, 10, 10))), 10);
+        assert_eq!(get_length(&Model::from_pos(Rect::from(4, 4, 5, 5))), 2);
+        assert_eq!(get_length(&Model::from_pos(Rect::from(5, 5, 5, 5))), 1);
     }
 
     #[test]
