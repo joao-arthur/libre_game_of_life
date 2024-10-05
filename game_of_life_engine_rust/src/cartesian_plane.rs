@@ -4,7 +4,7 @@ pub struct ArrPos {
     pub col: i64,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Point {
     pub x: i64,
     pub y: i64,

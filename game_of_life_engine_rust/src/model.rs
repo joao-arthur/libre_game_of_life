@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use crate::{
     cartesian_plane::{index_to_point, serialize_point, ArrPos, Point},
@@ -21,7 +21,7 @@ impl Rect {
 
 #[derive(Debug, PartialEq)]
 pub struct Model {
-    pub value: HashSet<String>,
+    pub value: HashMap<Point, State>,
     pub iter: u64,
     pub pos: Rect,
 }
@@ -38,7 +38,7 @@ impl Model {
 impl Default for Model {
     fn default() -> Self {
         Model {
-            value: HashSet::new(),
+            value: HashMap::new(),
             iter: 0,
             pos: Rect::from(0, 0, 0, 0),
         }
@@ -46,7 +46,7 @@ impl Default for Model {
 }
 
 pub fn from_string(model_as_str: Vec<String>) -> Model {
-    let mut value = HashSet::<String>::new();
+    let mut value = HashMap::<Point, State>::new();
 
     let len = model_as_str.len() as i64;
     let row_iter = model_as_str.iter().enumerate();
@@ -54,7 +54,16 @@ pub fn from_string(model_as_str: Vec<String>) -> Model {
         let col_iter = row_str.chars().enumerate();
         for (col, col_str) in col_iter {
             if col_str == '⬜' {
-                value.insert(serialize_point(index_to_point(ArrPos { col: col as i64, row: row as i64 }, len)));
+                value.insert(
+                    index_to_point(
+                        ArrPos {
+                            col: col as i64,
+                            row: row as i64,
+                        },
+                        len,
+                    ),
+                    State::ALIVE,
+                );
             }
         }
     }
@@ -96,7 +105,7 @@ pub fn get_middle_cell(model: &Model, total_size: i64) -> Point {
 }
 
 pub fn get_value(model: &Model, point: Point) -> State {
-    if model.value.contains(&serialize_point(point)) {
+    if model.value.get(&point).unwrap_or(&State::DEAD) == &State::ALIVE {
         State::ALIVE
     } else {
         State::DEAD
@@ -132,12 +141,12 @@ pub fn iterate(
                 point,
             );
             let newCell = cellFns.iterate(state, neighbors);
-            return newCell === State.ALIVE
+            return newCell === State::ALIVE
                 ? [cartesianPlaneFns.serializePoint(point), newCell]
                 : undefined;
         })
         .filter((value) => value !== undefined)
-        .map((value) => value as [string, State.ALIVE]);
+        .map((value) => value as [string, State::ALIVE]);
 
     return {
         value: new Map(entries),
@@ -167,7 +176,7 @@ pub fn move_in_plane(model: Model, delta: Point) -> Model {
 //     let entries = if model.value.contains(key) {
 //         current.filter(([valueKey]) => valueKey !== key)
 //     } else {
-//         current.concat([[key, State.ALIVE]]);
+//         current.concat([[key, State::ALIVE]]);
 //     }
 //
 //     return {
@@ -197,6 +206,7 @@ pub fn zoom(model: Model, new_size: i64) -> Model {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::cell::State;
 
     #[test]
     fn test_rect() {
@@ -216,7 +226,7 @@ mod test {
         assert_eq!(
             Model::default(),
             Model {
-                value: HashSet::new(),
+                value: HashMap::new(),
                 iter: 0,
                 pos: Rect::from(0, 0, 0, 0)
             }
@@ -224,7 +234,7 @@ mod test {
         assert_eq!(
             Model::from(Rect::from(-23, 38, 198, 7)),
             Model {
-                value: HashSet::new(),
+                value: HashMap::new(),
                 iter: 0,
                 pos: Rect::from(-23, 38, 198, 7)
             }
@@ -233,29 +243,48 @@ mod test {
 
     #[test]
     fn test_from_string() {
-    assert_eq!(
-        from_string([""]),Model { value: new Map(), iteration: 0, position: { x1: -10, y1: -10, x2: 10, y2: 10 },});
-    assert_eq!(
-        from_string(["⬛"]),Model { value: new Map(), iteration: 0, position: { x1: -10, y1: -10, x2: 10, y2: 10 },});
-    assert_eq!(
-        from_string(["⬜"]), Model { value: new Map([["(x: 0, y: 0)", State.ALIVE]]), iteration: 0, position: { x1: -10, y1: -10, x2: 10, y2: 10 }, });
-    assert_eq!(
-        from_string([
-            "⬛⬛⬛⬜",
-            "⬜⬛⬛⬛",
-            "⬛⬛⬜⬛",
-            "⬛⬛⬛⬛",
-        ]),
-    {
-        value: new Map([
-            ["(x: 1, y: 2)", State.ALIVE],
-            ["(x: -2, y: 1)", State.ALIVE],
-            ["(x: 0, y: 0)", State.ALIVE],
-        ]),
-        iteration: 0,
-        position: { x1: -10, y1: -10, x2: 10, y2: 10 },
-    });
-});
+        assert_eq!(
+            from_string(vec!["".to_string()]),
+            Model::from(Rect::from(-10, -10, 10, 10))
+        );
+        assert_eq!(
+            from_string(vec!["⬛".to_string()]),
+            Model {
+                value: HashMap::new(),
+                iter: 0,
+                pos: Rect::from(-10, -10, 10, 10)
+            }
+        );
+        assert_eq!(
+            from_string(vec!["⬜".to_string()]),
+            Model {
+                value: vec![(Point::from(0, 0), State::ALIVE)]
+                    .into_iter()
+                    .collect(),
+                iter: 0,
+                pos: Rect::from(-10, -10, 10, 10),
+            }
+        );
+
+        assert_eq!(
+            from_string(vec![
+                "⬛⬛⬛⬜".to_string(),
+                "⬜⬛⬛⬛".to_string(),
+                "⬛⬛⬜⬛".to_string(),
+                "⬛⬛⬛⬛".to_string(),
+            ]),
+            Model {
+                value: vec![
+                    (Point::from(1, 2), State::ALIVE),
+                    (Point::from(-2, 1), State::ALIVE),
+                    (Point::from(0, 0), State::ALIVE),
+                ]
+                .into_iter()
+                .collect(),
+                iter: 0,
+                pos: Rect::from(-10, -10, 10, 10),
+            }
+        );
     }
 
     #[test]
