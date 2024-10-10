@@ -1,41 +1,32 @@
-use crate::cell::State;
+use crate::{cartesian_plane::Point, cell::State, model::Model};
 
-pub type Neighbor = Option<State>;
+pub type Neighbor<'a> = Option<&'a State>;
 
-pub type Neighbors = [Neighbor; 8];
+pub type Neighbors<'a> = [Neighbor<'a>; 8];
 
-fn number_of_alive(neighbors: &Neighbors) -> u8 {
+fn number_of_alive(neighbors: Neighbors) -> u8 {
     return neighbors
         .iter()
-        .filter(|n| n == &&Some(State::ALIVE))
+        .filter(|n| n == &&Some(&State::ALIVE))
         .count() as u8;
 }
 
-/*
-pub fn number_of_alive_from_model(model: Model, point: CartesianPoint) -> u8 {
-    number_of_alive(from_Model(model, point))
-}
-
-fn from_Model(
-    model: Model,
-    point: CartesianPoint,
-): Neighbors {
-    const { getValue } = modelFns;
-
+fn from_model(model: &Model, point: Point) -> Neighbors {
     return [
-        getValue(model, { x: point.x - 1, y: point.y + 1 }),
-        getValue(model, { x: point.x, y: point.y + 1 }),
-        getValue(model, { x: point.x + 1, y: point.y + 1 }),
-
-        getValue(model, { x: point.x - 1, y: point.y }),
-        getValue(model, { x: point.x + 1, y: point.y }),
-
-        getValue(model, { x: point.x - 1, y: point.y - 1 }),
-        getValue(model, { x: point.x, y: point.y - 1 }),
-        getValue(model, { x: point.x + 1, y: point.y - 1 }),
+        model.value.get(&Point::from(point.x - 1, point.y + 1)),
+        model.value.get(&Point::from(point.x, point.y + 1)),
+        model.value.get(&Point::from(point.x + 1, point.y + 1)),
+        model.value.get(&Point::from(point.x - 1, point.y)),
+        model.value.get(&Point::from(point.x + 1, point.y)),
+        model.value.get(&Point::from(point.x - 1, point.y - 1)),
+        model.value.get(&Point::from(point.x, point.y - 1)),
+        model.value.get(&Point::from(point.x + 1, point.y - 1)),
     ];
 }
-*/
+
+pub fn number_of_alive_from_model(model: &Model, point: Point) -> u8 {
+    number_of_alive(from_model(model, point))
+}
 
 #[cfg(test)]
 mod test {
@@ -44,44 +35,44 @@ mod test {
     #[test]
     fn test_number_of_alive() {
         assert_eq!(
-            number_of_alive(&[None, None, None, None, None, None, None, None,]),
+            number_of_alive([None, None, None, None, None, None, None, None,]),
             0
         );
         assert_eq!(
-            number_of_alive(&[
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
+            number_of_alive([
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
             ]),
             0
         );
         assert_eq!(
-            number_of_alive(&[
-                Some(State::ALIVE),
-                Some(State::ALIVE),
-                Some(State::ALIVE),
-                Some(State::ALIVE),
-                Some(State::ALIVE),
-                Some(State::ALIVE),
-                Some(State::ALIVE),
-                Some(State::ALIVE),
+            number_of_alive([
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
+                Some(&State::ALIVE),
             ]),
             8
         );
         assert_eq!(
-            number_of_alive(&[
-                Some(State::ALIVE),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
-                Some(State::DEAD),
+            number_of_alive([
+                Some(&State::ALIVE),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
+                Some(&State::DEAD),
                 None,
             ]),
             1

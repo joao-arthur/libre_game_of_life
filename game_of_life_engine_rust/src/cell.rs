@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum State {
     DEAD,
     ALIVE,
@@ -18,7 +18,7 @@ pub fn iterate(state: State, number_of_alive_neighbors: u8) -> State {
     }
 }
 
-pub fn toggle(state: State) -> State {
+pub fn toggle(state: &State) -> State {
     match state {
         State::ALIVE => State::DEAD,
         State::DEAD => State::ALIVE,
@@ -65,7 +65,7 @@ mod test {
 
     #[test]
     fn test_toggle() {
-        assert_eq!(toggle(State::ALIVE), State::DEAD);
-        assert_eq!(toggle(State::DEAD), State::ALIVE);
+        assert_eq!(toggle(&State::ALIVE), State::DEAD);
+        assert_eq!(toggle(&State::DEAD), State::ALIVE);
     }
 }

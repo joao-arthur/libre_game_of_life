@@ -4,7 +4,7 @@ pub struct ArrPos {
     pub col: i64,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct Point {
     pub x: i64,
     pub y: i64,
@@ -37,10 +37,7 @@ pub fn absolute_to_relative(value: i64, unit_size: i64) -> i64 {
 
 pub fn index_to_point(position: ArrPos, length: i64) -> Point {
     let half = length / 2;
-    Point {
-        x: -half + position.col,
-        y: half - position.row,
-    }
+    Point::from(-half + position.col, half - position.row)
 }
 
 pub fn point_to_index(point: Point, length: i64) -> ArrPos {

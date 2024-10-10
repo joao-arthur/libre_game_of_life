@@ -1,11 +1,12 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     cartesian_plane::{index_to_point, ArrPos, Point},
-    cell::{toggle, State},
+    cell::{self, toggle, State},
+    neighbor::number_of_alive_from_model,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Rect {
     pub x1: i64,
     pub y1: i64,
@@ -19,7 +20,7 @@ impl Rect {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Model {
     pub value: HashMap<Point, State>,
     pub iter: u64,
@@ -103,7 +104,6 @@ pub fn get_middle_point(model: &Model) -> Point {
 pub fn get_middle_cell(model: &Model, total_size: i64) -> Point {
     let cell_size = get_cell_size(model, total_size);
     let middle = get_middle_point(model);
-
     Point {
         x: middle.x * cell_size,
         y: middle.y * cell_size,
@@ -118,49 +118,40 @@ pub fn get_value(model: &Model, point: Point) -> State {
     }
 }
 
-/*
-pub fn iterate(
-    model: Model,
-) -> Model {
-    let iteratingPoints = map
-        .keys(model.value)
-        .map(cartesianPlaneFns.deserialize_point)
-        .flatMap((point) => [
-            { x: point.x - 1, y: point.y + 1 },
-            { x: point.x, y: point.y + 1 },
-            { x: point.x + 1, y: point.y + 1 },
-            { x: point.x - 1, y: point.y },
-            { x: point.x, y: point.y },
-            { x: point.x + 1, y: point.y },
-            { x: point.x - 1, y: point.y - 1 },
-            { x: point.x, y: point.y - 1 },
-            { x: point.x + 1, y: point.y - 1 },
-        ]);
-    let uniquePoints = arr
-        .unique(iteratingPoints.map(cartesianPlaneFns.serializePoint))
-        .map(cartesianPlaneFns.deserializePoint);
-    let entries = uniquePoints
-        .map((point) => {
-            let state = getValue(model, point);
-            let neighbors = neighborsFns.aliveFromModel(
-                model,
-                point,
-            );
-            let newCell = cellFns.iterate(state, neighbors);
-            return newCell === State::ALIVE
-                ? [cartesianPlaneFns.serializePoint(point), newCell]
-                : undefined;
+// TODO: optimize by mutating the current hashmap instead of creating a new one
+pub fn iterate(model: &mut Model) {
+    let points: HashSet<Point> = model
+        .value
+        .keys()
+        .flat_map(|p| {
+            [
+                Point::from(p.x - 1, p.y + 1),
+                Point::from(p.x, p.y + 1),
+                Point::from(p.x + 1, p.y + 1),
+                Point::from(p.x - 1, p.y),
+                p.clone(),
+                Point::from(p.x + 1, p.y),
+                Point::from(p.x - 1, p.y - 1),
+                Point::from(p.x, p.y - 1),
+                Point::from(p.x + 1, p.y - 1),
+            ]
         })
-        .filter((value) => value !== undefined)
-        .map((value) => value as [string, State::ALIVE]);
-
-    return {
-        value: new Map(entries),
-        iter: model.iter + 1,
-        pos: model.pos,
-    };
+        .collect();
+    let entries: HashMap<Point, State> = points
+        .iter()
+        .filter_map(|p| {
+            let state = model.value.get(p).unwrap_or(&State::DEAD);
+            let number_of_alive_neighbors = number_of_alive_from_model(model, p.clone());
+            let new_cell = cell::iterate(state.clone(), number_of_alive_neighbors);
+            match new_cell {
+                State::DEAD => None,
+                State::ALIVE => Some((p.clone(), State::ALIVE)),
+            }
+        })
+        .collect();
+    model.iter += 1;
+    model.value = entries;
 }
-*/
 
 pub fn move_in_plane(model: Model, delta: Point) -> Model {
     Model {
@@ -175,26 +166,26 @@ pub fn move_in_plane(model: Model, delta: Point) -> Model {
     }
 }
 
-// pub fn toggle_cell(model: Model, point: Point) -> Model {
-//     let new_map: HashMap<Point, State> = HashMap::new();
-//     new_map.extend(model.value.iter().cloned());
-//     new_map.insert(
-//         point,
-//         toggle(*model.value.get(&point).unwrap_or(&State::DEAD)),
-//     );
-//     Model::from_value(new_map)
-// }
+pub fn toggle_cell(model: &mut Model, point: Point) {
+    let new_cell = toggle(model.value.get(&point).unwrap_or(&State::DEAD));
+    match new_cell {
+        State::DEAD => {
+            model.value.remove(&point);
+        }
+        State::ALIVE => {
+            model.value.insert(point, new_cell);
+        }
+    }
+}
 
 pub fn zoom(model: Model, new_size: i64) -> Model {
     let half_new_size = new_size as f64 / 2 as f64;
     let half_x = (model.pos.x1 + model.pos.x2) as f64 / 2 as f64;
     let half_y = (model.pos.y1 + model.pos.y2) as f64 / 2 as f64;
-
     let x1 = (half_x - half_new_size).ceil() as i64;
     let y1 = (half_y - half_new_size).ceil() as i64;
     let x2 = x1 + new_size as i64 - 1;
     let y2 = y1 + new_size as i64 - 1;
-
     Model {
         value: model.value,
         iter: model.iter,
@@ -672,5 +663,165 @@ mod test {
                 ..Default::default()
             }
         );
+    }
+
+    #[test]
+    fn test_toggle_model() {
+        let mut model = from_string(vec![
+            "⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+        ]);
+        let state1 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+        ]);
+        let state2 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+        ]);
+        let state3 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛".to_string(),
+            "⬜⬜⬛⬜".to_string(),
+            "⬜⬜⬜⬜".to_string(),
+        ]);
+        let state4 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛".to_string(),
+            "⬜⬜⬛⬜".to_string(),
+            "⬜⬜⬜⬛".to_string(),
+        ]);
+        let state5 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛".to_string(),
+            "⬜⬜⬛⬜".to_string(),
+            "⬛⬜⬜⬛".to_string(),
+        ]);
+        let state6 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛".to_string(),
+            "⬜⬛⬛⬜".to_string(),
+            "⬛⬜⬜⬛".to_string(),
+        ]);
+        let state7 = from_string(vec![
+            "⬜⬛⬛⬛".to_string(),
+            "⬛⬜⬜⬛".to_string(),
+            "⬜⬛⬛⬜".to_string(),
+            "⬛⬜⬜⬛".to_string(),
+        ]);
+        let state8 = from_string(vec![
+            "⬜⬛⬛⬜".to_string(),
+            "⬛⬜⬜⬛".to_string(),
+            "⬜⬛⬛⬜".to_string(),
+            "⬛⬜⬜⬛".to_string(),
+        ]);
+        toggle_cell(&mut model, Point::from(-2, 2));
+        assert_eq!(model, state1);
+        toggle_cell(&mut model, Point::from(-1, 1));
+        assert_eq!(model, state2);
+        toggle_cell(&mut model, Point::from(0, 0));
+        assert_eq!(model, state3);
+        toggle_cell(&mut model, Point::from(1, -1));
+        assert_eq!(model, state4);
+        toggle_cell(&mut model, Point::from(-2, -1));
+        assert_eq!(model, state5);
+        toggle_cell(&mut model, Point::from(-1, 0));
+        assert_eq!(model, state6);
+        toggle_cell(&mut model, Point::from(0, 1));
+        assert_eq!(model, state7);
+        toggle_cell(&mut model, Point::from(1, 2));
+        assert_eq!(model, state8);
+    }
+
+    #[test]
+    fn test_iterate() {
+        let mut model1x1iter0 = from_string(vec!["⬜".to_string()]);
+        let mut model1x1iter1 = from_string(vec!["⬛".to_string()]);
+        model1x1iter1.iter = 1;
+
+        let mut model2x2iter0 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]);
+        let mut model2x2iter1 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]);
+        model2x2iter1.iter = 1;
+
+        let mut model3x3_1_iter0 = from_string(vec![
+            "⬛⬜⬛".to_string(),
+            "⬛⬜⬛".to_string(),
+            "⬛⬜⬛".to_string(),
+        ]);
+        let mut model3x3_1_iter1 = from_string(vec![
+            "⬛⬛⬛".to_string(),
+            "⬜⬜⬜".to_string(),
+            "⬛⬛⬛".to_string(),
+        ]);
+        model3x3_1_iter1.iter = 1;
+
+        let mut model3x3_2_iter0 = from_string(vec![
+            "⬛⬛⬛".to_string(),
+            "⬜⬜⬜".to_string(),
+            "⬛⬛⬛".to_string(),
+        ]);
+        let mut model3x3_2_iter1 = from_string(vec![
+            "⬛⬜⬛".to_string(),
+            "⬛⬜⬛".to_string(),
+            "⬛⬜⬛".to_string(),
+        ]);
+        model3x3_2_iter1.iter = 1;
+
+        let mut model3x3_3_iter0 = from_string(vec![
+            "⬛⬛⬜".to_string(),
+            "⬜⬜⬜".to_string(),
+            "⬛⬛⬛".to_string(),
+        ]);
+        let mut model3x3_3_iter1 = from_string(vec![
+            "⬛⬛⬜".to_string(),
+            "⬛⬜⬜".to_string(),
+            "⬛⬜⬛".to_string(),
+        ]);
+        model3x3_3_iter1.iter = 1;
+
+        let mut model3x3_4_iter0 = from_string(vec![
+            "⬛⬛⬜".to_string(),
+            "⬛⬜⬜".to_string(),
+            "⬛⬜⬛".to_string(),
+        ]);
+        let mut model3x3_4_iter1 = from_string(vec![
+            "⬛⬜⬜".to_string(),
+            "⬛⬜⬜".to_string(),
+            "⬛⬜⬜".to_string(),
+        ]);
+        model3x3_4_iter1.iter = 1;
+
+        let mut model3x3_5_iter0 = from_string(vec![
+            "⬜⬜⬛".to_string(),
+            "⬜⬜⬜".to_string(),
+            "⬛⬜⬛".to_string(),
+        ]);
+        let mut model3x3_5_iter1 = from_string(vec![
+            "⬜⬛⬜".to_string(),
+            "⬛⬛⬜".to_string(),
+            "⬜⬜⬜".to_string(),
+        ]);
+        model3x3_5_iter1.iter = 1;
+
+        iterate(&mut model1x1iter0);
+        assert_eq!(model1x1iter0, model1x1iter1);
+        iterate(&mut model2x2iter0);
+        assert_eq!(model2x2iter0, model2x2iter1);
+        iterate(&mut model3x3_1_iter0);
+        assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
+        iterate(&mut model3x3_2_iter0);
+        assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
+        iterate(&mut model3x3_3_iter0);
+        assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
+        iterate(&mut model3x3_4_iter0);
+        assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
+        iterate(&mut model3x3_5_iter0);
+        assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
     }
 }
