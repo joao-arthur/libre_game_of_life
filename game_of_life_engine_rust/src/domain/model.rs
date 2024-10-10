@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use crate::{
+use crate::domain::{
     cartesian_plane::{index_to_point, ArrPos, Point},
     cell::{self, toggle, State},
     neighbor::number_of_alive_from_model,
@@ -196,7 +196,7 @@ pub fn zoom(model: Model, new_size: i64) -> Model {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::cell::State;
+    use crate::domain::cell::State;
 
     #[test]
     fn test_rect() {

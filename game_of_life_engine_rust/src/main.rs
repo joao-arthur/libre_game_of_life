@@ -1,7 +1,4 @@
-pub mod cartesian_plane;
-pub mod cell;
-pub mod model;
-pub mod neighbor;
+pub mod domain;
 
 fn main() {
     println!("Hello, world!");

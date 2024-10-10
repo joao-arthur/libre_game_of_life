@@ -1,4 +1,4 @@
-use crate::{cartesian_plane::Point, cell::State, model::Model};
+use crate::domain::{cartesian_plane::Point, cell::State, model::Model};
 
 pub type Neighbor<'a> = Option<&'a State>;
 
