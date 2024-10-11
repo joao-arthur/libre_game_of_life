@@ -77,12 +77,7 @@ pub fn from_string(model_as_str: Vec<String>) -> Model {
     Model {
         value,
         iter: 0,
-        pos: Rect {
-            x1: -10,
-            y1: -10,
-            x2: 10,
-            y2: 10,
-        },
+        pos: Rect::from(-10, -10, 10, 10),
     }
 }
 
@@ -95,19 +90,16 @@ pub fn get_cell_size(model: &Model, total_size: i64) -> i64 {
 }
 
 pub fn get_middle_point(model: &Model) -> Point {
-    Point {
-        x: (model.pos.x1 + model.pos.x2) / 2,
-        y: (model.pos.y1 + model.pos.y2) / 2,
-    }
+    Point::from(
+        (model.pos.x1 + model.pos.x2) / 2,
+        (model.pos.y1 + model.pos.y2) / 2,
+    )
 }
 
 pub fn get_middle_cell(model: &Model, total_size: i64) -> Point {
     let cell_size = get_cell_size(model, total_size);
     let middle = get_middle_point(model);
-    Point {
-        x: middle.x * cell_size,
-        y: middle.y * cell_size,
-    }
+    Point::from(middle.x * cell_size, middle.y * cell_size)
 }
 
 pub fn get_value(model: &Model, point: Point) -> State {
@@ -182,7 +174,7 @@ pub fn zoom(model: &mut Model, new_size: i64) {
     let y1 = (half_y - half_new_size).ceil() as i64;
     let x2 = x1 + new_size as i64 - 1;
     let y2 = y1 + new_size as i64 - 1;
-    model.pos = Rect { x1, y1, x2, y2 };
+    model.pos = Rect::from(x1, y1, x2, y2);
 }
 
 #[cfg(test)]
@@ -263,7 +255,6 @@ mod test {
                 pos: Rect::from(-10, -10, 10, 10),
             }
         );
-
         assert_eq!(
             from_string(vec![
                 "⬛⬛⬛⬜".to_string(),
@@ -326,7 +317,7 @@ mod test {
     #[test]
     fn test_get_middle_cell() {
         assert_eq!(
-            get_middle_cell(&Model::from_pos(Rect::from(-10, -10, 10, 10)), 100,),
+            get_middle_cell(&Model::from_pos(Rect::from(-10, -10, 10, 10)), 100),
             Point::from(0, 0)
         );
         // assert_eq!(
@@ -345,80 +336,57 @@ mod test {
 
     #[test]
     fn test_move_in_plane() {
-        let mut model1 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model2 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model3 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model4 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model5 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model6 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model7 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model8 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-
-        move_in_plane(&mut model1, Point::from(1, 0));
-        move_in_plane(&mut model2, Point::from(-1, 0));
-        move_in_plane(&mut model3, Point::from(0, 1));
-        move_in_plane(&mut model4, Point::from(0, -1));
-        move_in_plane(&mut model5, Point::from(11, 0));
-        move_in_plane(&mut model6, Point::from(-11, 0));
-        move_in_plane(&mut model7, Point::from(0, 11));
-        move_in_plane(&mut model8, Point::from(0, -11));
-
-        assert_eq!(model1.pos, Rect::from(-9, -10, 11, 10));
-        assert_eq!(model2.pos, Rect::from(-11, -10, 9, 10));
-        assert_eq!(model3.pos, Rect::from(-10, -9, 10, 11));
-        assert_eq!(model4.pos, Rect::from(-10, -11, 10, 9));
-        assert_eq!(model5.pos, Rect::from(1, -10, 21, 10));
-        assert_eq!(model6.pos, Rect::from(-21, -10, -1, 10));
-        assert_eq!(model7.pos, Rect::from(-10, 1, 10, 21));
-        assert_eq!(model8.pos, Rect::from(-10, -21, 10, -1));
+        let mut model = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        move_in_plane(&mut model, Point::from(1, 0));
+        assert_eq!(model.pos, Rect::from(-9, -10, 11, 10));
+        move_in_plane(&mut model, Point::from(-2, 0));
+        assert_eq!(model.pos, Rect::from(-11, -10, 9, 10));
+        move_in_plane(&mut model, Point::from(0, 1));
+        assert_eq!(model.pos, Rect::from(-11, -9, 9, 11));
+        move_in_plane(&mut model, Point::from(0, -2));
+        assert_eq!(model.pos, Rect::from(-11, -11, 9, 9));
+        move_in_plane(&mut model, Point::from(11, 0));
+        assert_eq!(model.pos, Rect::from(0, -11, 20, 9));
+        move_in_plane(&mut model, Point::from(0, 11));
+        assert_eq!(model.pos, Rect::from(0, 0, 20, 20));
+        move_in_plane(&mut model, Point::from(-20, 0));
+        assert_eq!(model.pos, Rect::from(-20, 0, 0, 20));
+        move_in_plane(&mut model, Point::from(0, -20));
+        assert_eq!(model.pos, Rect::from(-20, -20, 0, 0));
     }
 
     #[test]
     fn test_zoom_odd_size() {
-        let mut model1 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model2 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model3 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model4 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model5 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        let mut model6 = Model::from_pos(Rect::from(-10, -10, 10, 10));
-
-        zoom(&mut model1, 1);
-        zoom(&mut model2, 2);
-        zoom(&mut model3, 3);
-        zoom(&mut model4, 19);
-        zoom(&mut model5, 21);
-        zoom(&mut model6, 23);
-
-        assert_eq!(model1.pos, Rect::from(0, 0, 0, 0));
-        assert_eq!(model2.pos, Rect::from(-1, -1, 0, 0));
-        assert_eq!(model3.pos, Rect::from(-1, -1, 1, 1));
-        assert_eq!(model4.pos, Rect::from(-9, -9, 9, 9));
-        assert_eq!(model5.pos, Rect::from(-10, -10, 10, 10));
-        assert_eq!(model6.pos, Rect::from(-11, -11, 11, 11));
+        let mut model = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        zoom(&mut model, 1);
+        assert_eq!(model.pos, Rect::from(0, 0, 0, 0));
+        zoom(&mut model, 2);
+        assert_eq!(model.pos, Rect::from(-1, -1, 0, 0));
+        zoom(&mut model, 3);
+        assert_eq!(model.pos, Rect::from(-2, -2, 0, 0));
+        zoom(&mut model, 19);
+        assert_eq!(model.pos, Rect::from(-10, -10, 8, 8));
+        zoom(&mut model, 21);
+        assert_eq!(model.pos, Rect::from(-11, -11, 9, 9));
+        zoom(&mut model, 23);
+        assert_eq!(model.pos, Rect::from(-12, -12, 10, 10));
     }
 
     #[test]
     fn test_zoom_even_size() {
-        let mut model1 = Model::from_pos(Rect::from(10, 10, 19, 19));
-        let mut model2 = Model::from_pos(Rect::from(10, 10, 19, 19));
-        let mut model3 = Model::from_pos(Rect::from(10, 10, 19, 19));
-        let mut model4 = Model::from_pos(Rect::from(10, 10, 19, 19));
-        let mut model5 = Model::from_pos(Rect::from(10, 10, 19, 19));
-        let mut model6 = Model::from_pos(Rect::from(10, 10, 19, 19));
-
-        zoom(&mut model1, 1);
-        zoom(&mut model2, 2);
-        zoom(&mut model3, 3);
-        zoom(&mut model4, 8);
-        zoom(&mut model5, 10);
-        zoom(&mut model6, 12);
-
-        assert_eq!(model1.pos, Rect::from(14, 14, 14, 14));
-        assert_eq!(model2.pos, Rect::from(14, 14, 15, 15));
-        assert_eq!(model3.pos, Rect::from(13, 13, 15, 15));
-        assert_eq!(model4.pos, Rect::from(11, 11, 18, 18));
-        assert_eq!(model5.pos, Rect::from(10, 10, 19, 19));
-        assert_eq!(model6.pos, Rect::from(9, 9, 20, 20));
+        let mut model = Model::from_pos(Rect::from(10, 10, 19, 19));
+        zoom(&mut model, 1);
+        assert_eq!(model.pos, Rect::from(14, 14, 14, 14));
+        zoom(&mut model, 2);
+        assert_eq!(model.pos, Rect::from(13, 13, 14, 14));
+        zoom(&mut model, 3);
+        assert_eq!(model.pos, Rect::from(12, 12, 14, 14));
+        zoom(&mut model, 8);
+        assert_eq!(model.pos, Rect::from(9, 9, 16, 16));
+        zoom(&mut model, 10);
+        assert_eq!(model.pos, Rect::from(8, 8, 17, 17));
+        zoom(&mut model, 12);
+        assert_eq!(model.pos, Rect::from(7, 7, 18, 18));
     }
 
     #[test]
@@ -435,62 +403,62 @@ mod test {
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(-2, 2));
+        assert_eq!(model, state1);
         let state2 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(-1, 1));
+        assert_eq!(model, state2);
         let state3 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬛⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(0, 0));
+        assert_eq!(model, state3);
         let state4 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬛⬜".to_string(),
             "⬜⬜⬜⬛".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(1, -1));
+        assert_eq!(model, state4);
         let state5 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(-2, -1));
+        assert_eq!(model, state5);
         let state6 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(-1, 0));
+        assert_eq!(model, state6);
         let state7 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬜⬛".to_string(),
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
+        toggle_cell(&mut model, Point::from(0, 1));
+        assert_eq!(model, state7);
         let state8 = from_string(vec![
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(-2, 2));
-        assert_eq!(model, state1);
-        toggle_cell(&mut model, Point::from(-1, 1));
-        assert_eq!(model, state2);
-        toggle_cell(&mut model, Point::from(0, 0));
-        assert_eq!(model, state3);
-        toggle_cell(&mut model, Point::from(1, -1));
-        assert_eq!(model, state4);
-        toggle_cell(&mut model, Point::from(-2, -1));
-        assert_eq!(model, state5);
-        toggle_cell(&mut model, Point::from(-1, 0));
-        assert_eq!(model, state6);
-        toggle_cell(&mut model, Point::from(0, 1));
-        assert_eq!(model, state7);
         toggle_cell(&mut model, Point::from(1, 2));
         assert_eq!(model, state8);
     }
@@ -500,10 +468,14 @@ mod test {
         let mut model1x1iter0 = from_string(vec!["⬜".to_string()]);
         let mut model1x1iter1 = from_string(vec!["⬛".to_string()]);
         model1x1iter1.iter = 1;
+        iterate(&mut model1x1iter0);
+        assert_eq!(model1x1iter0, model1x1iter1);
 
         let mut model2x2iter0 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]);
         let mut model2x2iter1 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]);
         model2x2iter1.iter = 1;
+        iterate(&mut model2x2iter0);
+        assert_eq!(model2x2iter0, model2x2iter1);
 
         let mut model3x3_1_iter0 = from_string(vec![
             "⬛⬜⬛".to_string(),
@@ -516,6 +488,8 @@ mod test {
             "⬛⬛⬛".to_string(),
         ]);
         model3x3_1_iter1.iter = 1;
+        iterate(&mut model3x3_1_iter0);
+        assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
 
         let mut model3x3_2_iter0 = from_string(vec![
             "⬛⬛⬛".to_string(),
@@ -528,6 +502,8 @@ mod test {
             "⬛⬜⬛".to_string(),
         ]);
         model3x3_2_iter1.iter = 1;
+        iterate(&mut model3x3_2_iter0);
+        assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
 
         let mut model3x3_3_iter0 = from_string(vec![
             "⬛⬛⬜".to_string(),
@@ -540,6 +516,8 @@ mod test {
             "⬛⬜⬛".to_string(),
         ]);
         model3x3_3_iter1.iter = 1;
+        iterate(&mut model3x3_3_iter0);
+        assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
 
         let mut model3x3_4_iter0 = from_string(vec![
             "⬛⬛⬜".to_string(),
@@ -552,6 +530,8 @@ mod test {
             "⬛⬜⬜".to_string(),
         ]);
         model3x3_4_iter1.iter = 1;
+        iterate(&mut model3x3_4_iter0);
+        assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
 
         let mut model3x3_5_iter0 = from_string(vec![
             "⬜⬜⬛".to_string(),
@@ -564,19 +544,6 @@ mod test {
             "⬜⬜⬜".to_string(),
         ]);
         model3x3_5_iter1.iter = 1;
-
-        iterate(&mut model1x1iter0);
-        assert_eq!(model1x1iter0, model1x1iter1);
-        iterate(&mut model2x2iter0);
-        assert_eq!(model2x2iter0, model2x2iter1);
-        iterate(&mut model3x3_1_iter0);
-        assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
-        iterate(&mut model3x3_2_iter0);
-        assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
-        iterate(&mut model3x3_3_iter0);
-        assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
-        iterate(&mut model3x3_4_iter0);
-        assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
         iterate(&mut model3x3_5_iter0);
         assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
     }
