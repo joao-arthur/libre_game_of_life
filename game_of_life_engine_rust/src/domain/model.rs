@@ -153,17 +153,13 @@ pub fn iterate(model: &mut Model) {
     model.value = entries;
 }
 
-pub fn move_in_plane(model: Model, delta: Point) -> Model {
-    Model {
-        value: model.value,
-        iter: model.iter,
-        pos: Rect::from(
-            model.pos.x1 + delta.x,
-            model.pos.y1 + delta.y,
-            model.pos.x2 + delta.x,
-            model.pos.y2 + delta.y,
-        ),
-    }
+pub fn move_in_plane(model: &mut Model, delta: Point) {
+    model.pos = Rect::from(
+        model.pos.x1 + delta.x,
+        model.pos.y1 + delta.y,
+        model.pos.x2 + delta.x,
+        model.pos.y2 + delta.y,
+    )
 }
 
 pub fn toggle_cell(model: &mut Model, point: Point) {
@@ -178,7 +174,7 @@ pub fn toggle_cell(model: &mut Model, point: Point) {
     }
 }
 
-pub fn zoom(model: Model, new_size: i64) -> Model {
+pub fn zoom(model: &mut Model, new_size: i64) {
     let half_new_size = new_size as f64 / 2 as f64;
     let half_x = (model.pos.x1 + model.pos.x2) as f64 / 2 as f64;
     let half_y = (model.pos.y1 + model.pos.y2) as f64 / 2 as f64;
@@ -186,11 +182,7 @@ pub fn zoom(model: Model, new_size: i64) -> Model {
     let y1 = (half_y - half_new_size).ceil() as i64;
     let x2 = x1 + new_size as i64 - 1;
     let y2 = y1 + new_size as i64 - 1;
-    Model {
-        value: model.value,
-        iter: model.iter,
-        pos: Rect { x1, y1, x2, y2 },
-    }
+    model.pos = Rect { x1, y1, x2, y2 };
 }
 
 #[cfg(test)]
@@ -304,10 +296,7 @@ mod test {
 
     #[test]
     fn test_get_cell_size() {
-        let model = Model {
-            pos: Rect::from(1, 1, 10, 10),
-            ..Default::default()
-        };
+        let model = Model::from_pos(Rect::from(1, 1, 10, 10));
         assert_eq!(get_cell_size(&model, 100), 10);
         assert_eq!(get_cell_size(&model, 90), 9);
         assert_eq!(get_cell_size(&model, 50), 5);
@@ -317,31 +306,19 @@ mod test {
     #[test]
     fn test_get_middle_point() {
         assert_eq!(
-            get_middle_point(&Model {
-                pos: Rect::from(-10, -10, 10, 10),
-                ..Default::default()
-            }),
+            get_middle_point(&Model::from_pos(Rect::from(-10, -10, 10, 10))),
             Point::from(0, 0)
         );
         // assert_eq!(
-        //     get_middle_point(&Model {
-        //         pos: Rect::from(1, 1, 10, 10),
-        //         ..Default::default()
-        //     }),
+        //     get_middle_point(&Model::from_pos(Rect::from(1, 1, 10, 10))),
         //     Point::from(5.5, 5.5)
         // );
         // assert_eq!(
-        //     get_middle_point(&Model {
-        //         pos: Rect::from(4, 4, 5, 5),
-        //         ..Default::default()
-        //     }),
+        //     get_middle_point(&Model::from_pos(Rect::from(4, 4, 5, 5))),
         //     Point::from(4.5, 4.5)
         // );
         assert_eq!(
-            get_middle_point(&Model {
-                pos: Rect::from(5, 5, 5, 5),
-                ..Default::default()
-            }),
+            get_middle_point(&Model::from_pos(Rect::from(5, 5, 5, 5))),
             Point::from(5, 5)
         );
     }
@@ -349,320 +326,99 @@ mod test {
     #[test]
     fn test_get_middle_cell() {
         assert_eq!(
-            get_middle_cell(
-                &Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                100,
-            ),
+            get_middle_cell(&Model::from_pos(Rect::from(-10, -10, 10, 10)), 100,),
             Point::from(0, 0)
         );
-        //assert_eq!(
-        //    get_middle_cell(
-        //        &Model {
-        //            pos: Rect::from(1, 1, 10, 10),
-        //            ..Default::default()
-        //        },
-        //        50
-        //    ),
-        //    Point::from(27.5, 27.5)
-        //);
-        //assert_eq!(
-        //    get_middle_cell(
-        //        &Model {
-        //            pos: Rect::from(4, 4, 5, 5),
-        //            ..Default::default()
-        //        },
-        //        10
-        //    ),
-        //    Point::from(22.5, 22.5)
-        //);
+        // assert_eq!(
+        //     get_middle_cell(&Model::from_pos(Rect::from(1, 1, 10, 10)), 50),
+        //     Point::from(27.5, 27.5)
+        // );
+        // assert_eq!(
+        //     get_middle_cell(&Model::from_pos(Rect::from(4, 4, 5, 5)), 10),
+        //     Point::from(22.5, 22.5)
+        // );
         assert_eq!(
-            get_middle_cell(
-                &Model {
-                    pos: Rect::from(5, 5, 5, 5),
-                    ..Default::default()
-                },
-                1
-            ),
+            get_middle_cell(&Model::from_pos(Rect::from(5, 5, 5, 5)), 1),
             Point::from(5, 5)
         );
     }
 
     #[test]
     fn test_move_in_plane() {
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: 1, y: 0 }
-            ),
-            Model {
-                pos: Rect::from(-9, -10, 11, 10),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: -1, y: 0 }
-            ),
-            Model {
-                pos: Rect::from(-11, -10, 9, 10),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: 0, y: 1 }
-            ),
-            Model {
-                pos: Rect::from(-10, -9, 10, 11),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: 0, y: -1 }
-            ),
-            Model {
-                pos: Rect::from(-10, -11, 10, 9),
-                ..Default::default()
-            }
-        );
+        let mut model1 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model2 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model3 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model4 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model5 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model6 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model7 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model8 = Model::from_pos(Rect::from(-10, -10, 10, 10));
 
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: 11, y: 0 }
-            ),
-            Model {
-                pos: Rect::from(1, -10, 21, 10),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: -11, y: 0 }
-            ),
-            Model {
-                pos: Rect::from(-21, -10, -1, 10),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: 0, y: 11 }
-            ),
-            Model {
-                pos: Rect::from(-10, 1, 10, 21),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            move_in_plane(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                Point { x: 0, y: -11 }
-            ),
-            Model {
-                pos: Rect::from(-10, -21, 10, -1),
-                ..Default::default()
-            }
-        );
+        move_in_plane(&mut model1, Point::from(1, 0));
+        move_in_plane(&mut model2, Point::from(-1, 0));
+        move_in_plane(&mut model3, Point::from(0, 1));
+        move_in_plane(&mut model4, Point::from(0, -1));
+        move_in_plane(&mut model5, Point::from(11, 0));
+        move_in_plane(&mut model6, Point::from(-11, 0));
+        move_in_plane(&mut model7, Point::from(0, 11));
+        move_in_plane(&mut model8, Point::from(0, -11));
+
+        assert_eq!(model1.pos, Rect::from(-9, -10, 11, 10));
+        assert_eq!(model2.pos, Rect::from(-11, -10, 9, 10));
+        assert_eq!(model3.pos, Rect::from(-10, -9, 10, 11));
+        assert_eq!(model4.pos, Rect::from(-10, -11, 10, 9));
+        assert_eq!(model5.pos, Rect::from(1, -10, 21, 10));
+        assert_eq!(model6.pos, Rect::from(-21, -10, -1, 10));
+        assert_eq!(model7.pos, Rect::from(-10, 1, 10, 21));
+        assert_eq!(model8.pos, Rect::from(-10, -21, 10, -1));
     }
 
     #[test]
     fn test_zoom_odd_size() {
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                1
-            ),
-            Model {
-                pos: Rect::from(0, 0, 0, 0),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                2
-            ),
-            Model {
-                pos: Rect::from(-1, -1, 0, 0),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                3
-            ),
-            Model {
-                pos: Rect::from(-1, -1, 1, 1),
-                ..Default::default()
-            }
-        );
+        let mut model1 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model2 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model3 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model4 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model5 = Model::from_pos(Rect::from(-10, -10, 10, 10));
+        let mut model6 = Model::from_pos(Rect::from(-10, -10, 10, 10));
 
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                19
-            ),
-            Model {
-                pos: Rect::from(-9, -9, 9, 9),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                21
-            ),
-            Model {
-                pos: Rect::from(-10, -10, 10, 10),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(-10, -10, 10, 10),
-                    ..Default::default()
-                },
-                23
-            ),
-            Model {
-                pos: Rect::from(-11, -11, 11, 11),
-                ..Default::default()
-            }
-        );
+        zoom(&mut model1, 1);
+        zoom(&mut model2, 2);
+        zoom(&mut model3, 3);
+        zoom(&mut model4, 19);
+        zoom(&mut model5, 21);
+        zoom(&mut model6, 23);
+
+        assert_eq!(model1.pos, Rect::from(0, 0, 0, 0));
+        assert_eq!(model2.pos, Rect::from(-1, -1, 0, 0));
+        assert_eq!(model3.pos, Rect::from(-1, -1, 1, 1));
+        assert_eq!(model4.pos, Rect::from(-9, -9, 9, 9));
+        assert_eq!(model5.pos, Rect::from(-10, -10, 10, 10));
+        assert_eq!(model6.pos, Rect::from(-11, -11, 11, 11));
     }
 
     #[test]
     fn test_zoom_even_size() {
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(10, 10, 19, 19),
-                    ..Default::default()
-                },
-                1
-            ),
-            Model {
-                pos: Rect::from(14, 14, 14, 14),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(10, 10, 19, 19),
-                    ..Default::default()
-                },
-                2
-            ),
-            Model {
-                pos: Rect::from(14, 14, 15, 15),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(10, 10, 19, 19),
-                    ..Default::default()
-                },
-                3
-            ),
-            Model {
-                pos: Rect::from(13, 13, 15, 15),
-                ..Default::default()
-            }
-        );
+        let mut model1 = Model::from_pos(Rect::from(10, 10, 19, 19));
+        let mut model2 = Model::from_pos(Rect::from(10, 10, 19, 19));
+        let mut model3 = Model::from_pos(Rect::from(10, 10, 19, 19));
+        let mut model4 = Model::from_pos(Rect::from(10, 10, 19, 19));
+        let mut model5 = Model::from_pos(Rect::from(10, 10, 19, 19));
+        let mut model6 = Model::from_pos(Rect::from(10, 10, 19, 19));
 
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(10, 10, 19, 19),
-                    ..Default::default()
-                },
-                8
-            ),
-            Model {
-                pos: Rect::from(11, 11, 18, 18),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(10, 10, 19, 19),
-                    ..Default::default()
-                },
-                10
-            ),
-            Model {
-                pos: Rect::from(10, 10, 19, 19),
-                ..Default::default()
-            }
-        );
-        assert_eq!(
-            zoom(
-                Model {
-                    pos: Rect::from(10, 10, 19, 19),
-                    ..Default::default()
-                },
-                12
-            ),
-            Model {
-                pos: Rect::from(9, 9, 20, 20),
-                ..Default::default()
-            }
-        );
+        zoom(&mut model1, 1);
+        zoom(&mut model2, 2);
+        zoom(&mut model3, 3);
+        zoom(&mut model4, 8);
+        zoom(&mut model5, 10);
+        zoom(&mut model6, 12);
+
+        assert_eq!(model1.pos, Rect::from(14, 14, 14, 14));
+        assert_eq!(model2.pos, Rect::from(14, 14, 15, 15));
+        assert_eq!(model3.pos, Rect::from(13, 13, 15, 15));
+        assert_eq!(model4.pos, Rect::from(11, 11, 18, 18));
+        assert_eq!(model5.pos, Rect::from(10, 10, 19, 19));
+        assert_eq!(model6.pos, Rect::from(9, 9, 20, 20));
     }
 
     #[test]
