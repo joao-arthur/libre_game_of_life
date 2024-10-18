@@ -8,4 +8,4 @@ export {
     SystemController,
     SystemModelProxy,
 } from "./model.js";
-export {CanvasDrawContext} from "./infra.js";
+export { CanvasDrawContext } from "./infra.js";

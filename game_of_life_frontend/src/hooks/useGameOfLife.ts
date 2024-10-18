@@ -21,7 +21,7 @@ export function useGameOfLife(): GameOfLife {
     const dimension = useWindowDimension();
 
     useEffect(() => {
-        systemControllerRef.current?.setDimension(dimension);
+        systemControllerRef.current?.setDimension(BigInt(dimension));
     }, [dimension]);
 
     const init = useCallback(
@@ -31,10 +31,14 @@ export function useGameOfLife(): GameOfLife {
                 return;
             }
             const canvasDrawContext = new CanvasDrawContext(context);
-            const systemModel = new SystemModelProxy(buildModel(canvasDrawContext, dimension));
+            const systemModel = new SystemModelProxy(
+                buildModel(canvasDrawContext, BigInt(dimension)),
+            );
             const systemController = new SystemController(systemModel);
             manage(systemModel, systemController);
-            systemModel.addOnChangeListener(() =>{console.log('wfheuiuhe'); setModel(systemModel.getModel())});
+            systemModel.addOnChangeListener(() => {
+                setModel(systemModel.getModel());
+            });
             setModel(systemModel.getModel());
             systemControllerRef.current = systemController;
         },

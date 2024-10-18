@@ -1,17 +1,29 @@
 use std::collections::{HashMap, HashSet};
 
+use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::*;
+
 use crate::domain::{
     cartesian_plane::{index_to_point, ArrPos, Point},
     cell::{self, toggle, State},
     neighbor::number_of_alive_from_model,
 };
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct Rect {
     pub x1: i64,
     pub y1: i64,
     pub x2: i64,
     pub y2: i64,
+}
+
+#[wasm_bindgen]
+impl Rect {
+    #[wasm_bindgen(constructor)]
+    pub fn new(x1: i64, y1: i64, x2: i64, y2: i64) -> Rect {
+        Rect { x1, y1, x2, y2 }
+    }
 }
 
 impl Rect {
@@ -20,7 +32,7 @@ impl Rect {
     }
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Model {
     pub value: HashMap<Point, State>,
     pub iter: u64,

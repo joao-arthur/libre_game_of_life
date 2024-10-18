@@ -1,14 +1,18 @@
 import type { DrawContext, SystemModel } from "./model.js";
 import { assert, test } from "vitest";
-import { buildPresets, fpsToMilis, SystemController, SystemModelProxy } from "./model.js";
-import { modelFromString } from "game_of_life_engine";
+import { buildPresets, fpsToMilis, State, SystemController, SystemModelProxy } from "./model.js";
+import init from "game_of_life_engine";
 
 const defaultModelDead: SystemModel = {
-    model: modelFromString([""]),
+    model: {
+        iter: 0,
+        pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+        value: new Map(),
+    },
     gap: 10,
     fps: 1,
     status: "paused",
-    dimension: 100,
+    dimension: 100n,
     drawContext: {
         clear: () => {},
         drawSquare: () => {},
@@ -16,11 +20,15 @@ const defaultModelDead: SystemModel = {
 };
 
 const defaultModelOneDead: SystemModel = {
-    model: modelFromString(["⬛"]),
+    model: {
+        iter: 0,
+        pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+        value: new Map(),
+    },
     gap: 10,
     fps: 1,
     status: "paused",
-    dimension: 100,
+    dimension: 100n,
     drawContext: {
         clear: () => {},
         drawSquare: () => {},
@@ -54,20 +62,28 @@ test("SystemModel Should create with passed arguments", () => {
 
 test("SystemModel Setters should", () => {
     const systemModel = new SystemModelProxy(defaultModelDead);
-    systemModel.setModel(modelFromString(["⬛"]));
+    systemModel.setModel({
+        iter: 0,
+        pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+        value: new Map(),
+    });
     systemModel.setGap(0);
     systemModel.setFps(0);
     systemModel.setStatus("resumed");
-    systemModel.setDimension(0);
+    systemModel.setDimension(0n);
     systemModel.setDrawContext(alternativeDrawContext);
     assert.deepStrictEqual(
         systemModel.getModel(),
         {
-            model: modelFromString(["⬛"]),
+            model: {
+                iter: 0,
+                pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+                value: new Map(),
+            },
             gap: 0,
             fps: 0,
             status: "resumed",
-            dimension: 0,
+            dimension: 0n,
             drawContext: alternativeDrawContext,
         },
     );
@@ -79,11 +95,15 @@ test("SystemModel Should call the listener for each changed value", () => {
     systemModel.addOnChangeListener((prop) => {
         changedProps.push(prop);
     });
-    systemModel.setModel(modelFromString(["⬛"]));
+    systemModel.setModel({
+        iter: 0,
+        pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+        value: new Map(),
+    });
     systemModel.setGap(0);
     systemModel.setFps(0);
     systemModel.setStatus("resumed");
-    systemModel.setDimension(0);
+    systemModel.setDimension(0n);
     systemModel.setDrawContext({ clear: () => {}, drawSquare: () => {} });
     assert.deepStrictEqual(
         changedProps,
@@ -121,21 +141,29 @@ test("SystemModelProxy iterate", () => {
     assert.deepStrictEqual(systemModel.getModel().status, "paused");
 });
 
-test("SystemModelProxy toggleCell", () => {
+test("SystemModelProxy toggleCell", async () => {
+    await init();
     const systemModel = new SystemModelProxy(defaultModelOneDead);
     const systemController = new SystemController(systemModel);
     systemController.toggleCell({ x: 0, y: 0 });
-    assert.deepStrictEqual(systemModel.getModel().model, modelFromString(["⬜"]));
+    const mapa = new Map();
+    mapa.set({ x: 0, y: 0 }, State.ALIVE);
+    assert.deepStrictEqual(systemModel.getModel().model, {
+        iter: 0,
+        pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+        value: mapa,
+    });
 });
 
 test("SystemModelProxy setDimension", () => {
     const systemModel = new SystemModelProxy(defaultModelOneDead);
     const systemController = new SystemController(systemModel);
-    systemController.setDimension(9);
-    assert.deepStrictEqual(systemModel.getModel().dimension, 9);
+    systemController.setDimension(9n);
+    assert.deepStrictEqual(systemModel.getModel().dimension, 9n);
 });
 
-test("SystemModelProxy setPreset", () => {
+test("SystemModelProxy setPreset", async () => {
+    await init();
     const systemModel = new SystemModelProxy(defaultModelOneDead);
     const systemController = new SystemController(systemModel);
     systemController.setPreset("blinker");
@@ -143,7 +171,8 @@ test("SystemModelProxy setPreset", () => {
     assert.deepStrictEqual(systemModel.getModel().model.value, blinker.model.value);
 });
 
-test("SystemModelProxy setSize", () => {
+test("SystemModelProxy setSize", async () => {
+    await init();
     const systemModel = new SystemModelProxy(defaultModelOneDead);
     const systemController = new SystemController(systemModel);
     systemController.setSize(5);
@@ -152,7 +181,8 @@ test("SystemModelProxy setSize", () => {
     assert.deepStrictEqual(length, 4);
 });
 
-test("SystemModelProxy move", () => {
+test("SystemModelProxy move", async () => {
+    await init();
     const systemModel = new SystemModelProxy(defaultModelOneDead);
     const systemController = new SystemController(systemModel);
     const oldX1 = systemModel.getModel().model.pos.x1;

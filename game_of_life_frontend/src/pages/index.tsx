@@ -1,13 +1,14 @@
 import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
-import {
+import initWASM, {
     absoluteToRelative,
+    ArrPos,
     getModelCellSize,
     getModelLength,
     getModelMiddlePoint,
+    getPresetGroups,
     indexToPoint,
 } from "game_of_life_engine";
-import { buildPresetsOptions } from "game_of_life_frontend_core";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
 import { Select } from "../components/Select";
@@ -21,15 +22,18 @@ export default function Main(): ReactElement {
         controller,
     } = useGameOfLife();
     const [preset, setPreset] = useState<string>(undefined!);
-
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimension = useWindowDimension();
 
+    const modelLength = model ? Number(getModelLength({ Ok: model.model })) : 0;
+
     useEffect(() => {
-        if (!canvasRef.current) {
-            return;
-        }
-        init(canvasRef.current);
+        initWASM().then(() => {
+            if (!canvasRef.current) {
+                return;
+            }
+            init(canvasRef.current);
+        });
     }, []);
 
     useEffect(() => {
@@ -77,15 +81,18 @@ export default function Main(): ReactElement {
         }
         const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
-        const length = getModelLength(model.model);
-        const middlePoint = getModelMiddlePoint(model.model);
-        const cellSize = getModelCellSize(model.model, model.dimension);
-        const col = absoluteToRelative(x, cellSize);
-        const row = absoluteToRelative(y, cellSize);
-        const point = indexToPoint({ col, row }, length);
+        const length = getModelLength({ Ok: model.model });
+        const middlePoint = getModelMiddlePoint({ Ok: model.model });
+        const cellSize = getModelCellSize({ Ok: model.model }, model.dimension);
+        if (cellSize <= 0) {
+            return;
+        }
+        const col = absoluteToRelative(BigInt(x), cellSize);
+        const row = absoluteToRelative(BigInt(y), cellSize);
+        const point = indexToPoint(new ArrPos(BigInt(row), BigInt(col)), BigInt(length));
         const cell = {
-            x: point.x + middlePoint.x,
-            y: point.y + middlePoint.y,
+            x: Number(point.x + middlePoint.x),
+            y: Number(point.y + middlePoint.y),
         };
         controller.toggleCell(cell);
         setPreset("");
@@ -104,7 +111,7 @@ export default function Main(): ReactElement {
     function zoom(offset: number) {
         if (!model) return;
         if (!controller) return;
-        const newSize = getModelLength(model.model) + offset;
+        const newSize = Number(getModelLength({ Ok: model.model })) + offset;
         if (newSize < 2) return;
         if (newSize > 120) return;
         controller.setSize(newSize);
@@ -136,7 +143,7 @@ export default function Main(): ReactElement {
                     <label htmlFor="preset">Preset</label>
                     <Select
                         id="preset"
-                        groups={buildPresetsOptions()}
+                        groups={[]} //buildPresetsOptions()}
                         value={preset}
                         onChange={(preset) => {
                             setPreset(preset);
@@ -167,14 +174,14 @@ export default function Main(): ReactElement {
                     <div className="flex">
                         <RangeInput
                             id="size"
-                            min={2 + (model ? getModelLength(model.model) % 2 === 0 ? 0 : 1 : 0)}
-                            max={200 + (model ? getModelLength(model.model) % 2 === 0 ? 0 : 1 : 0)}
+                            min={2 + (model ? modelLength % 2 === 0 ? 0 : 1 : 0)}
+                            max={200 + (model ? modelLength % 2 === 0 ? 0 : 1 : 0)}
                             step={2}
-                            value={model ? getModelLength(model.model) : 0}
+                            value={model ? modelLength : 0}
                             onChange={(size) => controller?.setSize(size)}
                         />
                         <label className="w-8 text-center block">
-                            {model ? getModelLength(model.model) : 0}
+                            {model ? modelLength : 0}
                         </label>
                     </div>
                 </div>

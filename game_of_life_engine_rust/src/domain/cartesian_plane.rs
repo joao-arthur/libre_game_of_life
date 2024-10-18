@@ -1,13 +1,34 @@
-#[derive(Debug, PartialEq)]
+use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::*;
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct ArrPos {
     pub row: i64,
     pub col: i64,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[wasm_bindgen]
+impl ArrPos {
+    #[wasm_bindgen(constructor)]
+    pub fn new(row: i64, col: i64) -> ArrPos {
+        ArrPos { row, col }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, Serialize, Deserialize)]
+#[wasm_bindgen]
 pub struct Point {
     pub x: i64,
     pub y: i64,
+}
+
+#[wasm_bindgen]
+impl Point {
+    #[wasm_bindgen(constructor)]
+    pub fn new(x: i64, y: i64) -> Point {
+        Point { x, y }
+    }
 }
 
 impl Point {

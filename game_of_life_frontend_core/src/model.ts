@@ -1,23 +1,73 @@
-import type { Model, Point, Preset } from "game_of_life_engine";
 import { map } from "funis";
 import {
-    deserializePoint,
     getModelCellSize,
     getModelLength,
     getModelMiddleCell,
+    getPresetGroups,
     iterateModel,
-    modelFromString,
     moveModel,
+    Point,
     pointToIndex,
-    presetGroups,
     toggleModel,
     zoomModel,
 } from "game_of_life_engine";
+
+export type ArrPos = {
+    readonly row: number;
+    readonly col: number;
+};
+
+export type Rect = {
+    readonly x1: number;
+    readonly y1: number;
+    readonly x2: number;
+    readonly y2: number;
+};
+
+export type _Point = {
+    readonly x: number;
+    readonly y: number;
+};
+
+export enum State {
+    DEAD,
+    ALIVE,
+}
+
+export type Model = {
+    readonly value: Map<_Point, State>;
+    readonly iter: number;
+    readonly pos: Rect;
+};
 
 export type Square = {
     readonly x: number;
     readonly y: number;
     readonly size: number;
+};
+
+export type Preset = {
+    readonly name: string;
+    readonly id: string;
+    readonly discover: {
+        readonly name: string;
+        readonly year: number;
+    };
+    readonly model: Model;
+};
+
+export type PresetSubGroup = {
+    readonly name: string;
+    readonly id: string;
+    readonly items: readonly Preset[];
+};
+
+export type PresetGroup = {
+    readonly group: {
+        readonly name: string;
+        readonly id: string;
+    };
+    readonly subGroups: readonly PresetSubGroup[];
 };
 
 export type DrawContext = {
@@ -30,13 +80,17 @@ export type SystemModel = {
     readonly gap: number;
     readonly fps: number;
     readonly status: "resumed" | "paused";
-    readonly dimension: number;
+    readonly dimension: bigint;
     readonly drawContext: DrawContext;
 };
 
-export function buildModel(drawContext: DrawContext, dimension: number): SystemModel {
+export function buildModel(drawContext: DrawContext, dimension: bigint): SystemModel {
     return {
-        model: modelFromString(["⬛"]),
+        model: {
+            iter: 0,
+            pos: { x1: -10, x2: -10, y1: 10, y2: 10 },
+            value: new Map(),
+        },
         dimension,
         gap: 1,
         fps: 4,
@@ -55,12 +109,12 @@ type PresetOptions = {
 }[];
 
 export function buildPresetsOptions(): PresetOptions {
-    return presetGroups.map((group) => ({
+    return (getPresetGroups() as any).map((group: any) => ({
         label: group.group.name,
         value: group.group.id,
-        options: group.subGroups
-            .flatMap((subGroup) => subGroup.items)
-            .map((item) => ({
+        options: group.sub_groups
+            .flatMap((subGroup: any) => subGroup.items)
+            .map((item: any) => ({
                 label: item.name,
                 value: item.id,
             })),
@@ -68,7 +122,9 @@ export function buildPresetsOptions(): PresetOptions {
 }
 
 export function buildPresets(): readonly Preset[] {
-    return presetGroups.flatMap((group) => group.subGroups.flatMap((subGroup) => subGroup.items));
+    return (getPresetGroups() as any).flatMap((group: any) =>
+        group.sub_groups.flatMap((subGroup: any) => subGroup.items)
+    );
 }
 
 export function fpsToMilis(fps: number): number {
@@ -80,21 +136,20 @@ const ALIVE_COLOR = "#2e2e2e";
 
 function render(systemModel: SystemModelProxy): void {
     const model = systemModel.getModel();
-    const length = getModelLength(model.model);
-    const cellSize = getModelCellSize(model.model, model.dimension);
-    const middleCell = getModelMiddleCell(model.model, model.dimension);
+    const length = getModelLength({ Ok: model.model });
+    const cellSize = getModelCellSize({ Ok: model.model }, model.dimension);
+    const middleCell = getModelMiddleCell({ Ok: model.model }, model.dimension);
 
-    const dim = { x: 0, y: 0, size: model.dimension };
+    const dim = { x: 0, y: 0, size: Number(model.dimension) };
     model.drawContext.drawSquare(dim, DEAD_COLOR);
 
     map.keys(model.model.value)
-        .map(deserializePoint)
         .forEach((point) => {
-            const { col, row } = pointToIndex(point, length);
+            const { col, row } = pointToIndex(new Point(BigInt(point.x), BigInt(point.y)), length);
             model.drawContext.drawSquare({
-                x: col * cellSize + model.gap - middleCell.x,
-                y: row * cellSize + model.gap + middleCell.y,
-                size: cellSize - model.gap * 2,
+                x: Number(col) * Number(cellSize) + model.gap - Number(middleCell.x),
+                y: Number(row) * Number(cellSize) + model.gap + Number(middleCell.y),
+                size: Number(cellSize) - model.gap * 2,
             }, ALIVE_COLOR);
         });
 }
@@ -107,7 +162,7 @@ export class SystemModelProxy {
     private gap: number;
     private fps: number;
     private status: "resumed" | "paused";
-    private dimension: number;
+    private dimension: bigint;
     private drawContext: DrawContext;
 
     constructor(systemModel: SystemModel) {
@@ -182,15 +237,17 @@ export class SystemController {
 
     public singleIteration(): void {
         this.systemModel.setStatus("paused");
-        this.systemModel.setModel(iterateModel(this.systemModel.getModel().model));
+        this.systemModel.setModel(iterateModel({ Ok: this.systemModel.getModel().model }));
     }
 
     public iterate(): void {
-        this.systemModel.setModel(iterateModel(this.systemModel.getModel().model));
+        this.systemModel.setModel(iterateModel({ Ok: this.systemModel.getModel().model }));
     }
 
-    public toggleCell(point: Point): void {
-        this.systemModel.setModel(toggleModel(this.systemModel.getModel().model, point));
+    public toggleCell(point: _Point): void {
+        this.systemModel.setModel(
+            toggleModel({ Ok: this.systemModel.getModel().model }, new Point(BigInt(point.x), BigInt(point.y))),
+        );
     }
 
     public setPreset(preset: string): void {
@@ -210,11 +267,18 @@ export class SystemController {
     }
 
     public setSize(newSize: number): void {
-        this.systemModel.setModel(zoomModel(this.systemModel.getModel().model, newSize));
+        this.systemModel.setModel(
+            zoomModel({ Ok: this.systemModel.getModel().model }, BigInt(newSize)),
+        );
     }
 
-    public move(delta: Point): void {
-        this.systemModel.setModel(moveModel(this.systemModel.getModel().model, delta));
+    public move(delta: _Point): void {
+        this.systemModel.setModel(
+            moveModel(
+                { Ok: this.systemModel.getModel().model },
+                new Point(BigInt(delta.x), BigInt(delta.y)),
+            ),
+        );
     }
 
     public setFps(fps: SystemModel["fps"]): void {
