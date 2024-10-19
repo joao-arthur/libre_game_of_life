@@ -1,4 +1,4 @@
-use crate::domain::{cell::State, model::Model, plane::cartesian::CartesianPoint};
+use crate::domain::{cell::State, plane::cartesian::CartesianPoint, universe::Universe};
 
 pub type Neighbor<'a> = Option<&'a State>;
 
@@ -7,25 +7,25 @@ pub type Neighbors<'a> = [Neighbor<'a>; 8];
 fn number_of_alive(neighbors: Neighbors) -> u8 {
     return neighbors
         .iter()
-        .filter(|n| n == &&Some(&State::Alive))
+        .filter(|neighbor| neighbor == &&Some(&State::Alive))
         .count() as u8;
 }
 
-fn from_model(m: &Model, point: CartesianPoint) -> Neighbors {
+fn from_model(u: &Universe, point: CartesianPoint) -> Neighbors {
     return [
-        m.value.get(&CartesianPoint::from(point.x - 1, point.y + 1)),
-        m.value.get(&CartesianPoint::from(point.x, point.y + 1)),
-        m.value.get(&CartesianPoint::from(point.x + 1, point.y + 1)),
-        m.value.get(&CartesianPoint::from(point.x - 1, point.y)),
-        m.value.get(&CartesianPoint::from(point.x + 1, point.y)),
-        m.value.get(&CartesianPoint::from(point.x - 1, point.y - 1)),
-        m.value.get(&CartesianPoint::from(point.x, point.y - 1)),
-        m.value.get(&CartesianPoint::from(point.x + 1, point.y - 1)),
+        u.value.get(&CartesianPoint::from(point.x - 1, point.y + 1)),
+        u.value.get(&CartesianPoint::from(point.x, point.y + 1)),
+        u.value.get(&CartesianPoint::from(point.x + 1, point.y + 1)),
+        u.value.get(&CartesianPoint::from(point.x - 1, point.y)),
+        u.value.get(&CartesianPoint::from(point.x + 1, point.y)),
+        u.value.get(&CartesianPoint::from(point.x - 1, point.y - 1)),
+        u.value.get(&CartesianPoint::from(point.x, point.y - 1)),
+        u.value.get(&CartesianPoint::from(point.x + 1, point.y - 1)),
     ];
 }
 
-pub fn number_of_alive_from_model(m: &Model, point: CartesianPoint) -> u8 {
-    number_of_alive(from_model(m, point))
+pub fn number_of_alive_from_model(u: &Universe, point: CartesianPoint) -> u8 {
+    number_of_alive(from_model(u, point))
 }
 
 #[cfg(test)]

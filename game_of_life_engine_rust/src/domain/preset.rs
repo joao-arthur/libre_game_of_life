@@ -1,4 +1,4 @@
-use super::model::{from_string, Model};
+use super::universe::{from_string, Universe};
 
 pub struct PresetDiscover {
     pub name: String,
@@ -10,7 +10,7 @@ pub struct Preset {
     pub name: String,
     pub id: String,
     pub discover: PresetDiscover,
-    pub model: Model,
+    pub universe: Universe,
 }
 
 pub struct PresetSubGroup {
@@ -47,7 +47,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "Boat".to_string(),
                             id: "boat".to_string(),
                             discover: PresetDiscover { name: "JHC group".to_string(), year: 1970 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -84,7 +84,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "Block".to_string(),
                             id: "block".to_string(),
                             discover: PresetDiscover { name: "John Conway".to_string(), year: 1969 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -122,7 +122,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "Blinker".to_string(),
                             id: "blinker".to_string(),
                             discover: PresetDiscover { name: "John Conway".to_string(), year: 1969 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -159,7 +159,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "R-Pentomino".to_string(),
                             id: "rPentomino".to_string(),
                             discover: PresetDiscover { name: "John Conway".to_string(), year: 1969 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -196,7 +196,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "Glider".to_string(),
                             id: "glider".to_string(),
                             discover: PresetDiscover { name: "Richard K. Guy".to_string(), year: 1969 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -233,7 +233,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "Gosper glider gun".to_string(),
                             id: "gosperGliderGun".to_string(),
                             discover: PresetDiscover { name: "Bill Gosper".to_string(), year: 1970 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -290,7 +290,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                             name: "Puffer 1".to_string(),
                             id: "puffer1".to_string(),
                             discover: PresetDiscover { name: "Bill Gosper".to_string(), year: 1971 },
-                            model: from_string(vec![
+                            universe: from_string(vec![
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),

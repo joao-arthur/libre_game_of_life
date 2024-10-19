@@ -4,9 +4,9 @@ use gloo_timers::callback::Interval;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    model::{
+    universe::{
         get_cell_size, get_length, get_middle_cell, iterate, move_in_plane, toggle_cell, zoom,
-        Model, Rect,
+        Universe, Rect,
     },
     plane::cartesian::{to_matrix, CartesianPoint},
     preset::{get_preset_groups, Preset},
@@ -101,7 +101,7 @@ struct SystemSettings {
 }
 
 pub struct SystemModel {
-    pub model: Model,
+    pub universe: Universe,
     pub settings: SystemSettings,
     on_change_listeners: Vec<Box<dyn FnMut(Prop)>>,
     // pub interval: Option<Interval>,
@@ -110,7 +110,7 @@ pub struct SystemModel {
 impl Default for SystemModel {
     fn default() -> Self {
         SystemModel {
-            model: Model::from_pos(Rect::from(-10, -10, 10, 10)),
+            universe: Universe::from_pos(Rect::from(-10, -10, 10, 10)),
             settings: SystemSettings {
                 preset: Some(String::from("block")),
                 dim: 0,
@@ -144,7 +144,7 @@ fn fps_to_mili(fps: u16) -> u16 {
 
 #[derive(Clone)]
 enum Prop {
-    Model,
+    Universe,
     Preset,
     Gap,
     FPS,
@@ -167,9 +167,9 @@ const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render(draw_context: Rc<RefCell<Holder>>) {
     let system_model = get_instance();
-    let length = get_length(&system_model.model);
-    let cell_size = get_cell_size(&system_model.model, system_model.settings.dim);
-    let middle_cell = get_middle_cell(&system_model.model, system_model.settings.dim);
+    let length = get_length(&system_model.universe);
+    let cell_size = get_cell_size(&system_model.universe, system_model.settings.dim);
+    let middle_cell = get_middle_cell(&system_model.universe, system_model.settings.dim);
     let dim = Square {
         x: 0,
         y: 0,
@@ -179,7 +179,7 @@ fn render(draw_context: Rc<RefCell<Holder>>) {
         .borrow()
         .clone()
         .draw_square(dim, DEAD_COLOR.to_string());
-    system_model.model.value.iter().for_each(|point| {
+    system_model.universe.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
         let s = Square {
             x: arr_index.col as i64 * cell_size as i64 + system_model.settings.gap as i64
@@ -215,7 +215,7 @@ pub fn init(holder: Rc<RefCell<Holder>>) {
                 _ => {}
             },
             Status::Paused => match prop {
-                Prop::Gap | Prop::Dim | Prop::Model => {
+                Prop::Gap | Prop::Dim | Prop::Universe => {
                     render(holder.clone());
                 }
                 Prop::Status => {
@@ -244,15 +244,15 @@ pub fn control_resume() {
 }
 
 pub fn control_set_preset(system_model: &mut SystemModel, preset: String) {
-    if let Some(selected_preset) = build_presets().iter().find(|p| p.id == preset) {
+    if let Some(selected_preset) = build_presets().iter().find(|point| point.id == preset) {
         // wip
-        system_model.model = Model {
+        system_model.universe = Universe {
             iter: selected_preset.iter,
             pos: selected_preset.pos,
             value: selected_preset.value.iter(),
         };
         system_model.settings.preset = Some(preset);
-        on_change(Prop::Model);
+        on_change(Prop::Universe);
         on_change(Prop::Preset);
     }
 }
@@ -278,35 +278,35 @@ pub fn control_set_fps(fps: u16) {
 pub fn control_single_iteration() {
     let system_model = get_instance();
     system_model.settings.status = Status::Paused;
-    iterate(&mut system_model.model);
+    iterate(&mut system_model.universe);
     on_change(Prop::Status);
-    on_change(Prop::Model);
+    on_change(Prop::Universe);
 }
 
 pub fn control_iterate() {
     let system_model = get_instance();
-    iterate(&mut system_model.model);
-    on_change(Prop::Model);
+    iterate(&mut system_model.universe);
+    on_change(Prop::Universe);
 }
 
 pub fn control_toggle_model_cell(point: CartesianPoint) {
     let system_model = get_instance();
-    toggle_cell(&mut system_model.model, point);
+    toggle_cell(&mut system_model.universe, point);
     system_model.settings.preset = None;
-    on_change(Prop::Model);
+    on_change(Prop::Universe);
     on_change(Prop::Preset);
 }
 
 pub fn control_set_size(new_size: u16) {
     let system_model = get_instance();
-    zoom(&mut system_model.model, new_size);
-    on_change(Prop::Model);
+    zoom(&mut system_model.universe, new_size);
+    on_change(Prop::Universe);
 }
 
 pub fn control_move_model(delta: CartesianPoint) {
     let system_model = get_instance();
-    move_in_plane(&mut system_model.model, delta);
-    on_change(Prop::Model);
+    move_in_plane(&mut system_model.universe, delta);
+    on_change(Prop::Universe);
 }
 
 pub fn control_get_settings() -> SystemSettings {
