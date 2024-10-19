@@ -1,29 +1,18 @@
 use std::collections::{HashMap, HashSet};
 
-use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
-
 use crate::domain::{
-    cartesian_plane::{index_to_point, ArrPos, Point},
+    plane::{cartesian::{from_matrix, CartesianPoint}, matrix::MatrixPoint},
+
     cell::{self, toggle, State},
     neighbor::number_of_alive_from_model,
 };
 
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Rect {
     pub x1: i64,
     pub y1: i64,
     pub x2: i64,
     pub y2: i64,
-}
-
-#[wasm_bindgen]
-impl Rect {
-    #[wasm_bindgen(constructor)]
-    pub fn new(x1: i64, y1: i64, x2: i64, y2: i64) -> Rect {
-        Rect { x1, y1, x2, y2 }
-    }
 }
 
 impl Rect {
@@ -32,9 +21,9 @@ impl Rect {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Model {
-    pub value: HashMap<Point, State>,
+    pub value: HashMap<CartesianPoint, State>,
     pub iter: u64,
     pub pos: Rect,
 }
@@ -47,7 +36,7 @@ impl Model {
         }
     }
 
-    pub fn from_value(value: HashMap<Point, State>) -> Self {
+    pub fn from_value(value: HashMap<CartesianPoint, State>) -> Self {
         Model {
             value,
             ..Default::default()
@@ -66,16 +55,16 @@ impl Default for Model {
 }
 
 pub fn from_string(model_as_str: Vec<String>) -> Model {
-    let mut value = HashMap::<Point, State>::new();
+    let mut value = HashMap::<CartesianPoint, State>::new();
     let len = model_as_str.len();
     let row_iter = model_as_str.iter().enumerate();
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
         for (col, col_str) in col_iter {
-            if col_str == '⬜' {
+            if col_str  == '⬜' {
                 value.insert(
-                    index_to_point(
-                        ArrPos {
+                    from_matrix(
+                        MatrixPoint {
                             col: col.try_into().unwrap(),
                             row: row.try_into().unwrap(),
                         },
@@ -101,20 +90,20 @@ pub fn get_cell_size(model: &Model, total_size: u16) -> u16 {
     total_size / get_length(model)
 }
 
-pub fn get_middle_point(model: &Model) -> Point {
-    Point::from(
+pub fn get_middle_point(model: &Model) -> CartesianPoint {
+    CartesianPoint::from(
         (model.pos.x1 + model.pos.x2) / 2,
         (model.pos.y1 + model.pos.y2) / 2,
     )
 }
 
-pub fn get_middle_cell(model: &Model, total_size: u16) -> Point {
+pub fn get_middle_cell(model: &Model, total_size: u16) -> CartesianPoint {
     let cell_size: i64 = get_cell_size(model, total_size).into();
     let middle = get_middle_point(model);
-    Point::from(middle.x * cell_size, middle.y * cell_size)
+    CartesianPoint::from(middle.x * cell_size, middle.y * cell_size)
 }
 
-pub fn get_value(model: &Model, point: Point) -> State {
+pub fn get_value(model: &Model, point: CartesianPoint) -> State {
     if model.value.get(&point).unwrap_or(&State::Dead) == &State::Alive {
         State::Alive
     } else {
@@ -124,24 +113,24 @@ pub fn get_value(model: &Model, point: Point) -> State {
 
 // TODO: optimize by mutating the current hashmap instead of creating a new one
 pub fn iterate(model: &mut Model) {
-    let points: HashSet<Point> = model
+    let points: HashSet<CartesianPoint> = model
         .value
         .keys()
         .flat_map(|p| {
             [
-                Point::from(p.x - 1, p.y + 1),
-                Point::from(p.x, p.y + 1),
-                Point::from(p.x + 1, p.y + 1),
-                Point::from(p.x - 1, p.y),
+                CartesianPoint::from(p.x - 1, p.y + 1),
+                CartesianPoint::from(p.x, p.y + 1),
+                CartesianPoint::from(p.x + 1, p.y + 1),
+                CartesianPoint::from(p.x - 1, p.y),
                 p.clone(),
-                Point::from(p.x + 1, p.y),
-                Point::from(p.x - 1, p.y - 1),
-                Point::from(p.x, p.y - 1),
-                Point::from(p.x + 1, p.y - 1),
+                CartesianPoint::from(p.x + 1, p.y),
+                CartesianPoint::from(p.x - 1, p.y - 1),
+                CartesianPoint::from(p.x, p.y - 1),
+                CartesianPoint::from(p.x + 1, p.y - 1),
             ]
         })
         .collect();
-    let entries: HashMap<Point, State> = points
+    let entries: HashMap<CartesianPoint, State> = points
         .iter()
         .filter_map(|p| {
             let state = model.value.get(p).unwrap_or(&State::Dead);
@@ -157,7 +146,7 @@ pub fn iterate(model: &mut Model) {
     model.value = entries;
 }
 
-pub fn move_in_plane(model: &mut Model, delta: Point) {
+pub fn move_in_plane(model: &mut Model, delta: CartesianPoint) {
     model.pos = Rect::from(
         model.pos.x1 + delta.x,
         model.pos.y1 + delta.y,
@@ -166,7 +155,7 @@ pub fn move_in_plane(model: &mut Model, delta: Point) {
     )
 }
 
-pub fn toggle_cell(model: &mut Model, point: Point) {
+pub fn toggle_cell(model: &mut Model, point: CartesianPoint) {
     let new_cell = toggle(model.value.get(&point).unwrap_or(&State::Dead));
     match new_cell {
         State::Dead => {
@@ -227,17 +216,17 @@ mod test {
         );
         assert_eq!(
             Model::from_value(HashMap::from([
-                (Point::from(-1, -1), State::Alive),
-                (Point::from(-1, 1), State::Alive),
-                (Point::from(1, -1), State::Alive),
-                (Point::from(1, 1), State::Alive),
+                (CartesianPoint::from(-1, -1), State::Alive),
+                (CartesianPoint::from(-1, 1), State::Alive),
+                (CartesianPoint::from(1, -1), State::Alive),
+                (CartesianPoint::from(1, 1), State::Alive),
             ])),
             Model {
                 value: HashMap::from([
-                    (Point::from(-1, -1), State::Alive),
-                    (Point::from(-1, 1), State::Alive),
-                    (Point::from(1, -1), State::Alive),
-                    (Point::from(1, 1), State::Alive),
+                    (CartesianPoint::from(-1, -1), State::Alive),
+                    (CartesianPoint::from(-1, 1), State::Alive),
+                    (CartesianPoint::from(1, -1), State::Alive),
+                    (CartesianPoint::from(1, 1), State::Alive),
                 ]),
                 iter: 0,
                 pos: Rect::from(0, 0, 0, 0)
@@ -262,7 +251,7 @@ mod test {
         assert_eq!(
             from_string(vec!["⬜".to_string()]),
             Model {
-                value: HashMap::from([(Point::from(0, 0), State::Alive)]),
+                value: HashMap::from([(CartesianPoint::from(0, 0), State::Alive)]),
                 iter: 0,
                 pos: Rect::from(-10, -10, 10, 10),
             }
@@ -276,9 +265,9 @@ mod test {
             ]),
             Model {
                 value: HashMap::from([
-                    (Point::from(1, 2), State::Alive),
-                    (Point::from(-2, 1), State::Alive),
-                    (Point::from(0, 0), State::Alive),
+                    (CartesianPoint::from(1, 2), State::Alive),
+                    (CartesianPoint::from(-2, 1), State::Alive),
+                    (CartesianPoint::from(0, 0), State::Alive),
                 ]),
                 iter: 0,
                 pos: Rect::from(-10, -10, 10, 10),
@@ -310,19 +299,19 @@ mod test {
     fn test_get_middle_point() {
         assert_eq!(
             get_middle_point(&Model::from_pos(Rect::from(-10, -10, 10, 10))),
-            Point::from(0, 0)
+            CartesianPoint::from(0, 0)
         );
         // assert_eq!(
         //     get_middle_point(&Model::from_pos(Rect::from(1, 1, 10, 10))),
-        //     Point::from(5.5, 5.5)
+        //     CartesianPoint::from(5.5, 5.5)
         // );
         // assert_eq!(
         //     get_middle_point(&Model::from_pos(Rect::from(4, 4, 5, 5))),
-        //     Point::from(4.5, 4.5)
+        //     CartesianPoint::from(4.5, 4.5)
         // );
         assert_eq!(
             get_middle_point(&Model::from_pos(Rect::from(5, 5, 5, 5))),
-            Point::from(5, 5)
+            CartesianPoint::from(5, 5)
         );
     }
 
@@ -330,40 +319,40 @@ mod test {
     fn test_get_middle_cell() {
         assert_eq!(
             get_middle_cell(&Model::from_pos(Rect::from(-10, -10, 10, 10)), 100),
-            Point::from(0, 0)
+            CartesianPoint::from(0, 0)
         );
         // assert_eq!(
         //     get_middle_cell(&Model::from_pos(Rect::from(1, 1, 10, 10)), 50),
-        //     Point::from(27.5, 27.5)
+        //     CartesianPoint::from(27.5, 27.5)
         // );
         // assert_eq!(
         //     get_middle_cell(&Model::from_pos(Rect::from(4, 4, 5, 5)), 10),
-        //     Point::from(22.5, 22.5)
+        //     CartesianPoint::from(22.5, 22.5)
         // );
         assert_eq!(
             get_middle_cell(&Model::from_pos(Rect::from(5, 5, 5, 5)), 1),
-            Point::from(5, 5)
+            CartesianPoint::from(5, 5)
         );
     }
 
     #[test]
     fn test_move_in_plane() {
         let mut model = Model::from_pos(Rect::from(-10, -10, 10, 10));
-        move_in_plane(&mut model, Point::from(1, 0));
+        move_in_plane(&mut model, CartesianPoint::from(1, 0));
         assert_eq!(model.pos, Rect::from(-9, -10, 11, 10));
-        move_in_plane(&mut model, Point::from(-2, 0));
+        move_in_plane(&mut model, CartesianPoint::from(-2, 0));
         assert_eq!(model.pos, Rect::from(-11, -10, 9, 10));
-        move_in_plane(&mut model, Point::from(0, 1));
+        move_in_plane(&mut model, CartesianPoint::from(0, 1));
         assert_eq!(model.pos, Rect::from(-11, -9, 9, 11));
-        move_in_plane(&mut model, Point::from(0, -2));
+        move_in_plane(&mut model, CartesianPoint::from(0, -2));
         assert_eq!(model.pos, Rect::from(-11, -11, 9, 9));
-        move_in_plane(&mut model, Point::from(11, 0));
+        move_in_plane(&mut model, CartesianPoint::from(11, 0));
         assert_eq!(model.pos, Rect::from(0, -11, 20, 9));
-        move_in_plane(&mut model, Point::from(0, 11));
+        move_in_plane(&mut model, CartesianPoint::from(0, 11));
         assert_eq!(model.pos, Rect::from(0, 0, 20, 20));
-        move_in_plane(&mut model, Point::from(-20, 0));
+        move_in_plane(&mut model, CartesianPoint::from(-20, 0));
         assert_eq!(model.pos, Rect::from(-20, 0, 0, 20));
-        move_in_plane(&mut model, Point::from(0, -20));
+        move_in_plane(&mut model, CartesianPoint::from(0, -20));
         assert_eq!(model.pos, Rect::from(-20, -20, 0, 0));
     }
 
@@ -415,7 +404,7 @@ mod test {
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(-2, 2));
+        toggle_cell(&mut model, CartesianPoint::from(-2, 2));
         assert_eq!(model, state1);
         let state2 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
@@ -423,7 +412,7 @@ mod test {
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(-1, 1));
+        toggle_cell(&mut model, CartesianPoint::from(-1, 1));
         assert_eq!(model, state2);
         let state3 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
@@ -431,7 +420,7 @@ mod test {
             "⬜⬜⬛⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(0, 0));
+        toggle_cell(&mut model, CartesianPoint::from(0, 0));
         assert_eq!(model, state3);
         let state4 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
@@ -439,7 +428,7 @@ mod test {
             "⬜⬜⬛⬜".to_string(),
             "⬜⬜⬜⬛".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(1, -1));
+        toggle_cell(&mut model, CartesianPoint::from(1, -1));
         assert_eq!(model, state4);
         let state5 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
@@ -447,7 +436,7 @@ mod test {
             "⬜⬜⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(-2, -1));
+        toggle_cell(&mut model, CartesianPoint::from(-2, -1));
         assert_eq!(model, state5);
         let state6 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
@@ -455,7 +444,7 @@ mod test {
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(-1, 0));
+        toggle_cell(&mut model, CartesianPoint::from(-1, 0));
         assert_eq!(model, state6);
         let state7 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
@@ -463,7 +452,7 @@ mod test {
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(0, 1));
+        toggle_cell(&mut model, CartesianPoint::from(0, 1));
         assert_eq!(model, state7);
         let state8 = from_string(vec![
             "⬜⬛⬛⬜".to_string(),
@@ -471,7 +460,7 @@ mod test {
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
         ]);
-        toggle_cell(&mut model, Point::from(1, 2));
+        toggle_cell(&mut model, CartesianPoint::from(1, 2));
         assert_eq!(model, state8);
     }
 

@@ -4,7 +4,7 @@ use gloo_timers::callback::Interval;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    cartesian_plane::{point_to_index, Point},
+    plane::cartesian::{to_matrix, CartesianPoint},
     model::{
         get_cell_size, get_length, get_middle_cell, iterate, move_in_plane, toggle_cell, zoom,
         Model, Rect,
@@ -186,7 +186,7 @@ fn render(draw_context: Rc<RefCell<Holder>>) {
         .clone()
         .draw_square(dim, DEAD_COLOR.to_string());
     system_model.model.value.iter().for_each(|point| {
-        let arr_index = point_to_index(*point.0, length.into());
+        let arr_index = to_matrix(*point.0, length.into());
         let square = Square {
             x: arr_index.col as i64 * cell_size as i64 + system_model.settings.gap as i64 - middle_cell.x,
             y: arr_index.row as i64 * cell_size as i64 + system_model.settings.gap as i64 + middle_cell.y,
@@ -289,7 +289,7 @@ pub fn control_iterate() {
     on_change(Prop::Model);
 }
 
-pub fn control_toggle_model_cell(point: Point) {
+pub fn control_toggle_model_cell(point: CartesianPoint) {
     let system_model = get_instance();
     toggle_cell(&mut system_model.model, point);
     system_model.settings.preset = None;
@@ -303,7 +303,7 @@ pub fn control_set_size(new_size: u16) {
     on_change(Prop::Model);
 }
 
-pub fn control_move_model(delta: Point) {
+pub fn control_move_model(delta: CartesianPoint) {
     let system_model = get_instance();
     move_in_plane(&mut system_model.model, delta);
     on_change(Prop::Model);

@@ -1,4 +1,4 @@
-use crate::domain::{cartesian_plane::Point, cell::State, model::Model};
+use crate::domain::{plane::cartesian::CartesianPoint, cell::State, model::Model};
 
 pub type Neighbor<'a> = Option<&'a State>;
 
@@ -11,20 +11,20 @@ fn number_of_alive(neighbors: Neighbors) -> u8 {
         .count() as u8;
 }
 
-fn from_model(model: &Model, point: Point) -> Neighbors {
+fn from_model(model: &Model, point: CartesianPoint) -> Neighbors {
     return [
-        model.value.get(&Point::from(point.x - 1, point.y + 1)),
-        model.value.get(&Point::from(point.x, point.y + 1)),
-        model.value.get(&Point::from(point.x + 1, point.y + 1)),
-        model.value.get(&Point::from(point.x - 1, point.y)),
-        model.value.get(&Point::from(point.x + 1, point.y)),
-        model.value.get(&Point::from(point.x - 1, point.y - 1)),
-        model.value.get(&Point::from(point.x, point.y - 1)),
-        model.value.get(&Point::from(point.x + 1, point.y - 1)),
+        model.value.get(&CartesianPoint::from(point.x - 1, point.y + 1)),
+        model.value.get(&CartesianPoint::from(point.x, point.y + 1)),
+        model.value.get(&CartesianPoint::from(point.x + 1, point.y + 1)),
+        model.value.get(&CartesianPoint::from(point.x - 1, point.y)),
+        model.value.get(&CartesianPoint::from(point.x + 1, point.y)),
+        model.value.get(&CartesianPoint::from(point.x - 1, point.y - 1)),
+        model.value.get(&CartesianPoint::from(point.x, point.y - 1)),
+        model.value.get(&CartesianPoint::from(point.x + 1, point.y - 1)),
     ];
 }
 
-pub fn number_of_alive_from_model(model: &Model, point: Point) -> u8 {
+pub fn number_of_alive_from_model(model: &Model, point: CartesianPoint) -> u8 {
     number_of_alive(from_model(model, point))
 }
 

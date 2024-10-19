@@ -1,14 +1,11 @@
 use super::model::{from_string, Model};
-use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Serialize, Deserialize)]
 pub struct PresetDiscover {
     pub name: String,
     // In the year 65537 i'll fix 👍
     pub year: u16,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
 pub struct Preset {
     pub name: String,
     pub id: String,
@@ -16,20 +13,17 @@ pub struct Preset {
     pub model: Model,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
 pub struct PresetSubGroup {
     pub name: String,
     pub id: String,
     pub items: Vec<Preset>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
 pub struct PresetGroupInfo {
     pub name: String,
     pub id: String,
 }
 
-#[derive(Serialize, Deserialize)]
 pub struct PresetGroup {
     pub info: PresetGroupInfo,
     pub sub_groups: Vec<PresetSubGroup>,

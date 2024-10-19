@@ -1,8 +1,4 @@
-use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
-
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
-#[wasm_bindgen]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum State {
     Dead,
     Alive,
