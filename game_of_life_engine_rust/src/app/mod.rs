@@ -4,11 +4,11 @@ use gloo_timers::callback::Interval;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    plane::cartesian::{to_matrix, CartesianPoint},
     model::{
         get_cell_size, get_length, get_middle_cell, iterate, move_in_plane, toggle_cell, zoom,
         Model, Rect,
     },
+    plane::cartesian::{to_matrix, CartesianPoint},
     preset::{get_preset_groups, Preset},
 };
 
@@ -62,8 +62,8 @@ struct Square {
 }
 
 trait DrawContext {
-    fn clear(self, square: Square);
-    fn draw_square(self, square: Square, color: String);
+    fn clear(self, s: Square);
+    fn draw_square(self, s: Square, color: String);
 }
 
 #[derive(Clone)]
@@ -72,24 +72,16 @@ struct Holder {
 }
 
 impl DrawContext for Holder {
-    fn clear(self, square: Square) {
+    fn clear(self, s: Square) {
         self.context.set_fill_style_str("white");
-        self.context.fill_rect(
-            square.x as f64,
-            square.y as f64,
-            square.size as f64,
-            square.size as f64,
-        );
+        self.context
+            .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 
-    fn draw_square(self, square: Square, color: String) {
+    fn draw_square(self, s: Square, color: String) {
         self.context.set_fill_style_str(&color);
-        self.context.fill_rect(
-            square.x as f64,
-            square.y as f64,
-            square.size as f64,
-            square.size as f64,
-        );
+        self.context
+            .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 }
 
@@ -163,7 +155,9 @@ enum Prop {
 static SYSTEM_MODEL_INSTANCE: OnceLock<SystemModel> = OnceLock::new();
 
 fn get_instance() -> &'static mut SystemModel {
-    let instance = SYSTEM_MODEL_INSTANCE.get_or_init(|| SystemModel { ..Default::default() } );
+    let instance = SYSTEM_MODEL_INSTANCE.get_or_init(|| SystemModel {
+        ..Default::default()
+    });
     let mut_instance = unsafe { &mut *(instance as *const _ as *mut SystemModel) };
     mut_instance
 }
@@ -187,15 +181,18 @@ fn render(draw_context: Rc<RefCell<Holder>>) {
         .draw_square(dim, DEAD_COLOR.to_string());
     system_model.model.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
-        let square = Square {
-            x: arr_index.col as i64 * cell_size as i64 + system_model.settings.gap as i64 - middle_cell.x,
-            y: arr_index.row as i64 * cell_size as i64 + system_model.settings.gap as i64 + middle_cell.y,
+        let s = Square {
+            x: arr_index.col as i64 * cell_size as i64 + system_model.settings.gap as i64
+                - middle_cell.x,
+            y: arr_index.row as i64 * cell_size as i64
+                + system_model.settings.gap as i64
+                + middle_cell.y,
             size: cell_size as u64 - system_model.settings.gap as u64 * 2,
         };
         draw_context
             .borrow()
             .clone()
-            .draw_square(square, ALIVE_COLOR.to_string());
+            .draw_square(s, ALIVE_COLOR.to_string());
     });
 }
 
@@ -207,10 +204,13 @@ pub fn init(holder: Rc<RefCell<Holder>>) {
         match system_model.settings.status {
             Status::Resumed => match prop {
                 Prop::Status | Prop::FPS => {
-                    interval = Some(Interval::new(fps_to_mili(system_model.settings.fps).into(), move || {
-                        control_iterate();
-                        render(holder.clone());
-                    }));
+                    interval = Some(Interval::new(
+                        fps_to_mili(system_model.settings.fps).into(),
+                        move || {
+                            control_iterate();
+                            render(holder.clone());
+                        },
+                    ));
                 }
                 _ => {}
             },
@@ -248,9 +248,9 @@ pub fn control_set_preset(system_model: &mut SystemModel, preset: String) {
         // wip
         system_model.model = Model {
             iter: selected_preset.iter,
-             pos: selected_preset.pos,
-             value: selected_preset.value.iter()
-        }
+            pos: selected_preset.pos,
+            value: selected_preset.value.iter(),
+        };
         system_model.settings.preset = Some(preset);
         on_change(Prop::Model);
         on_change(Prop::Preset);

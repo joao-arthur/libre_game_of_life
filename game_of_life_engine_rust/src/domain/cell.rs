@@ -4,8 +4,8 @@ pub enum State {
     Alive,
 }
 
-pub fn iterate(state: State, number_of_alive_neighbors: u8) -> State {
-    match state {
+pub fn iterate(s: State, number_of_alive_neighbors: u8) -> State {
+    match s {
         State::Alive => match number_of_alive_neighbors {
             2 => State::Alive,
             3 => State::Alive,
@@ -18,8 +18,8 @@ pub fn iterate(state: State, number_of_alive_neighbors: u8) -> State {
     }
 }
 
-pub fn toggle(state: &State) -> State {
-    match state {
+pub fn toggle(s: &State) -> State {
+    match s {
         State::Alive => State::Dead,
         State::Dead => State::Alive,
     }
