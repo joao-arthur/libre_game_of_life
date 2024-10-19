@@ -4,14 +4,14 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[wasm_bindgen]
 pub struct ArrPos {
-    pub row: i64,
-    pub col: i64,
+    pub row: u64,
+    pub col: u64,
 }
 
 #[wasm_bindgen]
 impl ArrPos {
     #[wasm_bindgen(constructor)]
-    pub fn new(row: i64, col: i64) -> ArrPos {
+    pub fn new(row: u64, col: u64) -> ArrPos {
         ArrPos { row, col }
     }
 }
@@ -37,35 +37,22 @@ impl Point {
     }
 }
 
-pub fn serialize_point(point: Point) -> String {
-    format!("({}, {})", point.x, point.y).to_string()
+pub fn absolute_to_relative(value: i64, unit_size: u64) -> i64 {
+    value / unit_size as i64
 }
 
-pub fn deserialize_point(str: &String) -> Option<Point> {
-    let len = str.len();
-    if str.find("(")? == 0 && str.find(")")? == len - 1 {
-        let comma = str.find(", ")?;
-        let x: i64 = str.get(1..comma)?.parse().ok()?;
-        let y: i64 = str.get(comma + 2..len - 1)?.parse().ok()?;
-        return Some(Point { x, y });
-    }
-    None
-}
-
-pub fn absolute_to_relative(value: i64, unit_size: i64) -> i64 {
-    value / unit_size
-}
-
-pub fn index_to_point(position: ArrPos, length: i64) -> Point {
+pub fn index_to_point(position: ArrPos, length: u64) -> Point {
     let half = length / 2;
-    Point::from(-half + position.col, half - position.row)
+    let x: i64 = -(half as i64) + position.col as i64;
+    let y: i64 = half as i64 - position.row as i64;
+    Point::from(x, y)
 }
 
-pub fn point_to_index(point: Point, length: i64) -> ArrPos {
+pub fn point_to_index(point: Point, length: u64) -> ArrPos {
     let half = length / 2;
     ArrPos {
-        col: half + point.x,
-        row: half - point.y,
+        col: half + point.x as u64,
+        row: half - point.y as u64,
     }
 }
 
@@ -76,24 +63,6 @@ mod test {
     #[test]
     fn test_point() {
         assert_eq!(Point::from(-23, 38), Point { x: -23, y: 38 });
-    }
-
-    #[test]
-    fn test_serialize_point() {
-        assert_eq!(serialize_point(Point { x: -3, y: 1954 }), "(-3, 1954)");
-        assert_eq!(serialize_point(Point { x: 42, y: -23823 }), "(42, -23823)");
-    }
-
-    #[test]
-    fn test_deserialize_point() {
-        assert_eq!(
-            deserialize_point(&"(-3, 1954)".to_string()),
-            Some(Point { x: -3, y: 1954 })
-        );
-        assert_eq!(
-            deserialize_point(&"(42, -23823)".to_string()),
-            Some(Point { x: 42, y: -23823 })
-        );
     }
 
     #[test]

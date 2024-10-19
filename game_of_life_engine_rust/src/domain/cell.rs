@@ -4,28 +4,28 @@ use wasm_bindgen::prelude::*;
 #[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
 #[wasm_bindgen]
 pub enum State {
-    DEAD,
-    ALIVE,
+    Dead,
+    Alive,
 }
 
 pub fn iterate(state: State, number_of_alive_neighbors: u8) -> State {
     match state {
-        State::ALIVE => match number_of_alive_neighbors {
-            2 => State::ALIVE,
-            3 => State::ALIVE,
-            _ => State::DEAD,
+        State::Alive => match number_of_alive_neighbors {
+            2 => State::Alive,
+            3 => State::Alive,
+            _ => State::Dead,
         },
-        State::DEAD => match number_of_alive_neighbors {
-            3 => State::ALIVE,
-            _ => State::DEAD,
+        State::Dead => match number_of_alive_neighbors {
+            3 => State::Alive,
+            _ => State::Dead,
         },
     }
 }
 
 pub fn toggle(state: &State) -> State {
     match state {
-        State::ALIVE => State::DEAD,
-        State::DEAD => State::ALIVE,
+        State::Alive => State::Dead,
+        State::Dead => State::Alive,
     }
 }
 
@@ -35,41 +35,41 @@ mod test {
 
     #[test]
     fn test_iterate_any_live_cell_with_fewer_than_two_live_neighbours_dies() {
-        assert_eq!(iterate(State::ALIVE, 0), State::DEAD);
-        assert_eq!(iterate(State::ALIVE, 1), State::DEAD);
+        assert_eq!(iterate(State::Alive, 0), State::Dead);
+        assert_eq!(iterate(State::Alive, 1), State::Dead);
     }
 
     #[test]
     fn test_iterate_any_live_cell_with_two_or_three_live_neighbours_lives() {
-        assert_eq!(iterate(State::ALIVE, 2), State::ALIVE);
-        assert_eq!(iterate(State::ALIVE, 3), State::ALIVE);
+        assert_eq!(iterate(State::Alive, 2), State::Alive);
+        assert_eq!(iterate(State::Alive, 3), State::Alive);
     }
 
     #[test]
     fn test_iterate_any_live_cell_with_more_than_three_live_neighbours_dies() {
-        assert_eq!(iterate(State::ALIVE, 4), State::DEAD);
-        assert_eq!(iterate(State::ALIVE, 5), State::DEAD);
-        assert_eq!(iterate(State::ALIVE, 6), State::DEAD);
-        assert_eq!(iterate(State::ALIVE, 7), State::DEAD);
-        assert_eq!(iterate(State::ALIVE, 8), State::DEAD);
+        assert_eq!(iterate(State::Alive, 4), State::Dead);
+        assert_eq!(iterate(State::Alive, 5), State::Dead);
+        assert_eq!(iterate(State::Alive, 6), State::Dead);
+        assert_eq!(iterate(State::Alive, 7), State::Dead);
+        assert_eq!(iterate(State::Alive, 8), State::Dead);
     }
 
     #[test]
     fn test_iterate_any_dead_cell_with_exactly_three_live_neighbours_becomes_a_live_cell() {
-        assert_eq!(iterate(State::DEAD, 0), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 1), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 2), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 3), State::ALIVE);
-        assert_eq!(iterate(State::DEAD, 4), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 5), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 6), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 7), State::DEAD);
-        assert_eq!(iterate(State::DEAD, 8), State::DEAD);
+        assert_eq!(iterate(State::Dead, 0), State::Dead);
+        assert_eq!(iterate(State::Dead, 1), State::Dead);
+        assert_eq!(iterate(State::Dead, 2), State::Dead);
+        assert_eq!(iterate(State::Dead, 3), State::Alive);
+        assert_eq!(iterate(State::Dead, 4), State::Dead);
+        assert_eq!(iterate(State::Dead, 5), State::Dead);
+        assert_eq!(iterate(State::Dead, 6), State::Dead);
+        assert_eq!(iterate(State::Dead, 7), State::Dead);
+        assert_eq!(iterate(State::Dead, 8), State::Dead);
     }
 
     #[test]
     fn test_toggle() {
-        assert_eq!(toggle(&State::ALIVE), State::DEAD);
-        assert_eq!(toggle(&State::DEAD), State::ALIVE);
+        assert_eq!(toggle(&State::Alive), State::Dead);
+        assert_eq!(toggle(&State::Dead), State::Alive);
     }
 }

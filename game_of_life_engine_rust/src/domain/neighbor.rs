@@ -7,7 +7,7 @@ pub type Neighbors<'a> = [Neighbor<'a>; 8];
 fn number_of_alive(neighbors: Neighbors) -> u8 {
     return neighbors
         .iter()
-        .filter(|n| n == &&Some(&State::ALIVE))
+        .filter(|n| n == &&Some(&State::Alive))
         .count() as u8;
 }
 
@@ -40,39 +40,39 @@ mod test {
         );
         assert_eq!(
             number_of_alive([
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
             ]),
             0
         );
         assert_eq!(
             number_of_alive([
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
-                Some(&State::ALIVE),
+                Some(&State::Alive),
+                Some(&State::Alive),
+                Some(&State::Alive),
+                Some(&State::Alive),
+                Some(&State::Alive),
+                Some(&State::Alive),
+                Some(&State::Alive),
+                Some(&State::Alive),
             ]),
             8
         );
         assert_eq!(
             number_of_alive([
-                Some(&State::ALIVE),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
-                Some(&State::DEAD),
+                Some(&State::Alive),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
+                Some(&State::Dead),
                 None,
             ]),
             1

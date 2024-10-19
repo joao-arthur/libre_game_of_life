@@ -67,7 +67,7 @@ impl Default for Model {
 
 pub fn from_string(model_as_str: Vec<String>) -> Model {
     let mut value = HashMap::<Point, State>::new();
-    let len = model_as_str.len() as i64;
+    let len = model_as_str.len();
     let row_iter = model_as_str.iter().enumerate();
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
@@ -76,12 +76,12 @@ pub fn from_string(model_as_str: Vec<String>) -> Model {
                 value.insert(
                     index_to_point(
                         ArrPos {
-                            col: col as i64,
-                            row: row as i64,
+                            col: col.try_into().unwrap(),
+                            row: row.try_into().unwrap(),
                         },
-                        len,
+                        len.try_into().unwrap(),
                     ),
-                    State::ALIVE,
+                    State::Alive,
                 );
             }
         }
@@ -93,11 +93,11 @@ pub fn from_string(model_as_str: Vec<String>) -> Model {
     }
 }
 
-pub fn get_length(model: &Model) -> i64 {
-    model.pos.x2 - model.pos.x1 + 1
+pub fn get_length(model: &Model) -> u16 {
+    (model.pos.x2 - model.pos.x1 + 1).try_into().unwrap()
 }
 
-pub fn get_cell_size(model: &Model, total_size: i64) -> i64 {
+pub fn get_cell_size(model: &Model, total_size: u16) -> u16 {
     total_size / get_length(model)
 }
 
@@ -108,17 +108,17 @@ pub fn get_middle_point(model: &Model) -> Point {
     )
 }
 
-pub fn get_middle_cell(model: &Model, total_size: i64) -> Point {
-    let cell_size = get_cell_size(model, total_size);
+pub fn get_middle_cell(model: &Model, total_size: u16) -> Point {
+    let cell_size: i64 = get_cell_size(model, total_size).into();
     let middle = get_middle_point(model);
     Point::from(middle.x * cell_size, middle.y * cell_size)
 }
 
 pub fn get_value(model: &Model, point: Point) -> State {
-    if model.value.get(&point).unwrap_or(&State::DEAD) == &State::ALIVE {
-        State::ALIVE
+    if model.value.get(&point).unwrap_or(&State::Dead) == &State::Alive {
+        State::Alive
     } else {
-        State::DEAD
+        State::Dead
     }
 }
 
@@ -144,12 +144,12 @@ pub fn iterate(model: &mut Model) {
     let entries: HashMap<Point, State> = points
         .iter()
         .filter_map(|p| {
-            let state = model.value.get(p).unwrap_or(&State::DEAD);
+            let state = model.value.get(p).unwrap_or(&State::Dead);
             let number_of_alive_neighbors = number_of_alive_from_model(model, p.clone());
             let new_cell = cell::iterate(state.clone(), number_of_alive_neighbors);
             match new_cell {
-                State::DEAD => None,
-                State::ALIVE => Some((p.clone(), State::ALIVE)),
+                State::Dead => None,
+                State::Alive => Some((p.clone(), State::Alive)),
             }
         })
         .collect();
@@ -167,18 +167,18 @@ pub fn move_in_plane(model: &mut Model, delta: Point) {
 }
 
 pub fn toggle_cell(model: &mut Model, point: Point) {
-    let new_cell = toggle(model.value.get(&point).unwrap_or(&State::DEAD));
+    let new_cell = toggle(model.value.get(&point).unwrap_or(&State::Dead));
     match new_cell {
-        State::DEAD => {
+        State::Dead => {
             model.value.remove(&point);
         }
-        State::ALIVE => {
+        State::Alive => {
             model.value.insert(point, new_cell);
         }
     }
 }
 
-pub fn zoom(model: &mut Model, new_size: i64) {
+pub fn zoom(model: &mut Model, new_size: u16) {
     let half_new_size = new_size as f64 / 2 as f64;
     let half_x = (model.pos.x1 + model.pos.x2) as f64 / 2 as f64;
     let half_y = (model.pos.y1 + model.pos.y2) as f64 / 2 as f64;
@@ -227,17 +227,17 @@ mod test {
         );
         assert_eq!(
             Model::from_value(HashMap::from([
-                (Point::from(-1, -1), State::ALIVE),
-                (Point::from(-1, 1), State::ALIVE),
-                (Point::from(1, -1), State::ALIVE),
-                (Point::from(1, 1), State::ALIVE),
+                (Point::from(-1, -1), State::Alive),
+                (Point::from(-1, 1), State::Alive),
+                (Point::from(1, -1), State::Alive),
+                (Point::from(1, 1), State::Alive),
             ])),
             Model {
                 value: HashMap::from([
-                    (Point::from(-1, -1), State::ALIVE),
-                    (Point::from(-1, 1), State::ALIVE),
-                    (Point::from(1, -1), State::ALIVE),
-                    (Point::from(1, 1), State::ALIVE),
+                    (Point::from(-1, -1), State::Alive),
+                    (Point::from(-1, 1), State::Alive),
+                    (Point::from(1, -1), State::Alive),
+                    (Point::from(1, 1), State::Alive),
                 ]),
                 iter: 0,
                 pos: Rect::from(0, 0, 0, 0)
@@ -262,7 +262,7 @@ mod test {
         assert_eq!(
             from_string(vec!["⬜".to_string()]),
             Model {
-                value: HashMap::from([(Point::from(0, 0), State::ALIVE)]),
+                value: HashMap::from([(Point::from(0, 0), State::Alive)]),
                 iter: 0,
                 pos: Rect::from(-10, -10, 10, 10),
             }
@@ -276,9 +276,9 @@ mod test {
             ]),
             Model {
                 value: HashMap::from([
-                    (Point::from(1, 2), State::ALIVE),
-                    (Point::from(-2, 1), State::ALIVE),
-                    (Point::from(0, 0), State::ALIVE),
+                    (Point::from(1, 2), State::Alive),
+                    (Point::from(-2, 1), State::Alive),
+                    (Point::from(0, 0), State::Alive),
                 ]),
                 iter: 0,
                 pos: Rect::from(-10, -10, 10, 10),
