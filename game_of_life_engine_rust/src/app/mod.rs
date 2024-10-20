@@ -1,6 +1,4 @@
 use std::{
-    cell::{RefCell, UnsafeCell},
-    rc::Rc,
     sync::{
         mpsc::{channel, Receiver, Sender},
         Arc, Mutex, OnceLock,
@@ -12,23 +10,20 @@ use gloo_timers::callback::Interval;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    plane::{
-        cartesian::{to_matrix, CartesianPoint},
-        Rect,
-    },
-    preset::{get_preset_groups, get_presets, Preset},
+    plane::cartesian::{to_matrix, CartesianPoint},
+    preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     universe::{
         get_cell_size, get_length, get_middle_cell, iterate, move_in_plane, toggle_cell, zoom,
         Universe,
     },
 };
 
-struct PresetOptionItem {
+pub struct PresetOptionItem {
     pub label: String,
     pub value: String,
 }
 
-struct PresetOptionGroup {
+pub struct PresetOptionGroup {
     pub label: String,
     pub value: String,
     pub options: Vec<PresetOptionItem>,
@@ -66,19 +61,19 @@ pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
         .collect();
 }
 
-struct Square {
+pub struct Square {
     pub x: i64,
     pub y: i64,
     pub size: u64,
 }
 
-trait DrawContext {
+pub trait DrawContext {
     fn clear(self, s: Square);
     fn draw_square(self, s: Square, color: String);
 }
 
 #[derive(Clone)]
-struct Holder {
+pub struct Holder {
     context: CanvasRenderingContext2d,
 }
 
@@ -114,14 +109,14 @@ pub struct Settings {
 pub struct Model {
     pub universe: Universe,
     pub settings: Settings,
-    //pub holder: Option<dyn DrawContext + Send + 'static>,
+    pub holder: Option<Box<dyn DrawContext + Send + 'static>>,
     on_change_listeners: Mutex<Vec<Box<dyn FnMut(Prop) + Send + 'static>>>,
 }
 
 impl Default for Model {
     fn default() -> Self {
         Model {
-            universe: Universe::from_pos(Rect::from(-10, -10, 10, 10)),
+            universe: get_preset_unsafe("block"),
             settings: Settings {
                 preset: Some(String::from("block")),
                 dim: 0,
@@ -129,7 +124,7 @@ impl Default for Model {
                 fps: 4,
                 status: Status::Paused,
             },
-            //holder: None,
+            holder: None,
             on_change_listeners: Mutex::new(Vec::new()),
         }
     }
@@ -181,8 +176,6 @@ const DEAD_COLOR: &str = "#dbdbdb";
 const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render() {
-    //     let draw_context: Rc<RefCell<Holder>>;
-
     let mut model = get_instance();
     let length = get_length(&model.universe);
     let cell_size = get_cell_size(&model.universe, model.settings.dim);
@@ -192,7 +185,7 @@ fn render() {
         y: 0,
         size: model.settings.dim.into(),
     };
-    //draw_context.borrow().clone().draw_square(background, DEAD_COLOR.to_string());
+    //model.holder.unwrap().draw_square(background, DEAD_COLOR.to_string());
     model.universe.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
         let s = Square {
@@ -200,7 +193,7 @@ fn render() {
             y: arr_index.row as i64 * cell_size as i64 + model.settings.gap as i64 + middle_cell.y,
             size: cell_size as u64 - model.settings.gap as u64 * 2,
         };
-        //draw_context.borrow().clone().draw_square(s, ALIVE_COLOR.to_string());
+        //model.holder.unwrap().draw_square(s, ALIVE_COLOR.to_string());
     });
 }
 
@@ -272,78 +265,125 @@ pub fn init() {
 pub fn control_pause() {
     let mut model = get_instance();
     model.settings.status = Status::Paused;
-    on_change(Prop::Status);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Status);
+    }
 }
 
 pub fn control_resume() {
     let mut model = get_instance();
     model.settings.status = Status::Resumed;
-    on_change(Prop::Status);
-}
 
-pub fn control_set_preset(model: &mut Model, preset: String) {
-    if let Some(selected_preset) = get_presets().get(&preset) {
-        model.universe = Universe {
-            iter: selected_preset.iter,
-            pos: selected_preset.pos,
-            value: selected_preset.value.clone(),
-        };
-        model.settings.preset = Some(preset);
-        on_change(Prop::Universe);
-        on_change(Prop::Preset);
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Status);
     }
 }
 
 pub fn control_set_dimension(dim: u16) {
     let mut model = get_instance();
     model.settings.dim = dim;
-    on_change(Prop::Dim);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Dim);
+    }
 }
 
 pub fn control_set_gap(gap: u16) {
     let mut model = get_instance();
     model.settings.gap = gap;
-    on_change(Prop::Gap);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Gap);
+    }
 }
 
 pub fn control_set_fps(fps: u16) {
     let mut model = get_instance();
     model.settings.fps = fps;
-    on_change(Prop::FPS);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::FPS);
+    }
+}
+
+pub fn control_set_preset(preset: String) {
+    let mut model = get_instance();
+    if let Some(selected_preset) = get_preset(&preset) {
+        model.universe = selected_preset;
+        model.settings.preset = Some(preset);
+
+        let mut listeners = model.on_change_listeners.lock().unwrap();
+        for cb in listeners.iter_mut() {
+            cb(Prop::Universe);
+        }
+        for cb in listeners.iter_mut() {
+            cb(Prop::Preset);
+        }
+    }
 }
 
 pub fn control_single_iteration() {
     let mut model = get_instance();
     model.settings.status = Status::Paused;
     iterate(&mut model.universe);
-    on_change(Prop::Status);
-    on_change(Prop::Universe);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Status);
+    }
+    for cb in listeners.iter_mut() {
+        cb(Prop::Universe);
+    }
 }
 
 pub fn control_iterate() {
     let mut model = get_instance();
     iterate(&mut model.universe);
-    on_change(Prop::Universe);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Status);
+    }
 }
 
 pub fn control_toggle_model_cell(point: CartesianPoint) {
     let mut model = get_instance();
     toggle_cell(&mut model.universe, point);
     model.settings.preset = None;
-    on_change(Prop::Universe);
-    on_change(Prop::Preset);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Universe);
+    }
+    for cb in listeners.iter_mut() {
+        cb(Prop::Preset);
+    }
 }
 
-pub fn control_set_size(new_size: u16) {
+pub fn control_zoom(new_size: u16) {
     let mut model = get_instance();
     zoom(&mut model.universe, new_size);
-    on_change(Prop::Universe);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Universe);
+    }
 }
 
 pub fn control_move_model(delta: CartesianPoint) {
     let mut model = get_instance();
     move_in_plane(&mut model.universe, delta);
-    on_change(Prop::Universe);
+
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(Prop::Universe);
+    }
 }
 
 pub fn control_get_settings() -> Settings {
@@ -352,10 +392,14 @@ pub fn control_get_settings() -> Settings {
 
 #[cfg(test)]
 mod test {
+    use std::collections::HashMap;
+
+    use crate::domain::{cell::State, plane::Rect};
+
     use super::*;
 
     #[test]
-    fn test_get_instance() {
+    fn test_instance() {
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -366,9 +410,166 @@ mod test {
                 status: Status::Paused,
             }
         );
+        assert_eq!(get_instance().universe, get_preset_unsafe("block"));
+        let settings = control_get_settings();
+        assert_eq!(get_instance().settings, settings);
+
+        control_pause();
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 0,
+                gap: 0,
+                fps: 4,
+                status: Status::Paused,
+            }
+        );
+
+        control_resume();
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 0,
+                gap: 0,
+                fps: 4,
+                status: Status::Resumed,
+            }
+        );
+
+        control_set_dimension(1080);
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 0,
+                fps: 4,
+                status: Status::Resumed,
+            }
+        );
+
+        control_set_gap(2);
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 4,
+                status: Status::Resumed,
+            }
+        );
+
+        control_set_fps(60);
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Resumed,
+            }
+        );
+
+        control_set_preset("Gaius Julius Caesar".to_string());
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Resumed,
+            }
+        );
+        control_set_preset("r_pentomino".to_string());
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("r_pentomino")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Resumed,
+            }
+        );
+        control_set_preset("block".to_string());
+        control_iterate();
+        let block = get_preset_unsafe("block");
         assert_eq!(
             get_instance().universe,
-            Universe::from_pos(Rect::from(-10, -10, 10, 10)),
+            Universe {
+                iter: 1,
+                pos: Rect::from(-10, -10, 10, 10),
+                value: block.value.clone()
+            }
+        );
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Resumed,
+            }
+        );
+
+        control_single_iteration();
+        assert_eq!(
+            get_instance().universe,
+            Universe {
+                iter: 2,
+                pos: Rect::from(-10, -10, 10, 10),
+                value: block.value.clone()
+            }
+        );
+        assert_eq!(
+            get_instance().settings,
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Paused,
+            }
+        );
+
+        control_zoom(41);
+        assert_eq!(
+            get_instance().universe,
+            Universe {
+                iter: 2,
+                pos: Rect::from(-20, -20, 20, 20),
+                value: block.value.clone()
+            }
+        );
+
+        control_move_model(CartesianPoint::from(20, 20));
+        assert_eq!(
+            get_instance().universe,
+            Universe {
+                iter: 2,
+                pos: Rect::from(0, 0, 40, 40),
+                value: block.value.clone()
+            }
+        );
+
+        control_toggle_model_cell(CartesianPoint::from(0, 0));
+        assert_eq!(
+            get_instance().universe,
+            Universe {
+                iter: 2,
+                pos: Rect::from(0, 0, 40, 40),
+                value: HashMap::from([
+                    (CartesianPoint::from(-1, 1), State::Alive),
+                    (CartesianPoint::from(0, 1), State::Alive),
+                    (CartesianPoint::from(-1, 0), State::Alive),
+                ])
+            }
         );
     }
 }

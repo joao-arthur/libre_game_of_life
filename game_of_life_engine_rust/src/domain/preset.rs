@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::LazyLock};
 
 use super::universe::{from_string, Universe};
 
@@ -32,7 +32,7 @@ pub struct PresetGroup {
     pub sub_groups: Vec<PresetSubGroup>,
 }
 
-pub fn get_presets() -> HashMap<String, Universe> {
+static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
     HashMap::from([
         (
             "boat".to_string(),
@@ -189,6 +189,17 @@ pub fn get_presets() -> HashMap<String, Universe> {
             .unwrap(),
         ),
     ])
+});
+
+pub fn get_preset_unsafe(preset: &str) -> Universe {
+    PRESETS.get(preset).unwrap().clone()
+}
+
+pub fn get_preset(preset: &String) -> Option<Universe> {
+    match PRESETS.get(preset) {
+        None => None,
+        Some(u) => Some(u.clone()),
+    }
 }
 
 pub fn get_preset_groups() -> Vec<PresetGroup> {
