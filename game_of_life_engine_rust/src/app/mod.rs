@@ -1,15 +1,18 @@
-use std::{cell::RefCell, rc::Rc, sync::OnceLock};
+use std::{cell::RefCell, rc::Rc, sync::{Arc, Mutex, OnceLock}};
 
 use gloo_timers::callback::Interval;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
+    plane::{
+        cartesian::{to_matrix, CartesianPoint},
+        Rect,
+    },
+    preset::{get_preset_groups, get_presets, Preset},
     universe::{
         get_cell_size, get_length, get_middle_cell, iterate, move_in_plane, toggle_cell, zoom,
-        Universe, Rect,
+        Universe,
     },
-    plane::cartesian::{to_matrix, CartesianPoint},
-    preset::{get_preset_groups, Preset},
 };
 
 struct PresetOptionItem {
@@ -74,14 +77,12 @@ struct Holder {
 impl DrawContext for Holder {
     fn clear(self, s: Square) {
         self.context.set_fill_style_str("white");
-        self.context
-            .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
+        self.context.fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 
     fn draw_square(self, s: Square, color: String) {
         self.context.set_fill_style_str(&color);
-        self.context
-            .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
+        self.context.fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 }
 
@@ -92,7 +93,7 @@ enum Status {
 }
 
 #[derive(Clone)]
-struct SystemSettings {
+struct Settings {
     pub preset: Option<String>,
     pub gap: u16,
     pub fps: u16,
@@ -100,46 +101,36 @@ struct SystemSettings {
     pub dim: u16,
 }
 
-pub struct SystemModel {
+pub struct Model {
     pub universe: Universe,
-    pub settings: SystemSettings,
-    on_change_listeners: Vec<Box<dyn FnMut(Prop)>>,
-    // pub interval: Option<Interval>,
+    pub settings: Settings,
+    on_change_listeners: Mutex<Vec<Box<dyn FnMut(Prop) + Send + 'static>>>,
 }
 
-impl Default for SystemModel {
+impl Default for Model {
     fn default() -> Self {
-        SystemModel {
+        Model {
             universe: Universe::from_pos(Rect::from(-10, -10, 10, 10)),
-            settings: SystemSettings {
+            settings: Settings {
                 preset: Some(String::from("block")),
                 dim: 0,
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
             },
-            on_change_listeners: vec![],
+            on_change_listeners: Mutex::new(Vec::new()),
         }
     }
 }
 
-pub fn add_on_change_listener<F>(cb: F)
-where
-    F: FnMut(Prop) + 'static,
-{
-    let system_model = get_instance();
-    system_model.on_change_listeners.push(Box::new(cb));
-}
+static MODEL_INSTANCE: OnceLock<Model> = OnceLock::new();
 
-fn on_change(param: Prop) {
-    let system_model = get_instance();
-    for cb in &mut system_model.on_change_listeners {
-        cb(param.clone());
-    }
-}
-
-fn fps_to_mili(fps: u16) -> u16 {
-    return 1000 / fps;
+fn get_instance() -> &'static mut Model {
+    let instance = MODEL_INSTANCE.get_or_init(|| Model {
+        ..Default::default()
+    });
+    let mut_instance = unsafe { &mut *(instance as *const _ as *mut Model) };
+    mut_instance
 }
 
 #[derive(Clone)]
@@ -152,163 +143,173 @@ enum Prop {
     Dim,
 }
 
-static SYSTEM_MODEL_INSTANCE: OnceLock<SystemModel> = OnceLock::new();
+pub fn add_on_change_listener<F>(cb: F)
+where
+    F: FnMut(Prop) + Send + 'static,
+{
+    let model = get_instance();
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    listeners.push(Box::new(cb));
+}
 
-fn get_instance() -> &'static mut SystemModel {
-    let instance = SYSTEM_MODEL_INSTANCE.get_or_init(|| SystemModel {
-        ..Default::default()
-    });
-    let mut_instance = unsafe { &mut *(instance as *const _ as *mut SystemModel) };
-    mut_instance
+fn on_change(param: Prop) {
+    let model = get_instance();
+    let mut listeners = model.on_change_listeners.lock().unwrap();
+    for cb in listeners.iter_mut() {
+        cb(param.clone());
+    }
+}
+
+fn fps_to_mili(fps: u16) -> u16 {
+    return 1000 / fps;
 }
 
 const DEAD_COLOR: &str = "#dbdbdb";
 const ALIVE_COLOR: &str = "#2e2e2e";
 
-fn render(draw_context: Rc<RefCell<Holder>>) {
-    let system_model = get_instance();
-    let length = get_length(&system_model.universe);
-    let cell_size = get_cell_size(&system_model.universe, system_model.settings.dim);
-    let middle_cell = get_middle_cell(&system_model.universe, system_model.settings.dim);
-    let dim = Square {
+fn render() {
+   // let draw_context: Rc<RefCell<Holder>>;
+    let model = get_instance();
+    let length = get_length(&model.universe);
+    let cell_size = get_cell_size(&model.universe, model.settings.dim);
+    let middle_cell = get_middle_cell(&model.universe, model.settings.dim);
+    let background = Square {
         x: 0,
         y: 0,
-        size: system_model.settings.dim.into(),
+        size: model.settings.dim.into(),
     };
-    draw_context
-        .borrow()
-        .clone()
-        .draw_square(dim, DEAD_COLOR.to_string());
-    system_model.universe.value.iter().for_each(|point| {
+    //draw_context.borrow().clone().draw_square(background, DEAD_COLOR.to_string());
+    model.universe.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
         let s = Square {
-            x: arr_index.col as i64 * cell_size as i64 + system_model.settings.gap as i64
+            x: arr_index.col as i64 * cell_size as i64 + model.settings.gap as i64
                 - middle_cell.x,
             y: arr_index.row as i64 * cell_size as i64
-                + system_model.settings.gap as i64
+                + model.settings.gap as i64
                 + middle_cell.y,
-            size: cell_size as u64 - system_model.settings.gap as u64 * 2,
+            size: cell_size as u64 - model.settings.gap as u64 * 2,
         };
-        draw_context
-            .borrow()
-            .clone()
-            .draw_square(s, ALIVE_COLOR.to_string());
+        //draw_context.borrow().clone().draw_square(s, ALIVE_COLOR.to_string());
     });
 }
 
 pub fn init(holder: Rc<RefCell<Holder>>) {
-    let mut interval: Option<Interval> = None;
+    let interval: Arc<Mutex<Option<Interval>>> = Arc::new(Mutex::new(None));
 
-    add_on_change_listener(|prop| {
-        let system_model = get_instance();
-        match system_model.settings.status {
-            Status::Resumed => match prop {
-                Prop::Status | Prop::FPS => {
-                    interval = Some(Interval::new(
-                        fps_to_mili(system_model.settings.fps).into(),
-                        move || {
-                            control_iterate();
-                            render(holder.clone());
-                        },
-                    ));
-                }
-                _ => {}
-            },
-            Status::Paused => match prop {
-                Prop::Gap | Prop::Dim | Prop::Universe => {
-                    render(holder.clone());
-                }
-                Prop::Status => {
-                    if let Some(t) = interval {
-                        t.cancel();
+    add_on_change_listener( {
+        let interval = Arc::clone(&interval);
+        move |prop| {
+            let model = get_instance();
+            match model.settings.status {
+                Status::Resumed => match prop {
+                    Prop::Status | Prop::FPS => {
+                        let mut interval_guard = interval.lock().unwrap();
+                        *interval_guard = Some(Interval::new(
+                            fps_to_mili(model.settings.fps).into(),
+                            move || {
+                                control_iterate();
+                                render();
+                            },
+                        )); 
                     }
-                }
-                _ => {}
-            },
+                    _ => {}
+                },
+                Status::Paused => match prop {
+                    Prop::Gap | Prop::Dim | Prop::Universe => {
+                        render();
+                    }
+                    Prop::Status => {
+                        let mut interval_guard = interval.lock().unwrap();
+                        if let Some(t) = interval_guard.take() {
+                            t.cancel();
+                        }
+                    }
+                    _ => {}
+                },
+            }
         }
     });
-    render(holder.clone());
+    render();
     // control_pause();
 }
 
 pub fn control_pause() {
-    let system_model = get_instance();
-    system_model.settings.status = Status::Paused;
+    let model = get_instance();
+    model.settings.status = Status::Paused;
     on_change(Prop::Status);
 }
 
 pub fn control_resume() {
-    let system_model = get_instance();
-    system_model.settings.status = Status::Resumed;
+    let model = get_instance();
+    model.settings.status = Status::Resumed;
     on_change(Prop::Status);
 }
 
-pub fn control_set_preset(system_model: &mut SystemModel, preset: String) {
-    if let Some(selected_preset) = build_presets().iter().find(|point| point.id == preset) {
-        // wip
-        system_model.universe = Universe {
+pub fn control_set_preset(model: &mut Model, preset: String) {
+    if let Some(selected_preset) = get_presets().get(&preset) {
+        model.universe = Universe {
             iter: selected_preset.iter,
             pos: selected_preset.pos,
-            value: selected_preset.value.iter(),
+            value: selected_preset.value.clone(),
         };
-        system_model.settings.preset = Some(preset);
+        model.settings.preset = Some(preset);
         on_change(Prop::Universe);
         on_change(Prop::Preset);
     }
 }
 
 pub fn control_set_dimension(dim: u16) {
-    let system_model = get_instance();
-    system_model.settings.dim = dim;
+    let model = get_instance();
+    model.settings.dim = dim;
     on_change(Prop::Dim);
 }
 
 pub fn control_set_gap(gap: u16) {
-    let system_model = get_instance();
-    system_model.settings.gap = gap;
+    let model = get_instance();
+    model.settings.gap = gap;
     on_change(Prop::Gap);
 }
 
 pub fn control_set_fps(fps: u16) {
-    let system_model = get_instance();
-    system_model.settings.fps = fps;
+    let model = get_instance();
+    model.settings.fps = fps;
     on_change(Prop::FPS);
 }
 
 pub fn control_single_iteration() {
-    let system_model = get_instance();
-    system_model.settings.status = Status::Paused;
-    iterate(&mut system_model.universe);
+    let model = get_instance();
+    model.settings.status = Status::Paused;
+    iterate(&mut model.universe);
     on_change(Prop::Status);
     on_change(Prop::Universe);
 }
 
 pub fn control_iterate() {
-    let system_model = get_instance();
-    iterate(&mut system_model.universe);
+    let model = get_instance();
+    iterate(&mut model.universe);
     on_change(Prop::Universe);
 }
 
 pub fn control_toggle_model_cell(point: CartesianPoint) {
-    let system_model = get_instance();
-    toggle_cell(&mut system_model.universe, point);
-    system_model.settings.preset = None;
+    let model = get_instance();
+    toggle_cell(&mut model.universe, point);
+    model.settings.preset = None;
     on_change(Prop::Universe);
     on_change(Prop::Preset);
 }
 
 pub fn control_set_size(new_size: u16) {
-    let system_model = get_instance();
-    zoom(&mut system_model.universe, new_size);
+    let model = get_instance();
+    zoom(&mut model.universe, new_size);
     on_change(Prop::Universe);
 }
 
 pub fn control_move_model(delta: CartesianPoint) {
-    let system_model = get_instance();
-    move_in_plane(&mut system_model.universe, delta);
+    let model = get_instance();
+    move_in_plane(&mut model.universe, delta);
     on_change(Prop::Universe);
 }
 
-pub fn control_get_settings() -> SystemSettings {
+pub fn control_get_settings() -> Settings {
     get_instance().settings.clone()
 }
