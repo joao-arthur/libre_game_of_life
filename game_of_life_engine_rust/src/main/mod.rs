@@ -2,7 +2,7 @@ use crate::{
     app::{
         app_get_settings, app_init, app_move_model, app_pause, app_resume, app_set_dimension,
         app_set_fps, app_set_gap, app_set_preset, app_single_iteration, app_toggle_model_cell,
-        app_zoom, Settings, Status,
+        app_zoom, Status,
     },
     domain::plane::cartesian::CartesianPoint,
 };

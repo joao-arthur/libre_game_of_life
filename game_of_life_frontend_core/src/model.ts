@@ -139,7 +139,6 @@ function render(systemModel: SystemModelProxy): void {
     const length = getModelLength({ Ok: model.model });
     const cellSize = getModelCellSize({ Ok: model.model }, model.dimension);
     const middleCell = getModelMiddleCell({ Ok: model.model }, model.dimension);
-
     const dim = { x: 0, y: 0, size: Number(model.dimension) };
     model.drawContext.drawSquare(dim, DEAD_COLOR);
 
@@ -246,7 +245,10 @@ export class SystemController {
 
     public toggleCell(point: _Point): void {
         this.systemModel.setModel(
-            toggleModel({ Ok: this.systemModel.getModel().model }, new Point(BigInt(point.x), BigInt(point.y))),
+            toggleModel(
+                { Ok: this.systemModel.getModel().model },
+                new Point(BigInt(point.x), BigInt(point.y)),
+            ),
         );
     }
 

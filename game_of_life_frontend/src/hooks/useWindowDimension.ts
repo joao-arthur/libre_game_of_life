@@ -5,11 +5,8 @@ export function useWindowDimension(): number {
 
     useEffect(() => {
         function onWindowResize(): void {
-            setDimension(
-                Math.min(window.innerWidth, window.innerHeight),
-            );
+            setDimension(Math.min(window.innerWidth, window.innerHeight));
         }
-
         onWindowResize();
         window.addEventListener("resize", onWindowResize);
         return () => {

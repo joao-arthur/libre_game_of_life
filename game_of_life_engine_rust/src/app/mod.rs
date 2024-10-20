@@ -91,9 +91,7 @@ impl DrawContext for Holder {
     }
 }
 
-unsafe impl Send for Holder {
-
-}
+unsafe impl Send for Holder {}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Status {
@@ -236,18 +234,13 @@ pub fn run_interval_controller() -> Sender<Command> {
     tx
 }
 
-pub fn app_init(
-    context: CanvasRenderingContext2d,
-) {
+pub fn app_init(context: CanvasRenderingContext2d) {
     let mut model = get_instance();
     model.holder = Some(Box::new(Holder { context }));
-    
-    
+
     let interval: Arc<Mutex<Option<Interval>>> = Arc::new(Mutex::new(None));
     let controller = run_interval_controller();
 
-
-    
     add_on_change_listener({
         let interval = Arc::clone(&interval);
         move |prop| {

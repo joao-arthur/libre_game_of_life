@@ -1,53 +1,47 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    buildModel,
-    CanvasDrawContext,
-    manage,
-    SystemController,
-    SystemModel,
-    SystemModelProxy,
-} from "game_of_life_frontend_core";
+    engineAddOnChangeListener,
+    engineGetSettings,
+    engineInit,
+    engineSetDimension,
+    EngineSettings,
+} from "game_of_life_engine";
 import { useWindowDimension } from "./useWindowDimension";
 
 type GameOfLife = {
     readonly init: (canvasElement: HTMLCanvasElement) => void;
-    readonly model: SystemModel | undefined;
-    readonly controller: SystemController | undefined;
+    readonly model: EngineSettings | undefined;
 };
 
 export function useGameOfLife(): GameOfLife {
-    const systemControllerRef = useRef<SystemController | undefined>(undefined);
-    const [model, setModel] = useState<SystemModel | undefined>(undefined);
+    const [model, setModel] = useState<EngineSettings | undefined>(undefined);
     const dimension = useWindowDimension();
 
     useEffect(() => {
-        systemControllerRef.current?.setDimension(BigInt(dimension));
-    }, [dimension]);
+        console.log(dimension);
+        if (model) {
+            engineSetDimension(dimension);
+        }
+    }, [dimension, model]);
 
-    const init = useCallback(
-        (canvasElement: HTMLCanvasElement) => {
-            const context = canvasElement.getContext("2d");
-            if (!context) {
-                return;
-            }
-            const canvasDrawContext = new CanvasDrawContext(context);
-            const systemModel = new SystemModelProxy(
-                buildModel(canvasDrawContext, BigInt(dimension)),
-            );
-            const systemController = new SystemController(systemModel);
-            manage(systemModel, systemController);
-            systemModel.addOnChangeListener(() => {
-                setModel(systemModel.getModel());
-            });
-            setModel(systemModel.getModel());
-            systemControllerRef.current = systemController;
-        },
-        [],
-    );
+    function init(canvasElement: HTMLCanvasElement) {
+        const context = canvasElement.getContext("2d");
+        if (!context) {
+            return;
+        }
+        engineInit({ Ok: context });
+        let obj = engineGetSettings();
+        engineAddOnChangeListener(() => {
+            console.log(engineGetSettings());
+        });
+        setModel({
+            dim: obj.dim,
+            fps: obj.fps,
+            gap: obj.gap,
+            preset: obj.preset,
+            status: obj.status,
+        } as any);
+    }
 
-    return {
-        init,
-        model,
-        controller: systemControllerRef.current,
-    };
+    return { init, model };
 }
