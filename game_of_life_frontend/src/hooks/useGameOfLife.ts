@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-    engineAddOnChangeListener,
     engineGetSettings,
     engineInit,
     engineSetDimension,
@@ -18,7 +17,6 @@ export function useGameOfLife(): GameOfLife {
     const dimension = useWindowDimension();
 
     useEffect(() => {
-        console.log(dimension);
         if (model) {
             engineSetDimension(dimension);
         }
@@ -29,11 +27,12 @@ export function useGameOfLife(): GameOfLife {
         if (!context) {
             return;
         }
-        engineInit({ Ok: context });
+
+        engineInit(context);
         let obj = engineGetSettings();
-        engineAddOnChangeListener(() => {
-            console.log(engineGetSettings());
-        });
+        //engineAddOnChangeListener(() => {
+        //    console.log(engineGetSettings());
+        //});
         setModel({
             dim: obj.dim,
             fps: obj.fps,

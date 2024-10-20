@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { type ReactElement, useState } from "react";
 
 type Props = {
     readonly id: string;
@@ -9,7 +9,11 @@ type Props = {
     readonly onChange: (newValue: number) => void;
 };
 
-export function RangeInput({ id, min, max, step, value, onChange }: Props): ReactElement {
+export function RangeInput(
+    { id, min, max, step, value: defaultValue, onChange }: Props,
+): ReactElement {
+    const [value, setValue] = useState(defaultValue);
+
     function handleOnChange(newValue: number): void {
         if (newValue > max) return;
         if (newValue < min) return;
@@ -26,7 +30,11 @@ export function RangeInput({ id, min, max, step, value, onChange }: Props): Reac
             step={String(step)}
             value={String(value)}
             onInput={(e) => {
-                handleOnChange(Number(e.currentTarget.value));
+                let newValue = Number(e.currentTarget.value);
+                if (newValue != value) {
+                    setValue(newValue);
+                    handleOnChange(newValue);
+                }
             }}
             className="accent-indigo-500"
         />

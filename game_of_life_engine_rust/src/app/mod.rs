@@ -1,13 +1,11 @@
-use std::{
-    sync::{
-        mpsc::{channel, Receiver, Sender},
-        Arc, Mutex, OnceLock,
-    },
-    thread,
-};
-
 use gloo_timers::callback::Interval;
-use web_sys::CanvasRenderingContext2d;
+use std::{
+    borrow::Borrow,
+    cell::RefCell,
+    panic,
+    sync::{Arc, Mutex},
+};
+use web_sys::{console, CanvasRenderingContext2d};
 
 use crate::domain::{
     plane::cartesian::{to_matrix, CartesianPoint},
@@ -85,7 +83,7 @@ impl DrawContext for Holder {
     }
 
     fn draw_square(&self, s: Square, color: String) {
-        self.context.set_fill_style_str(&color);
+        self.context.set_fill_style(&color.into());
         self.context
             .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
@@ -111,8 +109,7 @@ pub struct Settings {
 pub struct Model {
     pub universe: Universe,
     pub settings: Settings,
-    pub holder: Option<Box<dyn DrawContext + Send + 'static>>,
-    on_change_listeners: Mutex<Vec<Box<dyn FnMut(Prop) + Send + 'static>>>,
+    pub holder: Option<Holder>,
 }
 
 impl Default for Model {
@@ -127,23 +124,19 @@ impl Default for Model {
                 status: Status::Paused,
             },
             holder: None,
-            on_change_listeners: Mutex::new(Vec::new()),
         }
     }
 }
 
-static MODEL_INSTANCE: OnceLock<Mutex<Model>> = OnceLock::new();
-
-fn get_instance() -> std::sync::MutexGuard<'static, Model> {
-    let instance = MODEL_INSTANCE.get_or_init(|| {
-        Mutex::new(Model {
-            ..Default::default()
-        })
-    });
-    instance.lock().unwrap()
+thread_local! {
+    static MODEL: RefCell<Model> = RefCell::new(Model::default());
 }
 
-#[derive(Clone)]
+thread_local! {
+    static LISTENERS: RefCell<Vec<Box<dyn FnMut(Prop) + 'static>>> = RefCell::new(Vec::new());
+}
+
+#[derive(Debug, Clone)]
 pub enum Prop {
     Universe,
     Preset,
@@ -155,19 +148,18 @@ pub enum Prop {
 
 pub fn add_on_change_listener<F>(cb: F)
 where
-    F: FnMut(Prop) + Send + 'static,
+    F: FnMut(Prop) + 'static,
 {
-    let mut model = get_instance();
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    listeners.push(Box::new(cb));
+    LISTENERS.with_borrow_mut(|l| l.push(Box::new(cb)));
 }
 
 fn on_change(param: Prop) {
-    let mut model = get_instance();
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(param.clone());
-    }
+    console::log_1(&format!("[onChange {:?} ]", param.clone()).into());
+    LISTENERS.with_borrow_mut(|l| {
+        for cb in l.iter_mut() {
+            cb(param.clone());
+        }
+    });
 }
 
 fn fps_to_mili(fps: u16) -> u16 {
@@ -178,24 +170,32 @@ const DEAD_COLOR: &str = "#dbdbdb";
 const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render() {
-    let mut model = get_instance();
-    let holder = model.holder.as_ref().unwrap();
-    let length = get_length(&model.universe);
-    let cell_size = get_cell_size(&model.universe, model.settings.dim);
-    let middle_cell = get_middle_cell(&model.universe, model.settings.dim);
+    let (universe, settings, holder) = MODEL.with(|i| {
+        (
+            i.borrow().universe.clone(),
+            i.borrow().settings.clone(),
+            i.borrow().holder.clone(),
+        )
+    });
+    let holder = holder.unwrap();
+    let length = get_length(&universe);
+    let cell_size = get_cell_size(&universe, settings.dim);
+    let middle_cell = get_middle_cell(&universe, settings.dim);
     let background = Square {
         x: 0,
         y: 0,
-        size: model.settings.dim.into(),
+        size: settings.dim.into(),
     };
     holder.draw_square(background, DEAD_COLOR.to_string());
-    model.universe.value.iter().for_each(|point| {
+    universe.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
         let s = Square {
-            x: arr_index.col as i64 * cell_size as i64 + model.settings.gap as i64 - middle_cell.x,
-            y: arr_index.row as i64 * cell_size as i64 + model.settings.gap as i64 + middle_cell.y,
-            size: cell_size as u64 - model.settings.gap as u64 * 2,
+            x: arr_index.col as i64 * cell_size as i64 + settings.gap as i64 - middle_cell.x,
+            y: arr_index.row as i64 * cell_size as i64 + settings.gap as i64 + middle_cell.y,
+            size: cell_size as u64 - settings.gap as u64 * 2,
         };
+        console::log_3(&s.x.into(), &s.y.into(), &s.size.into());
+
         holder.draw_square(s, ALIVE_COLOR.to_string());
     });
 }
@@ -205,50 +205,27 @@ pub enum Command {
     Stop,
 }
 
-pub fn run_interval_controller() -> Sender<Command> {
-    let (tx, rx): (Sender<Command>, Receiver<Command>) = channel();
-    thread::spawn(move || {
-        let mut interval: Option<Interval> = None;
-        for command in rx {
-            match command {
-                Command::Start => {
-                    if interval.is_none() {
-                        let mut model = get_instance();
-                        interval = Some(Interval::new(
-                            fps_to_mili(model.settings.fps).into(),
-                            || {
-                                app_iterate();
-                                render();
-                            },
-                        ));
-                    }
-                }
-                Command::Stop => {
-                    if let Some(i) = interval.take() {
-                        i.cancel();
-                    }
-                }
-            }
-        }
-    });
-    tx
-}
-
 pub fn app_init(context: CanvasRenderingContext2d) {
-    let mut model = get_instance();
-    model.holder = Some(Box::new(Holder { context }));
-
-    let interval: Arc<Mutex<Option<Interval>>> = Arc::new(Mutex::new(None));
-    let controller = run_interval_controller();
+    MODEL.with(|i| i.borrow_mut().holder = Some(Holder { context }));
+    let mut interval: Option<Interval> = None;
 
     add_on_change_listener({
-        let interval = Arc::clone(&interval);
         move |prop| {
-            let mut model = get_instance();
-            match model.settings.status {
+            let status = MODEL.with(|i| i.borrow().settings.status.clone());
+            match status {
                 Status::Resumed => match prop {
                     Prop::Status | Prop::FPS => {
-                        controller.clone().send(Command::Start).unwrap();
+                        if interval.is_none() {
+                            if let Some(i) = interval.take() {
+                                i.cancel();
+                            }
+                        }
+
+                        let fps = MODEL.with(|i| i.borrow().settings.fps);
+                        interval = Some(Interval::new(fps_to_mili(fps).into(), || {
+                            app_iterate();
+                            render();
+                        }))
                     }
                     _ => {}
                 },
@@ -257,7 +234,9 @@ pub fn app_init(context: CanvasRenderingContext2d) {
                         render();
                     }
                     Prop::Status => {
-                        controller.clone().send(Command::Start).unwrap();
+                        if let Some(i) = interval.take() {
+                            i.cancel();
+                        }
                     }
                     _ => {}
                 },
@@ -269,145 +248,116 @@ pub fn app_init(context: CanvasRenderingContext2d) {
 }
 
 pub fn app_pause() {
-    let mut model = get_instance();
-    model.settings.status = Status::Paused;
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Status);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        model.settings.status = Status::Paused;
+    });
+    on_change(Prop::Status);
 }
 
 pub fn app_resume() {
-    let mut model = get_instance();
-    model.settings.status = Status::Resumed;
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Status);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        model.settings.status = Status::Resumed;
+    });
+    on_change(Prop::Status);
 }
 
 pub fn app_set_dimension(dim: u16) {
-    let mut model = get_instance();
-    model.settings.dim = dim;
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Dim);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        model.settings.dim = dim;
+    });
+    on_change(Prop::Dim);
 }
 
 pub fn app_set_gap(gap: u16) {
-    let mut model = get_instance();
-    model.settings.gap = gap;
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Gap);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        model.settings.gap = gap;
+    });
+    on_change(Prop::Gap);
 }
 
 pub fn app_set_fps(fps: u16) {
-    let mut model = get_instance();
-    model.settings.fps = fps;
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::FPS);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        model.settings.fps = fps;
+    });
+    on_change(Prop::FPS);
 }
 
 pub fn app_set_preset(preset: String) {
-    let mut model = get_instance();
-    if let Some(selected_preset) = get_preset(&preset) {
-        model.universe = selected_preset;
-        model.settings.preset = Some(preset);
-
-        let mut listeners = model.on_change_listeners.lock().unwrap();
-        for cb in listeners.iter_mut() {
-            cb(Prop::Universe);
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        if let Some(selected_preset) = get_preset(&preset) {
+            model.universe = selected_preset;
+            model.settings.preset = Some(preset);
         }
-        for cb in listeners.iter_mut() {
-            cb(Prop::Preset);
-        }
-    }
+    });
+    on_change(Prop::Universe);
+    on_change(Prop::Preset);
 }
 
 pub fn app_single_iteration() {
-    let mut model = get_instance();
-    model.settings.status = Status::Paused;
-    iterate(&mut model.universe);
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Status);
-    }
-    for cb in listeners.iter_mut() {
-        cb(Prop::Universe);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        model.settings.status = Status::Paused;
+        iterate(&mut model.universe);
+    });
+    on_change(Prop::Status);
+    on_change(Prop::Universe);
 }
 
 pub fn app_iterate() {
-    let mut model = get_instance();
-    iterate(&mut model.universe);
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Status);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        iterate(&mut model.universe);
+    });
+    on_change(Prop::Universe);
 }
 
 pub fn app_toggle_model_cell(point: CartesianPoint) {
-    let mut model = get_instance();
-    toggle_cell(&mut model.universe, point);
-    model.settings.preset = None;
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Universe);
-    }
-    for cb in listeners.iter_mut() {
-        cb(Prop::Preset);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        toggle_cell(&mut model.universe, point);
+        model.settings.preset = None;
+    });
+    on_change(Prop::Universe);
+    on_change(Prop::Preset);
 }
 
 pub fn app_zoom(new_size: u16) {
-    let mut model = get_instance();
-    zoom(&mut model.universe, new_size);
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Universe);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        zoom(&mut model.universe, new_size);
+    });
+    on_change(Prop::Universe);
 }
 
 pub fn app_move_model(delta: CartesianPoint) {
-    let mut model = get_instance();
-    move_in_plane(&mut model.universe, delta);
-
-    let mut listeners = model.on_change_listeners.lock().unwrap();
-    for cb in listeners.iter_mut() {
-        cb(Prop::Universe);
-    }
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        move_in_plane(&mut model.universe, delta);
+    });
+    on_change(Prop::Universe);
 }
 
 pub fn app_get_settings() -> Settings {
-    get_instance().settings.clone()
+    MODEL.with(|i| i.borrow().settings.clone())
 }
 
 #[cfg(test)]
 mod test {
-    use std::collections::HashMap;
-
     use crate::domain::{cell::State, plane::Rect};
+    use std::collections::HashMap;
 
     use super::*;
 
     #[test]
     fn test_instance() {
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 0,
@@ -416,13 +366,16 @@ mod test {
                 status: Status::Paused,
             }
         );
-        assert_eq!(get_instance().universe, get_preset_unsafe("block"));
+        assert_eq!(
+            MODEL.with(|i| i.borrow().universe.clone()),
+            get_preset_unsafe("block")
+        );
         let settings = app_get_settings();
-        assert_eq!(get_instance().settings, settings);
+        assert_eq!(MODEL.with(|i| i.borrow().settings.clone()), settings);
 
         app_pause();
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 0,
@@ -434,7 +387,7 @@ mod test {
 
         app_resume();
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 0,
@@ -446,7 +399,7 @@ mod test {
 
         app_set_dimension(1080);
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 1080,
@@ -458,7 +411,7 @@ mod test {
 
         app_set_gap(2);
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 1080,
@@ -470,7 +423,7 @@ mod test {
 
         app_set_fps(60);
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 1080,
@@ -482,7 +435,7 @@ mod test {
 
         app_set_preset("Gaius Julius Caesar".to_string());
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 1080,
@@ -493,7 +446,7 @@ mod test {
         );
         app_set_preset("r_pentomino".to_string());
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("r_pentomino")),
                 dim: 1080,
@@ -506,7 +459,7 @@ mod test {
         app_iterate();
         let block = get_preset_unsafe("block");
         assert_eq!(
-            get_instance().universe,
+            MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 1,
                 pos: Rect::from(-10, -10, 10, 10),
@@ -514,7 +467,7 @@ mod test {
             }
         );
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 1080,
@@ -526,7 +479,7 @@ mod test {
 
         app_single_iteration();
         assert_eq!(
-            get_instance().universe,
+            MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
                 pos: Rect::from(-10, -10, 10, 10),
@@ -534,7 +487,7 @@ mod test {
             }
         );
         assert_eq!(
-            get_instance().settings,
+            MODEL.with(|i| i.borrow().settings.clone()),
             Settings {
                 preset: Some(String::from("block")),
                 dim: 1080,
@@ -546,7 +499,7 @@ mod test {
 
         app_zoom(41);
         assert_eq!(
-            get_instance().universe,
+            MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
                 pos: Rect::from(-20, -20, 20, 20),
@@ -556,7 +509,7 @@ mod test {
 
         app_move_model(CartesianPoint::from(20, 20));
         assert_eq!(
-            get_instance().universe,
+            MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
                 pos: Rect::from(0, 0, 40, 40),
@@ -566,7 +519,7 @@ mod test {
 
         app_toggle_model_cell(CartesianPoint::from(0, 0));
         assert_eq!(
-            get_instance().universe,
+            MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
                 pos: Rect::from(0, 0, 40, 40),

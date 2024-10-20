@@ -1,16 +1,18 @@
 use crate::{
     app::{
-        app_get_settings, app_init, app_move_model, app_pause, app_resume, app_set_dimension,
-        app_set_fps, app_set_gap, app_set_preset, app_single_iteration, app_toggle_model_cell,
-        app_zoom, Status,
+        add_on_change_listener, app_get_settings, app_init, app_move_model, app_pause, app_resume,
+        app_set_dimension, app_set_fps, app_set_gap, app_set_preset, app_single_iteration,
+        app_toggle_model_cell, app_zoom, Status,
     },
     domain::plane::cartesian::CartesianPoint,
 };
 use js_sys::Function;
 use wasm_bindgen::prelude::*;
+use web_sys::console;
 use web_sys::CanvasRenderingContext2d;
 
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct EngineCartesianPoint {
     pub x: i64,
     pub y: i64,
@@ -49,49 +51,57 @@ impl EngineSettings {
 }
 
 #[wasm_bindgen(js_name = "engineInit")]
-pub fn main_init(value: JsValue) {
-    if let Ok(context) = value.dyn_into::<CanvasRenderingContext2d>() {
-        app_init(context);
-    }
+pub fn main_init(value: CanvasRenderingContext2d) {
+    console::log_1(&"[init]".into());
+    console::log_1(&"[init dyn_into!]".into());
+    app_init(value);
 }
 
 #[wasm_bindgen(js_name = "enginePause")]
 pub fn main_pause() {
+    console::log_1(&"[pause]".into());
     app_pause();
 }
 
 #[wasm_bindgen(js_name = "engineResume")]
 pub fn main_resume() {
+    console::log_1(&"[resume]".into());
     app_resume();
 }
 
 #[wasm_bindgen(js_name = "engineSetDimension")]
 pub fn main_set_dimension(dim: u16) {
+    console::log_2(&"[set_dimension]".into(), &dim.into());
     app_set_dimension(dim);
 }
 
 #[wasm_bindgen(js_name = "engineSetGap")]
 pub fn main_set_gap(gap: u16) {
+    console::log_2(&"[set_gap]".into(), &gap.into());
     app_set_gap(gap);
 }
 
 #[wasm_bindgen(js_name = "engineSetFPS")]
 pub fn main_set_fps(fps: u16) {
+    console::log_2(&"[set_fps]".into(), &fps.into());
     app_set_fps(fps);
 }
 
 #[wasm_bindgen(js_name = "engineSetPreset")]
 pub fn main_set_preset(preset: String) {
+    console::log_1(&"[set_preset]".into());
     app_set_preset(preset);
 }
 
 #[wasm_bindgen(js_name = "engineSingleIteration")]
 pub fn main_single_iteration() {
+    console::log_1(&"[iterate]".into());
     app_single_iteration();
 }
 
 #[wasm_bindgen(js_name = "engineToggle")]
 pub fn main_toggle_model_cell(point: EngineCartesianPoint) {
+    console::log_2(&"[toggle]".into(), &point.clone().into());
     let cp = CartesianPoint {
         x: point.x,
         y: point.y,
@@ -101,11 +111,13 @@ pub fn main_toggle_model_cell(point: EngineCartesianPoint) {
 
 #[wasm_bindgen(js_name = "engineZoom")]
 pub fn main_zoom(new_size: u16) {
+    console::log_1(&"[zoom]".into());
     app_zoom(new_size);
 }
 
 #[wasm_bindgen(js_name = "engineMove")]
 pub fn main_move_model(delta: EngineCartesianPoint) {
+    console::log_2(&"[move]".into(), &delta.clone().into());
     let cp = CartesianPoint {
         x: delta.x,
         y: delta.y,
@@ -115,6 +127,7 @@ pub fn main_move_model(delta: EngineCartesianPoint) {
 
 #[wasm_bindgen(js_name = "engineGetSettings")]
 pub fn main_get_settings() -> EngineSettings {
+    console::log_1(&"[get_settings]".into());
     let settings = app_get_settings();
     EngineSettings {
         preset: settings.preset,
@@ -129,11 +142,10 @@ pub fn main_get_settings() -> EngineSettings {
 }
 
 #[wasm_bindgen(js_name = "engineAddOnChangeListener")]
-pub fn main_add_on_change_listener(cb: JsValue) {
-    if let Ok(func_to_exec) = cb.dyn_into::<Function>() {
+pub fn main_add_on_change_listener(cb: Function) {
+    console::log_1(&"[on_change_listener]".into());
+    add_on_change_listener(move |_| {
         let this = JsValue::null();
-        let _ = func_to_exec.call0(&this);
-        let __ = func_to_exec.call0(&this);
-        let ___ = func_to_exec.call0(&this);
-    }
+        cb.call0(&this).unwrap();
+    });
 }
