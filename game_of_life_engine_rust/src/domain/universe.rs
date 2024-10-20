@@ -1,4 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt,
+};
 
 use crate::domain::{
     cell::{self, State},
@@ -43,9 +46,37 @@ impl Default for Universe {
     }
 }
 
-pub fn from_string(as_str: Vec<String>) -> Universe {
+#[derive(Debug)]
+pub struct InvalidCharacterError;
+
+impl fmt::Display for InvalidCharacterError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Only \"⬜\" and \"⬛\" characters are allowed!")
+    }
+}
+
+#[derive(Debug)]
+pub struct InvalidLengthError;
+
+impl fmt::Display for InvalidLengthError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "The length of every line and the number of lines must be equal!"
+        )
+    }
+}
+
+#[derive(Debug)]
+pub enum FromStringError {
+    InvalidCharacter(InvalidCharacterError),
+    InvalidLength(InvalidLengthError),
+}
+
+pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     let mut value = HashMap::<CartesianPoint, State>::new();
     let len = as_str.len();
+    // TODO errors
     let row_iter = as_str.iter().enumerate();
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
@@ -64,11 +95,11 @@ pub fn from_string(as_str: Vec<String>) -> Universe {
             }
         }
     }
-    Universe {
+    Ok(Universe {
         value,
         iter: 0,
         pos: Rect::from(-10, -10, 10, 10),
-    }
+    })
 }
 
 pub fn get_length(u: &Universe) -> u16 {
@@ -209,11 +240,11 @@ mod test {
     #[test]
     fn test_from_string() {
         assert_eq!(
-            from_string(vec!["".to_string()]),
+            from_string(vec!["".to_string()]).unwrap(),
             Universe::from_pos(Rect::from(-10, -10, 10, 10))
         );
         assert_eq!(
-            from_string(vec!["⬛".to_string()]),
+            from_string(vec!["⬛".to_string()]).unwrap(),
             Universe {
                 value: HashMap::new(),
                 iter: 0,
@@ -221,7 +252,7 @@ mod test {
             }
         );
         assert_eq!(
-            from_string(vec!["⬜".to_string()]),
+            from_string(vec!["⬜".to_string()]).unwrap(),
             Universe {
                 value: HashMap::from([(CartesianPoint::from(0, 0), State::Alive)]),
                 iter: 0,
@@ -234,7 +265,8 @@ mod test {
                 "⬜⬛⬛⬛".to_string(),
                 "⬛⬛⬜⬛".to_string(),
                 "⬛⬛⬛⬛".to_string(),
-            ]),
+            ])
+            .unwrap(),
             Universe {
                 value: HashMap::from([
                     (CartesianPoint::from(1, 2), State::Alive),
@@ -372,13 +404,15 @@ mod test {
             "⬛⬛⬛⬛".to_string(),
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
-        ]);
+        ])
+        .unwrap();
         let state1 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬛⬛⬛".to_string(),
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(-2, 2));
         assert_eq!(u, state1);
         let state2 = from_string(vec![
@@ -386,7 +420,8 @@ mod test {
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬜⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(-1, 1));
         assert_eq!(u, state2);
         let state3 = from_string(vec![
@@ -394,7 +429,8 @@ mod test {
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬛⬜".to_string(),
             "⬜⬜⬜⬜".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(0, 0));
         assert_eq!(u, state3);
         let state4 = from_string(vec![
@@ -402,7 +438,8 @@ mod test {
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬛⬜".to_string(),
             "⬜⬜⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(1, -1));
         assert_eq!(u, state4);
         let state5 = from_string(vec![
@@ -410,7 +447,8 @@ mod test {
             "⬛⬜⬛⬛".to_string(),
             "⬜⬜⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(-2, -1));
         assert_eq!(u, state5);
         let state6 = from_string(vec![
@@ -418,7 +456,8 @@ mod test {
             "⬛⬜⬛⬛".to_string(),
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(-1, 0));
         assert_eq!(u, state6);
         let state7 = from_string(vec![
@@ -426,7 +465,8 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(0, 1));
         assert_eq!(u, state7);
         let state8 = from_string(vec![
@@ -434,21 +474,22 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         toggle_cell(&mut u, CartesianPoint::from(1, 2));
         assert_eq!(u, state8);
     }
 
     #[test]
     fn test_iterate() {
-        let mut model1x1iter0 = from_string(vec!["⬜".to_string()]);
-        let mut model1x1iter1 = from_string(vec!["⬛".to_string()]);
+        let mut model1x1iter0 = from_string(vec!["⬜".to_string()]).unwrap();
+        let mut model1x1iter1 = from_string(vec!["⬛".to_string()]).unwrap();
         model1x1iter1.iter = 1;
         iterate(&mut model1x1iter0);
         assert_eq!(model1x1iter0, model1x1iter1);
 
-        let mut model2x2iter0 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]);
-        let mut model2x2iter1 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]);
+        let mut model2x2iter0 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]).unwrap();
+        let mut model2x2iter1 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]).unwrap();
         model2x2iter1.iter = 1;
         iterate(&mut model2x2iter0);
         assert_eq!(model2x2iter0, model2x2iter1);
@@ -457,12 +498,14 @@ mod test {
             "⬛⬜⬛".to_string(),
             "⬛⬜⬛".to_string(),
             "⬛⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         let mut model3x3_1_iter1 = from_string(vec![
             "⬛⬛⬛".to_string(),
             "⬜⬜⬜".to_string(),
             "⬛⬛⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         model3x3_1_iter1.iter = 1;
         iterate(&mut model3x3_1_iter0);
         assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
@@ -471,12 +514,14 @@ mod test {
             "⬛⬛⬛".to_string(),
             "⬜⬜⬜".to_string(),
             "⬛⬛⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         let mut model3x3_2_iter1 = from_string(vec![
             "⬛⬜⬛".to_string(),
             "⬛⬜⬛".to_string(),
             "⬛⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         model3x3_2_iter1.iter = 1;
         iterate(&mut model3x3_2_iter0);
         assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
@@ -485,12 +530,14 @@ mod test {
             "⬛⬛⬜".to_string(),
             "⬜⬜⬜".to_string(),
             "⬛⬛⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         let mut model3x3_3_iter1 = from_string(vec![
             "⬛⬛⬜".to_string(),
             "⬛⬜⬜".to_string(),
             "⬛⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         model3x3_3_iter1.iter = 1;
         iterate(&mut model3x3_3_iter0);
         assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
@@ -499,12 +546,14 @@ mod test {
             "⬛⬛⬜".to_string(),
             "⬛⬜⬜".to_string(),
             "⬛⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         let mut model3x3_4_iter1 = from_string(vec![
             "⬛⬜⬜".to_string(),
             "⬛⬜⬜".to_string(),
             "⬛⬜⬜".to_string(),
-        ]);
+        ])
+        .unwrap();
         model3x3_4_iter1.iter = 1;
         iterate(&mut model3x3_4_iter0);
         assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
@@ -513,12 +562,14 @@ mod test {
             "⬜⬜⬛".to_string(),
             "⬜⬜⬜".to_string(),
             "⬛⬜⬛".to_string(),
-        ]);
+        ])
+        .unwrap();
         let mut model3x3_5_iter1 = from_string(vec![
             "⬜⬛⬜".to_string(),
             "⬛⬛⬜".to_string(),
             "⬜⬜⬜".to_string(),
-        ]);
+        ])
+        .unwrap();
         model3x3_5_iter1.iter = 1;
         iterate(&mut model3x3_5_iter0);
         assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
