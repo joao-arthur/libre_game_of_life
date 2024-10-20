@@ -68,8 +68,8 @@ pub struct Square {
 }
 
 pub trait DrawContext {
-    fn clear(self, s: Square);
-    fn draw_square(self, s: Square, color: String);
+    fn clear(&self, s: Square);
+    fn draw_square(&self, s: Square, color: String);
 }
 
 #[derive(Clone)]
@@ -78,17 +78,21 @@ pub struct Holder {
 }
 
 impl DrawContext for Holder {
-    fn clear(self, s: Square) {
+    fn clear(&self, s: Square) {
         self.context.set_fill_style_str("white");
         self.context
             .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 
-    fn draw_square(self, s: Square, color: String) {
+    fn draw_square(&self, s: Square, color: String) {
         self.context.set_fill_style_str(&color);
         self.context
             .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
+}
+
+unsafe impl Send for Holder {
+
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -177,6 +181,7 @@ const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render() {
     let mut model = get_instance();
+    let holder = model.holder.as_ref().unwrap();
     let length = get_length(&model.universe);
     let cell_size = get_cell_size(&model.universe, model.settings.dim);
     let middle_cell = get_middle_cell(&model.universe, model.settings.dim);
@@ -185,7 +190,7 @@ fn render() {
         y: 0,
         size: model.settings.dim.into(),
     };
-    //model.holder.unwrap().draw_square(background, DEAD_COLOR.to_string());
+    holder.draw_square(background, DEAD_COLOR.to_string());
     model.universe.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
         let s = Square {
@@ -193,7 +198,7 @@ fn render() {
             y: arr_index.row as i64 * cell_size as i64 + model.settings.gap as i64 + middle_cell.y,
             size: cell_size as u64 - model.settings.gap as u64 * 2,
         };
-        //model.holder.unwrap().draw_square(s, ALIVE_COLOR.to_string());
+        holder.draw_square(s, ALIVE_COLOR.to_string());
     });
 }
 
@@ -214,7 +219,7 @@ pub fn run_interval_controller() -> Sender<Command> {
                         interval = Some(Interval::new(
                             fps_to_mili(model.settings.fps).into(),
                             || {
-                                control_iterate();
+                                app_iterate();
                                 render();
                             },
                         ));
@@ -231,10 +236,18 @@ pub fn run_interval_controller() -> Sender<Command> {
     tx
 }
 
-pub fn init() {
+pub fn app_init(
+    context: CanvasRenderingContext2d,
+) {
+    let mut model = get_instance();
+    model.holder = Some(Box::new(Holder { context }));
+    
+    
     let interval: Arc<Mutex<Option<Interval>>> = Arc::new(Mutex::new(None));
     let controller = run_interval_controller();
 
+
+    
     add_on_change_listener({
         let interval = Arc::clone(&interval);
         move |prop| {
@@ -259,10 +272,10 @@ pub fn init() {
         }
     });
     render();
-    // control_pause();
+    // app_pause();
 }
 
-pub fn control_pause() {
+pub fn app_pause() {
     let mut model = get_instance();
     model.settings.status = Status::Paused;
 
@@ -272,7 +285,7 @@ pub fn control_pause() {
     }
 }
 
-pub fn control_resume() {
+pub fn app_resume() {
     let mut model = get_instance();
     model.settings.status = Status::Resumed;
 
@@ -282,7 +295,7 @@ pub fn control_resume() {
     }
 }
 
-pub fn control_set_dimension(dim: u16) {
+pub fn app_set_dimension(dim: u16) {
     let mut model = get_instance();
     model.settings.dim = dim;
 
@@ -292,7 +305,7 @@ pub fn control_set_dimension(dim: u16) {
     }
 }
 
-pub fn control_set_gap(gap: u16) {
+pub fn app_set_gap(gap: u16) {
     let mut model = get_instance();
     model.settings.gap = gap;
 
@@ -302,7 +315,7 @@ pub fn control_set_gap(gap: u16) {
     }
 }
 
-pub fn control_set_fps(fps: u16) {
+pub fn app_set_fps(fps: u16) {
     let mut model = get_instance();
     model.settings.fps = fps;
 
@@ -312,7 +325,7 @@ pub fn control_set_fps(fps: u16) {
     }
 }
 
-pub fn control_set_preset(preset: String) {
+pub fn app_set_preset(preset: String) {
     let mut model = get_instance();
     if let Some(selected_preset) = get_preset(&preset) {
         model.universe = selected_preset;
@@ -328,7 +341,7 @@ pub fn control_set_preset(preset: String) {
     }
 }
 
-pub fn control_single_iteration() {
+pub fn app_single_iteration() {
     let mut model = get_instance();
     model.settings.status = Status::Paused;
     iterate(&mut model.universe);
@@ -342,7 +355,7 @@ pub fn control_single_iteration() {
     }
 }
 
-pub fn control_iterate() {
+pub fn app_iterate() {
     let mut model = get_instance();
     iterate(&mut model.universe);
 
@@ -352,7 +365,7 @@ pub fn control_iterate() {
     }
 }
 
-pub fn control_toggle_model_cell(point: CartesianPoint) {
+pub fn app_toggle_model_cell(point: CartesianPoint) {
     let mut model = get_instance();
     toggle_cell(&mut model.universe, point);
     model.settings.preset = None;
@@ -366,7 +379,7 @@ pub fn control_toggle_model_cell(point: CartesianPoint) {
     }
 }
 
-pub fn control_zoom(new_size: u16) {
+pub fn app_zoom(new_size: u16) {
     let mut model = get_instance();
     zoom(&mut model.universe, new_size);
 
@@ -376,7 +389,7 @@ pub fn control_zoom(new_size: u16) {
     }
 }
 
-pub fn control_move_model(delta: CartesianPoint) {
+pub fn app_move_model(delta: CartesianPoint) {
     let mut model = get_instance();
     move_in_plane(&mut model.universe, delta);
 
@@ -386,7 +399,7 @@ pub fn control_move_model(delta: CartesianPoint) {
     }
 }
 
-pub fn control_get_settings() -> Settings {
+pub fn app_get_settings() -> Settings {
     get_instance().settings.clone()
 }
 
@@ -411,10 +424,10 @@ mod test {
             }
         );
         assert_eq!(get_instance().universe, get_preset_unsafe("block"));
-        let settings = control_get_settings();
+        let settings = app_get_settings();
         assert_eq!(get_instance().settings, settings);
 
-        control_pause();
+        app_pause();
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -426,7 +439,7 @@ mod test {
             }
         );
 
-        control_resume();
+        app_resume();
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -438,7 +451,7 @@ mod test {
             }
         );
 
-        control_set_dimension(1080);
+        app_set_dimension(1080);
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -450,7 +463,7 @@ mod test {
             }
         );
 
-        control_set_gap(2);
+        app_set_gap(2);
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -462,7 +475,7 @@ mod test {
             }
         );
 
-        control_set_fps(60);
+        app_set_fps(60);
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -474,7 +487,7 @@ mod test {
             }
         );
 
-        control_set_preset("Gaius Julius Caesar".to_string());
+        app_set_preset("Gaius Julius Caesar".to_string());
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -485,7 +498,7 @@ mod test {
                 status: Status::Resumed,
             }
         );
-        control_set_preset("r_pentomino".to_string());
+        app_set_preset("r_pentomino".to_string());
         assert_eq!(
             get_instance().settings,
             Settings {
@@ -496,8 +509,8 @@ mod test {
                 status: Status::Resumed,
             }
         );
-        control_set_preset("block".to_string());
-        control_iterate();
+        app_set_preset("block".to_string());
+        app_iterate();
         let block = get_preset_unsafe("block");
         assert_eq!(
             get_instance().universe,
@@ -518,7 +531,7 @@ mod test {
             }
         );
 
-        control_single_iteration();
+        app_single_iteration();
         assert_eq!(
             get_instance().universe,
             Universe {
@@ -538,7 +551,7 @@ mod test {
             }
         );
 
-        control_zoom(41);
+        app_zoom(41);
         assert_eq!(
             get_instance().universe,
             Universe {
@@ -548,7 +561,7 @@ mod test {
             }
         );
 
-        control_move_model(CartesianPoint::from(20, 20));
+        app_move_model(CartesianPoint::from(20, 20));
         assert_eq!(
             get_instance().universe,
             Universe {
@@ -558,7 +571,7 @@ mod test {
             }
         );
 
-        control_toggle_model_cell(CartesianPoint::from(0, 0));
+        app_toggle_model_cell(CartesianPoint::from(0, 0));
         assert_eq!(
             get_instance().universe,
             Universe {
