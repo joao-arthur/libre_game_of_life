@@ -99,7 +99,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "gosperGliderGun".to_string(),
+            "gosper_glider_gun".to_string(),
             from_string(vec![
                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
                 "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
@@ -310,7 +310,7 @@ pub fn get_preset_groups() -> Vec<PresetGroup> {
                 id: "general".to_string(),
                 items: vec![Preset {
                     name: "Gosper glider gun".to_string(),
-                    id: "gosperGliderGun".to_string(),
+                    id: "gosper_glider_gun".to_string(),
                     discover: PresetDiscover {
                         name: "Bill Gosper".to_string(),
                         year: 1970,

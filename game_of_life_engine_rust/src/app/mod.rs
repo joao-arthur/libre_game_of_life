@@ -1,18 +1,16 @@
 use gloo_timers::callback::Interval;
-use std::{
-    borrow::Borrow,
-    cell::RefCell,
-    panic,
-    sync::{Arc, Mutex},
-};
-use web_sys::{console, CanvasRenderingContext2d};
+use std::cell::RefCell;
+use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    plane::cartesian::{to_matrix, CartesianPoint},
+    plane::{
+        cartesian::{absolute_to_relative, from_matrix, to_matrix, CartesianPoint},
+        matrix::MatrixPoint,
+    },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     universe::{
-        get_cell_size, get_length, get_middle_cell, iterate, move_in_plane, toggle_cell, zoom,
-        Universe,
+        get_cell_size, get_length, get_middle_cell, get_middle_point, iterate, move_in_plane,
+        toggle_cell, zoom, Universe,
     },
 };
 
@@ -154,7 +152,6 @@ where
 }
 
 fn on_change(param: Prop) {
-    console::log_1(&format!("[onChange {:?} ]", param.clone()).into());
     LISTENERS.with_borrow_mut(|l| {
         for cb in l.iter_mut() {
             cb(param.clone());
@@ -194,8 +191,6 @@ fn render() {
             y: arr_index.row as i64 * cell_size as i64 + settings.gap as i64 + middle_cell.y,
             size: cell_size as u64 - settings.gap as u64 * 2,
         };
-        console::log_3(&s.x.into(), &s.y.into(), &s.size.into());
-
         holder.draw_square(s, ALIVE_COLOR.to_string());
     });
 }
@@ -220,7 +215,6 @@ pub fn app_init(context: CanvasRenderingContext2d) {
                                 i.cancel();
                             }
                         }
-
                         let fps = MODEL.with(|i| i.borrow().settings.fps);
                         interval = Some(Interval::new(fps_to_mili(fps).into(), || {
                             app_iterate();
@@ -288,15 +282,15 @@ pub fn app_set_fps(fps: u16) {
 }
 
 pub fn app_set_preset(preset: String) {
-    MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        if let Some(selected_preset) = get_preset(&preset) {
+    if let Some(selected_preset) = get_preset(&preset) {
+        MODEL.with(|i| {
+            let mut model = i.borrow_mut();
             model.universe = selected_preset;
             model.settings.preset = Some(preset);
-        }
-    });
-    on_change(Prop::Universe);
-    on_change(Prop::Preset);
+        });
+        on_change(Prop::Universe);
+        on_change(Prop::Preset);
+    }
 }
 
 pub fn app_single_iteration() {
@@ -327,6 +321,37 @@ pub fn app_toggle_model_cell(point: CartesianPoint) {
     on_change(Prop::Preset);
 }
 
+pub fn app_toggle_model_cell_by_point(point: CartesianPoint) {
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        let length = get_length(&model.universe);
+        let middle_point = get_middle_point(&model.universe);
+        let cell_size = get_cell_size(&model.universe, model.settings.dim);
+        if cell_size <= 0 {
+            return;
+        }
+        let col = absolute_to_relative(point.x, cell_size.into());
+        let row = absolute_to_relative(point.y, cell_size.into());
+        if col > 0 && row > 0 {
+            let point = from_matrix(
+                MatrixPoint {
+                    row: row.try_into().unwrap(),
+                    col: col.try_into().unwrap(),
+                },
+                length.into(),
+            );
+            let cell = CartesianPoint {
+                x: point.x + middle_point.x,
+                y: point.y + middle_point.y,
+            };
+            toggle_cell(&mut model.universe, cell);
+            model.settings.preset = None;
+        }
+    });
+    on_change(Prop::Universe);
+    on_change(Prop::Preset);
+}
+
 pub fn app_zoom(new_size: u16) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
@@ -343,8 +368,31 @@ pub fn app_move_model(delta: CartesianPoint) {
     on_change(Prop::Universe);
 }
 
-pub fn app_get_settings() -> Settings {
-    MODEL.with(|i| i.borrow().settings.clone())
+#[derive(Debug, PartialEq)]
+pub struct AppInfo {
+    pub preset: Option<String>,
+    pub gap: u16,
+    pub size: u16,
+    pub fps: u16,
+    pub status: Status,
+    pub iter: u64,
+}
+
+pub fn app_get_settings() -> AppInfo {
+    MODEL.with(|i| {
+        let m = i.borrow();
+        let s = m.settings.clone();
+        let u = m.universe.clone();
+        AppInfo {
+            preset: s.preset,
+            gap: s.gap,
+            // TODO remove size from model, as it is a ui specific thing
+            size: get_length(&u),
+            fps: s.fps,
+            status: s.status,
+            iter: u.iter,
+        }
+    })
 }
 
 #[cfg(test)]
@@ -371,7 +419,17 @@ mod test {
             get_preset_unsafe("block")
         );
         let settings = app_get_settings();
-        assert_eq!(MODEL.with(|i| i.borrow().settings.clone()), settings);
+        assert_eq!(
+            AppInfo {
+                preset: Some("block".to_string()),
+                gap: 0,
+                size: 21,
+                fps: 4,
+                status: Status::Paused,
+                iter: 0,
+            },
+            settings
+        );
 
         app_pause();
         assert_eq!(

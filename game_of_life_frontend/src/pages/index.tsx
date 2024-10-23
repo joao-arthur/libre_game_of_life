@@ -2,14 +2,16 @@ import type { MouseEvent, ReactElement } from "react";
 import { useEffect, useRef, useState } from "react";
 import initWASM, {
     EngineCartesianPoint,
+    engineGetPresets,
     engineMove,
     enginePause,
     engineResume,
-    engineSetDimension,
     engineSetFPS,
     engineSetGap,
     engineSetPreset,
     engineSingleIteration,
+    engineToggleByPoint,
+    engineZoom,
     EngineStatus,
 } from "game_of_life_engine";
 import { Button } from "../components/Button";
@@ -21,27 +23,17 @@ import { useGameOfLife } from "../hooks/useGameOfLife";
 export default function Main(): ReactElement {
     const { init, model } = useGameOfLife();
     const [presets, setPresets] = useState<any[]>([]);
-    const [preset, setPreset] = useState<string>(undefined!);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimension = useWindowDimension();
 
-    //const modelLength = model ? Number(getModelLength({ Ok: model.model })) : 0;
-    let modelLength = 1000;
-
     useEffect(() => {
-        globalThis.setTimeout(() => {
-            initWASM().then(() => {
-                if (!canvasRef.current) {
-                    return;
-                }
-                console.log("dfffff");
-                init(canvasRef.current);
-            });
-        }, 1000);
-    }, []);
-
-    useEffect(() => {
-        //  setPresets(getPresetGroups());
+        initWASM().then(() => {
+            if (!canvasRef.current) {
+                return;
+            }
+            init(canvasRef.current);
+            setPresets(engineGetPresets());
+        });
     }, []);
 
     useEffect(() => {
@@ -77,23 +69,13 @@ export default function Main(): ReactElement {
         if (!model) {
             return;
         }
-        /*  const x = e.pageX - e.currentTarget.offsetLeft;
+        const x = e.pageX - e.currentTarget.offsetLeft;
         const y = e.pageY - e.currentTarget.offsetTop;
-        const length = getModelLength({ Ok: model.model });
-        const middlePoint = getModelMiddlePoint({ Ok: model.model });
-        const cellSize = getModelCellSize({ Ok: model.model }, model.dimension);
-        if (cellSize <= 0) {
-            return;
-        }
-        const col = absoluteToRelative(BigInt(x), cellSize);
-        const row = absoluteToRelative(BigInt(y), cellSize);
-        const point = indexToPoint(new ArrPos(BigInt(row), BigInt(col)), BigInt(length));
-        const cell = new EngineCartesianPoint(
-            BigInt(Number(point.x + middlePoint.x)),
-            BigInt(Number(point.y + middlePoint.y)),
+        const point = new EngineCartesianPoint(
+            BigInt(Number(x)),
+            BigInt(Number(y)),
         );
-        engineToggle(cell);
-        setPreset("");*/
+        engineToggleByPoint(point);
     }
 
     function handleToggle(): void {
@@ -109,11 +91,11 @@ export default function Main(): ReactElement {
     }
 
     function zoom(offset: number) {
-        //if (!model) return;
-        //const newSize = Number(getModelLength({ Ok: model.model })) + offset;
-        //if (newSize < 2) return;
-        //if (newSize > 120) return;
-        //engineZoom(newSize);
+        if (!model) return;
+        const newSize = model.size + offset;
+        if (newSize < 2) return;
+        if (newSize > 120) return;
+        engineZoom(newSize);
     }
 
     function zoomIn() {
@@ -145,16 +127,14 @@ export default function Main(): ReactElement {
                         groups={presets.map((group: any) => ({
                             label: group.info.name,
                             value: group.info.id,
-                            options: group.sub_groups
-                                .flatMap((subGroup: any) => subGroup.items)
+                            options: group.items
                                 .map((item: any) => ({
                                     label: item.name,
                                     value: item.id,
                                 })),
                         }))}
-                        value={preset}
+                        value={model?.preset || ""}
                         onChange={(preset) => {
-                            setPreset(preset);
                             engineSetPreset(preset);
                         }}
                     />
@@ -182,14 +162,14 @@ export default function Main(): ReactElement {
                     <div className="flex">
                         <RangeInput
                             id="size"
-                            min={2 + (model ? modelLength % 2 === 0 ? 0 : 1 : 0)}
-                            max={200 + (model ? modelLength % 2 === 0 ? 0 : 1 : 0)}
+                            min={2 + (model ? model.size % 2 === 0 ? 0 : 1 : 0)}
+                            max={200 + (model ? model.size % 2 === 0 ? 0 : 1 : 0)}
                             step={2}
-                            value={model ? modelLength : 0}
-                            onChange={(size) => engineSetDimension(size)}
+                            value={model ? model.size : 0}
+                            onChange={(size) => engineZoom(size)}
                         />
                         <label className="w-8 text-center block">
-                            {model ? modelLength : 0}
+                            {model ? model.size : 0}
                         </label>
                     </div>
                 </div>
@@ -213,7 +193,7 @@ export default function Main(): ReactElement {
                 </div>
                 <span className="my-1">
                     <label>
-                        Iteration: {0}
+                        Iteration: {model ? Number(model.iter) : 0}
                     </label>
                 </span>
                 <Button

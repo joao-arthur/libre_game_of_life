@@ -1,26 +1,28 @@
 import { useEffect, useState } from "react";
 import {
+    engineAddOnChangeListener,
     engineGetSettings,
+    EngineInfo,
     engineInit,
     engineSetDimension,
-    EngineSettings,
 } from "game_of_life_engine";
 import { useWindowDimension } from "./useWindowDimension";
 
 type GameOfLife = {
     readonly init: (canvasElement: HTMLCanvasElement) => void;
-    readonly model: EngineSettings | undefined;
+    readonly model: EngineInfo | undefined;
 };
 
 export function useGameOfLife(): GameOfLife {
-    const [model, setModel] = useState<EngineSettings | undefined>(undefined);
+    const [hasInited, setInit] = useState(false);
+    const [model, setModel] = useState<EngineInfo | undefined>(undefined);
     const dimension = useWindowDimension();
 
     useEffect(() => {
-        if (model) {
+        if (hasInited) {
             engineSetDimension(dimension);
         }
-    }, [dimension, model]);
+    }, [dimension, hasInited]);
 
     function init(canvasElement: HTMLCanvasElement) {
         const context = canvasElement.getContext("2d");
@@ -29,17 +31,19 @@ export function useGameOfLife(): GameOfLife {
         }
 
         engineInit(context);
-        let obj = engineGetSettings();
-        //engineAddOnChangeListener(() => {
-        //    console.log(engineGetSettings());
-        //});
-        setModel({
-            dim: obj.dim,
-            fps: obj.fps,
-            gap: obj.gap,
-            preset: obj.preset,
-            status: obj.status,
-        } as any);
+
+        engineAddOnChangeListener(() => {
+            let obj = engineGetSettings();
+            setModel({
+                size: obj.size,
+                fps: obj.fps,
+                gap: obj.gap,
+                preset: obj.preset,
+                iter: obj.iter,
+                status: obj.status,
+            } as any);
+        });
+        setInit(true);
     }
 
     return { init, model };
