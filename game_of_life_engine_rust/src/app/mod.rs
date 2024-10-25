@@ -3,15 +3,16 @@ use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
+    camera::{
+        get_division_size, get_length, get_middle_cell, get_middle_point, move_by, zoom_in,
+        zoom_out, zoom_to, Rect,
+    },
     plane::{
         cartesian::{absolute_to_relative, from_matrix, to_matrix, CartesianPoint},
         matrix::MatrixPoint,
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
-    universe::{
-        get_cell_size, get_length, get_middle_cell, get_middle_point, iterate, move_in_plane,
-        toggle_cell, zoom, Universe,
-    },
+    universe::{iterate, toggle_cell, Universe},
 };
 
 pub struct PresetOptionItem {
@@ -102,6 +103,7 @@ pub struct Settings {
     pub fps: u16,
     pub status: Status,
     pub dim: u16,
+    pub cam: Rect,
 }
 
 pub struct Model {
@@ -120,6 +122,7 @@ impl Default for Model {
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
+                cam: Rect::from(-10, -10, 9, 9),
             },
             holder: None,
         }
@@ -142,6 +145,7 @@ pub enum Prop {
     FPS,
     Status,
     Dim,
+    Cam,
 }
 
 pub fn add_on_change_listener<F>(cb: F)
@@ -168,16 +172,13 @@ const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render() {
     let (universe, settings, holder) = MODEL.with(|i| {
-        (
-            i.borrow().universe.clone(),
-            i.borrow().settings.clone(),
-            i.borrow().holder.clone(),
-        )
+        let m = i.borrow();
+        (m.universe.clone(), m.settings.clone(), m.holder.clone())
     });
     let holder = holder.unwrap();
-    let length = get_length(&universe);
-    let cell_size = get_cell_size(&universe, settings.dim);
-    let middle_cell = get_middle_cell(&universe, settings.dim);
+    let length = get_length(&settings.cam);
+    let cell_size = get_division_size(&settings.cam, settings.dim);
+    let middle_cell = get_middle_cell(&settings.cam, settings.dim);
     let background = Square {
         x: 0,
         y: 0,
@@ -224,7 +225,7 @@ pub fn app_init(context: CanvasRenderingContext2d) {
                     _ => {}
                 },
                 Status::Paused => match prop {
-                    Prop::Gap | Prop::Dim | Prop::Universe => {
+                    Prop::Gap | Prop::Dim | Prop::Universe | Prop::Cam => {
                         render();
                     }
                     Prop::Status => {
@@ -311,7 +312,7 @@ pub fn app_iterate() {
     on_change(Prop::Universe);
 }
 
-pub fn app_toggle_model_cell(point: CartesianPoint) {
+pub fn app_toggle_by_point(point: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         toggle_cell(&mut model.universe, point);
@@ -321,12 +322,12 @@ pub fn app_toggle_model_cell(point: CartesianPoint) {
     on_change(Prop::Preset);
 }
 
-pub fn app_toggle_model_cell_by_point(point: CartesianPoint) {
+pub fn app_toggle_model_cell_by_absolute_point(point: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        let length = get_length(&model.universe);
-        let middle_point = get_middle_point(&model.universe);
-        let cell_size = get_cell_size(&model.universe, model.settings.dim);
+        let length = get_length(&model.settings.cam);
+        let middle_point = get_middle_point(&model.settings.cam);
+        let cell_size = get_division_size(&model.settings.cam, model.settings.dim);
         if cell_size <= 0 {
             return;
         }
@@ -352,18 +353,34 @@ pub fn app_toggle_model_cell_by_point(point: CartesianPoint) {
     on_change(Prop::Preset);
 }
 
-pub fn app_zoom(new_size: u16) {
+pub fn app_zoom_in() {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        zoom(&mut model.universe, new_size);
+        zoom_in(&mut model.settings.cam);
     });
-    on_change(Prop::Universe);
+    on_change(Prop::Cam);
+}
+
+pub fn app_zoom_out() {
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        zoom_out(&mut model.settings.cam);
+    });
+    on_change(Prop::Cam);
+}
+
+pub fn app_zoom_to(new_size: u16) {
+    MODEL.with(|i| {
+        let mut model = i.borrow_mut();
+        zoom_to(&mut model.settings.cam, new_size);
+    });
+    on_change(Prop::Cam);
 }
 
 pub fn app_move_model(delta: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        move_in_plane(&mut model.universe, delta);
+        move_by(&mut model.settings.cam, delta);
     });
     on_change(Prop::Universe);
 }
@@ -386,8 +403,7 @@ pub fn app_get_settings() -> AppInfo {
         AppInfo {
             preset: s.preset,
             gap: s.gap,
-            // TODO remove size from model, as it is a ui specific thing
-            size: get_length(&u),
+            size: get_length(&s.cam).try_into().unwrap(),
             fps: s.fps,
             status: s.status,
             iter: u.iter,
@@ -397,7 +413,7 @@ pub fn app_get_settings() -> AppInfo {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::{cell::State, plane::Rect};
+    use crate::domain::cell::State;
     use std::collections::HashMap;
 
     use super::*;
@@ -412,6 +428,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
         assert_eq!(
@@ -423,7 +440,7 @@ mod test {
             AppInfo {
                 preset: Some("block".to_string()),
                 gap: 0,
-                size: 21,
+                size: 20,
                 fps: 4,
                 status: Status::Paused,
                 iter: 0,
@@ -440,6 +457,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
@@ -452,6 +470,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
@@ -464,6 +483,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
@@ -476,6 +496,7 @@ mod test {
                 gap: 2,
                 fps: 4,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
@@ -488,6 +509,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
@@ -500,6 +522,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
         app_set_preset("r_pentomino".to_string());
@@ -511,6 +534,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
         app_set_preset("block".to_string());
@@ -520,7 +544,6 @@ mod test {
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 1,
-                pos: Rect::from(-10, -10, 10, 10),
                 value: block.value.clone()
             }
         );
@@ -532,6 +555,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
@@ -540,7 +564,6 @@ mod test {
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
-                pos: Rect::from(-10, -10, 10, 10),
                 value: block.value.clone()
             }
         );
@@ -552,16 +575,44 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Paused,
+                cam: Rect::from(-10, -10, 9, 9),
             }
         );
 
-        app_zoom(41);
+        app_zoom_to(40);
         assert_eq!(
-            MODEL.with(|i| i.borrow().universe.clone()),
-            Universe {
-                iter: 2,
-                pos: Rect::from(-20, -20, 20, 20),
-                value: block.value.clone()
+            MODEL.with(|i| i.borrow().settings.clone()),
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Paused,
+                cam: Rect::from(-20, -20, 19, 19),
+            }
+        );
+        app_zoom_in();
+        assert_eq!(
+            MODEL.with(|i| i.borrow().settings.clone()),
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Paused,
+                cam: Rect::from(-19, -19, 18, 18),
+            }
+        );
+        app_zoom_out();
+        assert_eq!(
+            MODEL.with(|i| i.borrow().settings.clone()),
+            Settings {
+                preset: Some(String::from("block")),
+                dim: 1080,
+                gap: 2,
+                fps: 60,
+                status: Status::Paused,
+                cam: Rect::from(-20, -20, 19, 19),
             }
         );
 
@@ -570,17 +621,15 @@ mod test {
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
-                pos: Rect::from(0, 0, 40, 40),
                 value: block.value.clone()
             }
         );
 
-        app_toggle_model_cell(CartesianPoint::from(0, 0));
+        app_toggle_by_point(CartesianPoint::from(0, 0));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 iter: 2,
-                pos: Rect::from(0, 0, 40, 40),
                 value: HashMap::from([
                     (CartesianPoint::from(-1, 1), State::Alive),
                     (CartesianPoint::from(0, 1), State::Alive),

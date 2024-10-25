@@ -3,16 +3,18 @@ import { useEffect, useRef, useState } from "react";
 import initWASM, {
     EngineCartesianPoint,
     engineGetPresets,
-    engineMove,
+    engineMoveBy,
     enginePause,
     engineResume,
     engineSetFPS,
     engineSetGap,
     engineSetPreset,
     engineSingleIteration,
-    engineToggleByPoint,
-    engineZoom,
     EngineStatus,
+    engineToggle,
+    engineZoomIn,
+    engineZoomOut,
+    engineZoomTo,
 } from "game_of_life_engine";
 import { Button } from "../components/Button";
 import { RangeInput } from "../components/RangeInput";
@@ -40,22 +42,22 @@ export default function Main(): ReactElement {
         function onKeyPress(e: KeyboardEvent) {
             switch (e.key) {
                 case "w":
-                    engineMove(new EngineCartesianPoint(BigInt(0), BigInt(1)));
+                    engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(1)));
                     break;
                 case "a":
-                    engineMove(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
+                    engineMoveBy(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
                     break;
                 case "s":
-                    engineMove(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
+                    engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
                     break;
                 case "d":
-                    engineMove(new EngineCartesianPoint(BigInt(1), BigInt(0)));
+                    engineMoveBy(new EngineCartesianPoint(BigInt(1), BigInt(0)));
                     break;
                 case "+":
-                    zoomIn();
+                    engineZoomIn();
                     break;
                 case "-":
-                    zoomOut();
+                    engineZoomOut();
                     break;
             }
         }
@@ -75,7 +77,7 @@ export default function Main(): ReactElement {
             BigInt(Number(x)),
             BigInt(Number(y)),
         );
-        engineToggleByPoint(point);
+        engineToggle(point);
     }
 
     function handleToggle(): void {
@@ -88,22 +90,6 @@ export default function Main(): ReactElement {
                 engineResume();
                 break;
         }
-    }
-
-    function zoom(offset: number) {
-        if (!model) return;
-        const newSize = model.size + offset;
-        if (newSize < 2) return;
-        if (newSize > 120) return;
-        engineZoom(newSize);
-    }
-
-    function zoomIn() {
-        zoom(-2);
-    }
-
-    function zoomOut() {
-        zoom(+2);
     }
 
     return (
@@ -166,7 +152,7 @@ export default function Main(): ReactElement {
                             max={200 + (model ? model.size % 2 === 0 ? 0 : 1 : 0)}
                             step={2}
                             value={model ? model.size : 0}
-                            onChange={(size) => engineZoom(size)}
+                            onChange={(size) => engineZoomTo(size)}
                         />
                         <label className="w-8 text-center block">
                             {model ? model.size : 0}
