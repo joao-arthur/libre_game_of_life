@@ -429,7 +429,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
         assert_eq!(
@@ -441,7 +441,7 @@ mod test {
             AppInfo {
                 preset: Some("block".to_string()),
                 gap: 0,
-                size: 20,
+                size: 10,
                 fps: 4,
                 status: Status::Paused,
                 iter: 0,
@@ -458,7 +458,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -471,7 +471,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -484,7 +484,7 @@ mod test {
                 gap: 0,
                 fps: 4,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -497,7 +497,7 @@ mod test {
                 gap: 2,
                 fps: 4,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -510,7 +510,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -523,7 +523,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
         app_set_preset("r_pentomino".to_string());
@@ -535,7 +535,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -5, 5, 5),
             }
         );
         app_set_preset("block".to_string());
@@ -556,7 +556,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -576,7 +576,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam: Rect::from(-5, -4, 4, 5),
             }
         );
 
@@ -589,7 +589,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-20, -20, 19, 19),
+                cam: Rect::from(-20, -19, 19, 20),
             }
         );
         app_zoom_in();
@@ -601,7 +601,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-19, -19, 18, 18),
+                cam: Rect::from(-19, -18, 18, 19),
             }
         );
         app_zoom_out();
@@ -613,7 +613,7 @@ mod test {
                 gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-20, -20, 19, 19),
+                cam: Rect::from(-20, -19, 19, 20),
             }
         );
 

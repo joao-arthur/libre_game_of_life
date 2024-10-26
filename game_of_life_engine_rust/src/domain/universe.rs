@@ -4,18 +4,13 @@ use std::{
 };
 
 use crate::domain::{
-    camera::get_center,
+    camera::{get_center, get_length, get_subdivision_size, Rect},
     cell::{self, State},
     neighbor::number_of_alive_from_model,
     plane::{
-        cartesian::{from_matrix, CartesianPoint},
+        cartesian::{from_matrix, subdivide, CartesianPoint},
         matrix::MatrixPoint,
     },
-};
-
-use super::{
-    camera::{center, get_length, get_subdivision_size, Rect},
-    plane::cartesian::subdivide,
 };
 
 #[derive(Debug, PartialEq, Clone)]
@@ -42,7 +37,7 @@ impl Default for Universe {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct InvalidCharacterError;
 
 impl fmt::Display for InvalidCharacterError {
@@ -51,7 +46,7 @@ impl fmt::Display for InvalidCharacterError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct InvalidLengthError;
 
 impl fmt::Display for InvalidLengthError {
@@ -63,16 +58,31 @@ impl fmt::Display for InvalidLengthError {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum FromStringError {
     InvalidCharacter(InvalidCharacterError),
     InvalidLength(InvalidLengthError),
 }
 
 pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
+    if !as_str
+        .join("")
+        .replace("⬜", "")
+        .replace("⬛", "")
+        .is_empty()
+    {
+        return Err(FromStringError::InvalidCharacter(InvalidCharacterError));
+    }
     let mut value = HashMap::<CartesianPoint, State>::new();
     let len = as_str.len();
-    // TODO errors
+    let lines_len: HashSet<usize> = as_str.iter().map(|row| row.len()).collect();
+    if lines_len.len() > 1 {
+        return Err(FromStringError::InvalidLength(InvalidLengthError));
+    }
+    let lines_len = as_str.get(0).unwrap().len();
+    if lines_len / 3 != len {
+        return Err(FromStringError::InvalidLength(InvalidLengthError));
+    }
     let row_iter = as_str.iter().enumerate();
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
@@ -81,8 +91,8 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
                 value.insert(
                     from_matrix(
                         MatrixPoint {
-                            col: col.try_into().unwrap(),
                             row: row.try_into().unwrap(),
+                            col: col.try_into().unwrap(),
                         },
                         len.try_into().unwrap(),
                     ),
@@ -91,7 +101,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
             }
         }
     }
-    Ok(Universe { value, iter: 0 })
+    Ok(Universe::from(value))
 }
 
 pub fn get_value(u: &Universe, point: CartesianPoint) -> State {
@@ -181,8 +191,8 @@ pub fn toggle_cell_by_absolute_point(
 pub fn get_camera(u: &Universe) -> Rect {
     let xx: Vec<i64> = u.value.iter().map(|v| v.0.x).collect();
     let yy: Vec<i64> = u.value.iter().map(|v| v.0.y).collect();
-    let min_x = xx.iter().min().unwrap().to_owned();
-    let min_y = yy.iter().min().unwrap().to_owned();
+    let mut min_x = xx.iter().min().unwrap().to_owned();
+    let mut min_y = yy.iter().min().unwrap().to_owned();
     let mut max_x = xx.iter().max().unwrap().to_owned();
     let mut max_y = yy.iter().max().unwrap().to_owned();
     let points = Rect {
@@ -191,31 +201,27 @@ pub fn get_camera(u: &Universe) -> Rect {
         x2: max_x,
         y2: max_y,
     };
-    let center_point = get_center(&points);
     let len_x = max_x - min_x + 1;
     let len_y = max_y - min_y + 1;
     if len_x > len_y {
         let diff = len_x - len_y;
-        max_y += diff;
+        let diff_start = diff / 2;
+        let diff_end = diff - diff_start;
+        min_y -= diff_start;
+        max_y += diff_end;
     }
     if len_y > len_x {
         let diff = len_y - len_x;
-        max_x += diff;
-    }
-    let mut centered = Rect {
-        x1: min_x,
-        y1: min_y,
-        x2: max_x,
-        y2: max_y,
-    };
-    if len_x != len_y {
-        center(&mut centered, center_point);
+        let diff_start = diff / 2;
+        let diff_end = diff - diff_start;
+        min_x -= diff_start;
+        max_x += diff_end;
     }
     Rect {
-        x1: centered.x1 - 2,
-        y1: centered.y1 - 2,
-        x2: centered.x2 + 2,
-        y2: centered.y2 + 2,
+        x1: min_x - 4,
+        y1: min_y - 4,
+        x2: max_x + 4,
+        y2: max_y + 4,
     }
 }
 
@@ -253,11 +259,36 @@ mod test {
     }
 
     #[test]
-    fn test_from_string() {
+    fn test_from_string_error() {
         assert_eq!(
-            from_string(vec!["".to_string()]).unwrap(),
-            Universe::default(),
+            from_string(vec!["".to_string()]),
+            Err(FromStringError::InvalidLength(InvalidLengthError)),
         );
+        assert_eq!(
+            from_string(vec!["abcdefg".to_string()]),
+            Err(FromStringError::InvalidCharacter(InvalidCharacterError)),
+        );
+        assert_eq!(
+            from_string(vec![
+                "⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛".to_string(),
+            ]),
+            Err(FromStringError::InvalidLength(InvalidLengthError)),
+        );
+        assert_eq!(
+            from_string(vec![
+                "⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛".to_string(),
+            ]),
+            Err(FromStringError::InvalidLength(InvalidLengthError)),
+        );
+    }
+
+    #[test]
+    fn test_from_string() {
         assert_eq!(
             from_string(vec!["⬛".to_string()]).unwrap(),
             Universe::default()
@@ -508,7 +539,7 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-3, -2, 2, 3)
+            Rect::from(-5, -4, 4, 5)
         );
         assert_eq!(
             get_camera(
@@ -523,7 +554,7 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-3, -3, 3, 3)
+            Rect::from(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
@@ -531,7 +562,7 @@ mod test {
                 (CartesianPoint::from(3, 5), State::Alive),
                 (CartesianPoint::from(5, 3), State::Alive),
             ]))),
-            Rect::from(0, 0, 7, 7)
+            Rect::from(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
@@ -539,7 +570,7 @@ mod test {
                 (CartesianPoint::from(3, 4), State::Alive),
                 (CartesianPoint::from(5, 3), State::Alive),
             ]))),
-            Rect::from(0, 0, 6, 6) //Rect::from(0, 0, 7, 7)
+            Rect::from(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
@@ -547,7 +578,7 @@ mod test {
                 (CartesianPoint::from(3, 4), State::Alive),
                 (CartesianPoint::from(4, 3), State::Alive),
             ]))),
-            Rect::from(0, 0, 6, 6) //Rect::from(0, 0, 7, 7)
+            Rect::from(-2, -2, 8, 8)
         );
     }
 }
