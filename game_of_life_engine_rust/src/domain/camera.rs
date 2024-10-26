@@ -26,9 +26,9 @@ pub fn get_length(r: &Rect) -> u64 {
     let d_x = delta_x(r);
     let d_y = delta_y(r);
     if d_x > d_y {
-        return d_x + 1;
+        d_x + 1
     } else {
-        return d_y + 1;
+        d_y + 1
     }
 }
 

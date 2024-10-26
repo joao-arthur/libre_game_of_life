@@ -5,14 +5,14 @@ pub type Neighbor<'a> = Option<&'a State>;
 pub type Neighbors<'a> = [Neighbor<'a>; 8];
 
 fn number_of_alive(neighbors: Neighbors) -> u8 {
-    return neighbors
+    neighbors
         .iter()
         .filter(|neighbor| neighbor == &&Some(&State::Alive))
-        .count() as u8;
+        .count() as u8
 }
 
 fn from_model(u: &Universe, point: CartesianPoint) -> Neighbors {
-    return [
+    [
         u.value.get(&CartesianPoint::from(point.x - 1, point.y + 1)),
         u.value.get(&CartesianPoint::from(point.x, point.y + 1)),
         u.value.get(&CartesianPoint::from(point.x + 1, point.y + 1)),
@@ -21,7 +21,7 @@ fn from_model(u: &Universe, point: CartesianPoint) -> Neighbors {
         u.value.get(&CartesianPoint::from(point.x - 1, point.y - 1)),
         u.value.get(&CartesianPoint::from(point.x, point.y - 1)),
         u.value.get(&CartesianPoint::from(point.x + 1, point.y - 1)),
-    ];
+    ]
 }
 
 pub fn number_of_alive_from_model(u: &Universe, point: CartesianPoint) -> u8 {

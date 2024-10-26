@@ -12,6 +12,8 @@ use crate::domain::{
     },
 };
 
+use super::camera::Rect;
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
     pub value: HashMap<CartesianPoint, State>,
@@ -142,6 +144,49 @@ pub fn toggle_cell(u: &mut Universe, point: CartesianPoint) {
     }
 }
 
+pub fn get_camera(u: &Universe) -> Rect {
+    let nums: Vec<i64> = u.value.iter().flat_map(|v| [v.0.x, v.0.y]).collect();
+    let xx: Vec<i64> = u.value.iter().map(|v| v.0.x).collect();
+    let yy: Vec<i64> = u.value.iter().map(|v| v.0.y).collect();
+
+    let min_x = xx.iter().min().unwrap();
+    let min_y = yy.iter().min().unwrap();
+    let max_x = xx.iter().max().unwrap();
+    let max_y = yy.iter().max().unwrap();
+
+    let sqr = Rect {
+        x1: min_x,
+        y1: min_y,
+        x2: max_x,
+        y2: max_y
+    };
+
+    middle point = dsdsdsds
+
+
+    let min = nums.iter().min().unwrap();
+    let max = nums.iter().max().unwrap();
+    let diff_x = max_x - min_x;
+    let diff_y = max_y - min_y;
+    let diff = if diff_x > diff_y { diff_x } else { diff_y };
+
+    let x1 = min_x - 2;
+    let y1 = min_y - 2;
+    let x2 = min_x + diff + 2;
+    let y2 = min_y + diff + 2;
+
+    println!(
+        "min_x: {min_x} min_y: {min_y} diff: {diff}           x1: {x1} y1: {y1} x2: {x2} y2: {y2}"
+    );
+
+    Rect {
+        x1: min_x - 2,
+        y1: min_y - 2,
+        x2: min_x + diff_x + 2,
+        y2: min_y + diff_y + 2,
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -179,24 +224,15 @@ mod test {
     fn test_from_string() {
         assert_eq!(
             from_string(vec!["".to_string()]).unwrap(),
-            Universe {
-                value: HashMap::new(),
-                iter: 0,
-            }
+            Universe::default(),
         );
         assert_eq!(
             from_string(vec!["⬛".to_string()]).unwrap(),
-            Universe {
-                value: HashMap::new(),
-                iter: 0,
-            }
+            Universe::default()
         );
         assert_eq!(
             from_string(vec!["⬜".to_string()]).unwrap(),
-            Universe {
-                value: HashMap::from([(CartesianPoint::from(0, 0), State::Alive)]),
-                iter: 0,
-            }
+            Universe::from(HashMap::from([(CartesianPoint::from(0, 0), State::Alive)])),
         );
         assert_eq!(
             from_string(vec![
@@ -206,14 +242,45 @@ mod test {
                 "⬛⬛⬛⬛".to_string(),
             ])
             .unwrap(),
-            Universe {
-                value: HashMap::from([
-                    (CartesianPoint::from(1, 2), State::Alive),
-                    (CartesianPoint::from(-2, 1), State::Alive),
-                    (CartesianPoint::from(0, 0), State::Alive),
-                ]),
-                iter: 0,
-            }
+            Universe::from(HashMap::from([
+                (CartesianPoint::from(1, 2), State::Alive),
+                (CartesianPoint::from(-2, 1), State::Alive),
+                (CartesianPoint::from(0, 0), State::Alive),
+            ]))
+        );
+        assert_eq!(
+            from_string(vec![
+                "⬛⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬜⬜⬛⬛".to_string(),
+                "⬛⬛⬜⬜⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛⬛".to_string(),
+            ])
+            .unwrap(),
+            Universe::from(HashMap::from([
+                (CartesianPoint::from(0, 0), State::Alive),
+                (CartesianPoint::from(0, 1), State::Alive),
+                (CartesianPoint::from(-1, 0), State::Alive),
+                (CartesianPoint::from(-1, 1), State::Alive),
+            ]),)
+        );
+        assert_eq!(
+            from_string(vec![
+                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬜⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬜⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬜⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            ])
+            .unwrap(),
+            Universe::from(HashMap::from([
+                (CartesianPoint::from(0, -1), State::Alive),
+                (CartesianPoint::from(0, 0), State::Alive),
+                (CartesianPoint::from(0, 1), State::Alive),
+            ]),)
         );
     }
 
@@ -393,5 +460,64 @@ mod test {
         model3x3_5_iter1.iter = 1;
         iterate(&mut model3x3_5_iter0);
         assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
+    }
+
+    #[test]
+    fn test_get_camera() {
+        assert_eq!(
+            get_camera(
+                &from_string(vec![
+                    "⬛⬛⬛⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬛⬛⬛".to_string(),
+                    "⬛⬛⬜⬜⬛⬛".to_string(),
+                    "⬛⬛⬜⬜⬛⬛".to_string(),
+                    "⬛⬛⬛⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬛⬛⬛".to_string(),
+                ])
+                .unwrap()
+            ),
+            Rect::from(-3, -2, 2, 3)
+        );
+        assert_eq!(
+            get_camera(
+                &from_string(vec![
+                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬜⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬜⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬜⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                ])
+                .unwrap()
+            ),
+            Rect::from(-3, -3, 3, 3)
+        );
+
+        /////
+        assert_eq!(
+            get_camera(&Universe::from(HashMap::from([
+                (CartesianPoint::from(2, 2), State::Alive),
+                (CartesianPoint::from(3, 5), State::Alive),
+                (CartesianPoint::from(5, 3), State::Alive),
+            ]))),
+            Rect::from(0, 0, 7, 7)
+        );
+        assert_eq!(
+            get_camera(&Universe::from(HashMap::from([
+                (CartesianPoint::from(2, 2), State::Alive),
+                (CartesianPoint::from(3, 4), State::Alive),
+                (CartesianPoint::from(5, 3), State::Alive),
+            ]))),
+            Rect::from(0, 0, 7, 7)
+        );
+        assert_eq!(
+            get_camera(&Universe::from(HashMap::from([
+                (CartesianPoint::from(2, 2), State::Alive),
+                (CartesianPoint::from(3, 4), State::Alive),
+                (CartesianPoint::from(4, 3), State::Alive),
+            ]))),
+            Rect::from(0, 0, 7, 7)
+        );
     }
 }

@@ -27,7 +27,7 @@ pub struct PresetOptionGroup {
 }
 
 pub fn build_presets() -> Vec<Preset> {
-    return get_preset_groups()
+    get_preset_groups()
         .iter()
         .flat_map(|group| {
             group
@@ -36,11 +36,11 @@ pub fn build_presets() -> Vec<Preset> {
                 .flat_map(|sub_group| sub_group.items.clone())
                 .collect::<Vec<Preset>>()
         })
-        .collect();
+        .collect()
 }
 
 pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
-    return get_preset_groups()
+    get_preset_groups()
         .iter()
         .map(|group| PresetOptionGroup {
             label: group.info.name.clone(),
@@ -55,7 +55,7 @@ pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
                 })
                 .collect(),
         })
-        .collect();
+        .collect()
 }
 
 pub struct Square {
@@ -164,7 +164,7 @@ fn on_change(param: Prop) {
 }
 
 fn fps_to_mili(fps: u16) -> u16 {
-    return 1000 / fps;
+    1000 / fps
 }
 
 const DEAD_COLOR: &str = "#dbdbdb";
