@@ -2,16 +2,14 @@ use crate::domain::{cell::State, plane::cartesian::CartesianPoint, universe::Uni
 
 pub type Neighbor<'a> = Option<&'a State>;
 
-pub type Neighbors<'a> = [Neighbor<'a>; 8];
-
-fn number_of_alive(neighbors: Neighbors) -> u8 {
+fn number_of_alive(neighbors: [Neighbor; 8]) -> u8 {
     neighbors
         .iter()
         .filter(|neighbor| neighbor == &&Some(&State::Alive))
         .count() as u8
 }
 
-fn from_model(u: &Universe, point: CartesianPoint) -> Neighbors {
+fn from_point_in_rectangular_grid(u: &Universe, point: CartesianPoint) -> [Neighbor; 8] {
     [
         u.value.get(&CartesianPoint::from(point.x - 1, point.y + 1)),
         u.value.get(&CartesianPoint::from(point.x, point.y + 1)),
@@ -25,7 +23,7 @@ fn from_model(u: &Universe, point: CartesianPoint) -> Neighbors {
 }
 
 pub fn number_of_alive_from_model(u: &Universe, point: CartesianPoint) -> u8 {
-    number_of_alive(from_model(u, point))
+    number_of_alive(from_point_in_rectangular_grid(u, point))
 }
 
 #[cfg(test)]

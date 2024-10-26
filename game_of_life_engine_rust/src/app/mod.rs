@@ -4,11 +4,11 @@ use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
     camera::{
-        get_division_size, get_length, get_middle_cell, get_middle_point, move_by, zoom_in,
+        get_center, get_center_absolute, get_length, get_subdivision_size, move_by, zoom_in,
         zoom_out, zoom_to, Rect,
     },
     plane::{
-        cartesian::{absolute_to_relative, from_matrix, to_matrix, CartesianPoint},
+        cartesian::{from_matrix, subdivide, to_matrix, CartesianPoint},
         matrix::MatrixPoint,
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
@@ -177,8 +177,8 @@ fn render() {
     });
     let holder = holder.unwrap();
     let length = get_length(&settings.cam);
-    let cell_size = get_division_size(&settings.cam, settings.dim);
-    let middle_cell = get_middle_cell(&settings.cam, settings.dim);
+    let subdivision_size = get_subdivision_size(&settings.cam, settings.dim);
+    let center_absolute = get_center_absolute(&settings.cam, settings.dim);
     let background = Square {
         x: 0,
         y: 0,
@@ -188,9 +188,12 @@ fn render() {
     universe.value.iter().for_each(|point| {
         let arr_index = to_matrix(*point.0, length.into());
         let s = Square {
-            x: arr_index.col as i64 * cell_size as i64 + settings.gap as i64 - middle_cell.x,
-            y: arr_index.row as i64 * cell_size as i64 + settings.gap as i64 + middle_cell.y,
-            size: cell_size as u64 - settings.gap as u64 * 2,
+            x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
+                - center_absolute.x,
+            y: arr_index.row as i64 * subdivision_size as i64
+                + settings.gap as i64
+                + center_absolute.y,
+            size: subdivision_size as u64 - settings.gap as u64 * 2,
         };
         holder.draw_square(s, ALIVE_COLOR.to_string());
     });
@@ -239,7 +242,7 @@ pub fn app_init(context: CanvasRenderingContext2d) {
         }
     });
     render();
-    // app_pause();
+    //app_pause();
 }
 
 pub fn app_pause() {
@@ -326,13 +329,13 @@ pub fn app_toggle_model_cell_by_absolute_point(point: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         let length = get_length(&model.settings.cam);
-        let middle_point = get_middle_point(&model.settings.cam);
-        let cell_size = get_division_size(&model.settings.cam, model.settings.dim);
-        if cell_size <= 0 {
+        let center = get_center(&model.settings.cam);
+        let subdivision_size = get_subdivision_size(&model.settings.cam, model.settings.dim);
+        if subdivision_size <= 0 {
             return;
         }
-        let col = absolute_to_relative(point.x, cell_size.into());
-        let row = absolute_to_relative(point.y, cell_size.into());
+        let col = subdivide(point.x, subdivision_size.into());
+        let row = subdivide(point.y, subdivision_size.into());
         if col > 0 && row > 0 {
             let point = from_matrix(
                 MatrixPoint {
@@ -342,8 +345,8 @@ pub fn app_toggle_model_cell_by_absolute_point(point: CartesianPoint) {
                 length.into(),
             );
             let cell = CartesianPoint {
-                x: point.x + middle_point.x,
-                y: point.y + middle_point.y,
+                x: point.x + center.x,
+                y: point.y + center.y,
             };
             toggle_cell(&mut model.universe, cell);
             model.settings.preset = None;

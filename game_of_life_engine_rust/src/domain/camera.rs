@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::domain::plane::cartesian::CartesianPoint;
 
 /** Constraint: x2 > x1 && y2 > y1 */
@@ -14,6 +16,17 @@ impl Rect {
         Rect { x1, y1, x2, y2 }
     }
 }
+
+impl fmt::Display for Rect {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "(({}, {}), ({}, {}))",
+            self.x1, self.y1, self.x2, self.y2
+        )
+    }
+}
+
 fn delta_x(r: &Rect) -> u64 {
     (r.x2 - r.x1).try_into().unwrap()
 }
@@ -32,22 +45,33 @@ pub fn get_length(r: &Rect) -> u64 {
     }
 }
 
-/////////////////////
-pub fn get_middle_cell(r: &Rect, total_size: u16) -> CartesianPoint {
-    let cell_size: i64 = get_division_size(r, total_size).try_into().unwrap();
-    let middle = get_middle_point(r);
-    CartesianPoint::from(middle.x * cell_size, middle.y * cell_size)
-}
-
-pub fn get_division_size(r: &Rect, size: u16) -> u64 {
+pub fn get_subdivision_size(r: &Rect, size: u16) -> u64 {
     let size: u64 = size.into();
-    size / delta_x(r)
+    size / get_length(r)
 }
 
-pub fn get_middle_point(r: &Rect) -> CartesianPoint {
+pub fn get_center(r: &Rect) -> CartesianPoint {
     CartesianPoint::from((r.x1 + r.x2) / 2, (r.y1 + r.y2) / 2)
 }
-/////////////////////
+
+pub fn get_center_absolute(r: &Rect, size: u16) -> CartesianPoint {
+    let cell_size: i64 = get_subdivision_size(r, size).try_into().unwrap();
+    let center = get_center(r);
+    CartesianPoint::from(center.x * cell_size, center.y * cell_size)
+}
+
+pub fn center(r: &mut Rect, p: CartesianPoint) {
+    let len_x = r.x2 - r.x1;
+    let len_y = r.y2 - r.y1;
+    let end_x = len_x / 2;
+    let end_y = len_y / 2;
+    let start_x = p.x - end_x;
+    let start_y = p.y - end_y;
+    r.x1 = start_x;
+    r.y1 = start_y;
+    r.x2 = p.x + end_x;
+    r.y2 = p.y + end_y;
+}
 
 pub fn zoom_in(r: &mut Rect) {
     if delta_x(&r) > 2 && delta_y(r) > 2 {
@@ -70,16 +94,12 @@ pub fn zoom_to(r: &mut Rect, size: u16) {
         return;
     }
     let size: i64 = size.into();
-
     let d_x: i64 = delta_x(r).try_into().unwrap();
     let d_y: i64 = delta_y(r).try_into().unwrap();
-
     let len_x: i64 = d_x + 1;
     let len_y: i64 = d_y + 1;
-
     let diff_x: i64 = len_x - size;
     let diff_y: i64 = len_y - size;
-
     r.x1 += diff_x / 2;
     r.y1 += diff_y / 2;
     r.x2 -= diff_x / 2;
@@ -99,8 +119,9 @@ mod test {
 
     #[test]
     fn test_rect() {
+        let r = Rect::from(-23, 38, 198, 7);
         assert_eq!(
-            Rect::from(-23, 38, 198, 7),
+            r,
             Rect {
                 x1: -23,
                 y1: 38,
@@ -108,6 +129,7 @@ mod test {
                 y2: 7
             }
         );
+        assert_eq!(format!("{r}"), "((-23, 38), (198, 7))");
     }
 
     #[test]
@@ -297,76 +319,62 @@ mod test {
         assert_eq!(get_length(&Rect::from(4, 4, 5, 5)), 2);
         assert_eq!(get_length(&Rect::from(5, 5, 5, 5)), 1);
     }
-    /*
-        #[test]
-        fn test_get_cell_size() {
-            let u = Rect::from(1, 1, 10, 10));
-            assert_eq!(get_cell_size(&u, 100), 10);
-            assert_eq!(get_cell_size(&u, 90), 9);
-            assert_eq!(get_cell_size(&u, 50), 5);
-            assert_eq!(get_cell_size(&u, 10), 1);
-        }
 
-        #[test]
-        fn test_get_middle_point() {
-            assert_eq!(
-                get_middle_point(&Rect::from(-10, -10, 10, 10)),
-                CartesianPoint::from(0, 0)
-            );
-            assert_eq!(
-                get_middle_point(&Rect::from(1, 1, 10, 10)),
-                CartesianPoint::from(5, 5)
-            );
-            assert_eq!(
-                get_middle_point(&Rect::from(4, 4, 5, 5)),
-                CartesianPoint::from(4, 4)
-            );
-            assert_eq!(
-                get_middle_point(&Rect::from(5, 5, 5, 5)),
-                CartesianPoint::from(5, 5)
-            );
-        }
+    #[test]
+    fn test_get_subdivision_size() {
+        let r = Rect::from(1, 1, 10, 10);
+        assert_eq!(get_subdivision_size(&r, 100), 10);
+        assert_eq!(get_subdivision_size(&r, 90), 9);
+        assert_eq!(get_subdivision_size(&r, 50), 5);
+        assert_eq!(get_subdivision_size(&r, 10), 1);
+    }
 
-        #[test]
-        fn test_get_middle_cell() {
-            assert_eq!(
-                get_middle_cell(&Rect::from(-10, -10, 10, 10), 100),
-                CartesianPoint::from(0, 0)
-            );
-            assert_eq!(
-                get_middle_cell(&Rect::from(1, 1, 10, 10), 50),
-                CartesianPoint::from(27, 27)
-            );
-            assert_eq!(
-                get_middle_cell(&Rect::from(4, 4, 5, 5), 10),
-                CartesianPoint::from(22, 22)
-            );
-            assert_eq!(
-                get_middle_cell(&Rect::from(5, 5, 5, 5), 1),
-                CartesianPoint::from(5, 5)
-            );
-        }
+    #[test]
+    fn test_get_center() {
+        assert_eq!(
+            get_center(&Rect::from(-10, -10, 10, 10)),
+            CartesianPoint::from(0, 0)
+        );
+        assert_eq!(
+            get_center(&Rect::from(1, 1, 10, 10)),
+            CartesianPoint::from(5, 5)
+        );
+        assert_eq!(
+            get_center(&Rect::from(4, 4, 5, 5)),
+            CartesianPoint::from(4, 4)
+        );
+        assert_eq!(
+            get_center(&Rect::from(5, 5, 5, 5)),
+            CartesianPoint::from(5, 5)
+        );
+    }
 
-        #[test]
-        fn test_move_in_plane() {
-            let mut u = Rect::from(-10, -10, 10, 10);
-            move_in_plane(&mut u, CartesianPoint::from(1, 0));
-            assert_eq!(u.pos, Rect::from(-9, -10, 11, 10));
-            move_in_plane(&mut u, CartesianPoint::from(-2, 0));
-            assert_eq!(u.pos, Rect::from(-11, -10, 9, 10));
-            move_in_plane(&mut u, CartesianPoint::from(0, 1));
-            assert_eq!(u.pos, Rect::from(-11, -9, 9, 11));
-            move_in_plane(&mut u, CartesianPoint::from(0, -2));
-            assert_eq!(u.pos, Rect::from(-11, -11, 9, 9));
-            move_in_plane(&mut u, CartesianPoint::from(11, 0));
-            assert_eq!(u.pos, Rect::from(0, -11, 20, 9));
-            move_in_plane(&mut u, CartesianPoint::from(0, 11));
-            assert_eq!(u.pos, Rect::from(0, 0, 20, 20));
-            move_in_plane(&mut u, CartesianPoint::from(-20, 0));
-            assert_eq!(u.pos, Rect::from(-20, 0, 0, 20));
-            move_in_plane(&mut u, CartesianPoint::from(0, -20));
-            assert_eq!(u.pos, Rect::from(-20, -20, 0, 0));
-        }
+    #[test]
+    fn test_get_center_absolute() {
+        assert_eq!(
+            get_center_absolute(&Rect::from(-10, -10, 10, 10), 100),
+            CartesianPoint::from(0, 0)
+        );
+        assert_eq!(
+            get_center_absolute(&Rect::from(1, 1, 10, 10), 50),
+            CartesianPoint::from(25, 25)
+        );
+        assert_eq!(
+            get_center_absolute(&Rect::from(4, 4, 5, 5), 10),
+            CartesianPoint::from(20, 20)
+        );
+        assert_eq!(
+            get_center_absolute(&Rect::from(5, 5, 5, 5), 1),
+            CartesianPoint::from(5, 5)
+        );
+    }
 
-    */
+    #[test]
+    fn test_center() {
+        let mut r = Rect::from(-10, -10, 10, 10);
+        center(&mut r, CartesianPoint::from(0, 0));
+        assert_eq!(r, Rect::from(-10, -10, 10, 10));
+        center(&mut r, CartesianPoint::from(10, 10));
+        assert_eq!(r, Rect::from(0, 0, 20, 20));
+    }
 }

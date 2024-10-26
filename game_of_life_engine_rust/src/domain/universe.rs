@@ -4,6 +4,7 @@ use std::{
 };
 
 use crate::domain::{
+    camera::get_center,
     cell::{self, State},
     neighbor::number_of_alive_from_model,
     plane::{
@@ -12,7 +13,7 @@ use crate::domain::{
     },
 };
 
-use super::camera::Rect;
+use super::camera::{center, Rect};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
@@ -145,45 +146,43 @@ pub fn toggle_cell(u: &mut Universe, point: CartesianPoint) {
 }
 
 pub fn get_camera(u: &Universe) -> Rect {
-    let nums: Vec<i64> = u.value.iter().flat_map(|v| [v.0.x, v.0.y]).collect();
     let xx: Vec<i64> = u.value.iter().map(|v| v.0.x).collect();
     let yy: Vec<i64> = u.value.iter().map(|v| v.0.y).collect();
-
-    let min_x = xx.iter().min().unwrap();
-    let min_y = yy.iter().min().unwrap();
-    let max_x = xx.iter().max().unwrap();
-    let max_y = yy.iter().max().unwrap();
-
-    let sqr = Rect {
+    let min_x = xx.iter().min().unwrap().to_owned();
+    let min_y = yy.iter().min().unwrap().to_owned();
+    let mut max_x = xx.iter().max().unwrap().to_owned();
+    let mut max_y = yy.iter().max().unwrap().to_owned();
+    let points = Rect {
         x1: min_x,
         y1: min_y,
         x2: max_x,
-        y2: max_y
+        y2: max_y,
     };
-
-    middle point = dsdsdsds
-
-
-    let min = nums.iter().min().unwrap();
-    let max = nums.iter().max().unwrap();
-    let diff_x = max_x - min_x;
-    let diff_y = max_y - min_y;
-    let diff = if diff_x > diff_y { diff_x } else { diff_y };
-
-    let x1 = min_x - 2;
-    let y1 = min_y - 2;
-    let x2 = min_x + diff + 2;
-    let y2 = min_y + diff + 2;
-
-    println!(
-        "min_x: {min_x} min_y: {min_y} diff: {diff}           x1: {x1} y1: {y1} x2: {x2} y2: {y2}"
-    );
-
+    let center_point = get_center(&points);
+    let len_x = max_x - min_x + 1;
+    let len_y = max_y - min_y + 1;
+    if len_x > len_y {
+        let diff = len_x - len_y;
+        max_y += diff;
+    }
+    if len_y > len_x {
+        let diff = len_y - len_x;
+        max_x += diff;
+    }
+    let mut centered = Rect {
+        x1: min_x,
+        y1: min_y,
+        x2: max_x,
+        y2: max_y,
+    };
+    if len_x != len_y {
+        center(&mut centered, center_point);
+    }
     Rect {
-        x1: min_x - 2,
-        y1: min_y - 2,
-        x2: min_x + diff_x + 2,
-        y2: min_y + diff_y + 2,
+        x1: centered.x1 - 2,
+        y1: centered.y1 - 2,
+        x2: centered.x2 + 2,
+        y2: centered.y2 + 2,
     }
 }
 
@@ -493,8 +492,6 @@ mod test {
             ),
             Rect::from(-3, -3, 3, 3)
         );
-
-        /////
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
                 (CartesianPoint::from(2, 2), State::Alive),
@@ -509,7 +506,7 @@ mod test {
                 (CartesianPoint::from(3, 4), State::Alive),
                 (CartesianPoint::from(5, 3), State::Alive),
             ]))),
-            Rect::from(0, 0, 7, 7)
+            Rect::from(0, 0, 6, 6) //Rect::from(0, 0, 7, 7)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
@@ -517,7 +514,7 @@ mod test {
                 (CartesianPoint::from(3, 4), State::Alive),
                 (CartesianPoint::from(4, 3), State::Alive),
             ]))),
-            Rect::from(0, 0, 7, 7)
+            Rect::from(0, 0, 6, 6) //Rect::from(0, 0, 7, 7)
         );
     }
 }

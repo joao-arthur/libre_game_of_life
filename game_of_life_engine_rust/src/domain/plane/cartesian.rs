@@ -1,4 +1,5 @@
 use super::matrix::MatrixPoint;
+use std::fmt;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub struct CartesianPoint {
@@ -12,7 +13,13 @@ impl CartesianPoint {
     }
 }
 
-pub fn absolute_to_relative(value: i64, unit_size: u64) -> i64 {
+impl fmt::Display for CartesianPoint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
+pub fn subdivide(value: i64, unit_size: u64) -> i64 {
     let u: i64 = unit_size.try_into().unwrap();
     value / u
 }
@@ -21,7 +28,6 @@ pub fn from_matrix(point: MatrixPoint, length: u64) -> CartesianPoint {
     let len: i64 = length.try_into().unwrap();
     let col: i64 = point.col.try_into().unwrap();
     let row: i64 = point.row.try_into().unwrap();
-
     let half = len / 2;
     CartesianPoint::from(-(half) + col, half - row)
 }
@@ -31,7 +37,6 @@ pub fn to_matrix(point: CartesianPoint, length: u64) -> MatrixPoint {
     let half = len / 2;
     let row = half - point.y;
     let col = half + point.x;
-
     MatrixPoint::from(row.try_into().unwrap(), col.try_into().unwrap())
 }
 
@@ -40,26 +45,20 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_arr() {
-        assert_eq!(MatrixPoint::from(23, 38), MatrixPoint { row: 23, col: 38 });
-    }
-
-    #[test]
-    fn test_point() {
-        assert_eq!(
-            CartesianPoint::from(-23, 38),
-            CartesianPoint { x: -23, y: 38 }
-        );
+    fn test_cartesian_point() {
+        let p = CartesianPoint::from(-23, 38);
+        assert_eq!(p, CartesianPoint { x: -23, y: 38 });
+        assert_eq!(format!("{p}"), "(-23, 38)");
     }
 
     #[test]
     fn test_absolute_to_relative() {
-        assert_eq!(absolute_to_relative(0, 30), 0);
-        assert_eq!(absolute_to_relative(10, 30), 0);
-        assert_eq!(absolute_to_relative(20, 30), 0);
-        assert_eq!(absolute_to_relative(29, 30), 0);
-        assert_eq!(absolute_to_relative(30, 30), 1);
-        assert_eq!(absolute_to_relative(300, 30), 10);
+        assert_eq!(subdivide(0, 30), 0);
+        assert_eq!(subdivide(10, 30), 0);
+        assert_eq!(subdivide(20, 30), 0);
+        assert_eq!(subdivide(29, 30), 0);
+        assert_eq!(subdivide(30, 30), 1);
+        assert_eq!(subdivide(300, 30), 10);
     }
 
     #[test]
