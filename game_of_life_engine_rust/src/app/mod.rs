@@ -4,15 +4,13 @@ use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
     camera::{
-        get_center, get_center_absolute, get_length, get_subdivision_size, move_by, zoom_in,
-        zoom_out, zoom_to, Rect,
+        get_center_absolute, get_length, get_subdivision_size, move_by, zoom_in, zoom_out, zoom_to,
+        Rect,
     },
-    plane::{
-        cartesian::{from_matrix, subdivide, to_matrix, CartesianPoint},
-        matrix::MatrixPoint,
-    },
+    cell::State,
+    plane::cartesian::{to_matrix, CartesianPoint},
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
-    universe::{iterate, toggle_cell, Universe},
+    universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
 };
 
 pub struct PresetOptionItem {
@@ -114,15 +112,17 @@ pub struct Model {
 
 impl Default for Model {
     fn default() -> Self {
+        let universe = get_preset_unsafe("block");
+        let cam = get_camera(&universe);
         Model {
-            universe: get_preset_unsafe("block"),
+            universe,
             settings: Settings {
                 preset: Some(String::from("block")),
                 dim: 0,
                 gap: 0,
                 fps: 4,
                 status: Status::Paused,
-                cam: Rect::from(-10, -10, 9, 9),
+                cam,
             },
             holder: None,
         }
@@ -179,24 +179,39 @@ fn render() {
     let length = get_length(&settings.cam);
     let subdivision_size = get_subdivision_size(&settings.cam, settings.dim);
     let center_absolute = get_center_absolute(&settings.cam, settings.dim);
+    let cam = settings.cam;
     let background = Square {
         x: 0,
         y: 0,
         size: settings.dim.into(),
     };
     holder.draw_square(background, DEAD_COLOR.to_string());
-    universe.value.iter().for_each(|point| {
-        let arr_index = to_matrix(*point.0, length.into());
-        let s = Square {
-            x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
-                - center_absolute.x,
-            y: arr_index.row as i64 * subdivision_size as i64
-                + settings.gap as i64
-                + center_absolute.y,
-            size: subdivision_size as u64 - settings.gap as u64 * 2,
-        };
-        holder.draw_square(s, ALIVE_COLOR.to_string());
-    });
+
+    let values_in_camera: Vec<(&CartesianPoint, &State)> = universe
+        .value
+        .iter()
+        .filter(|value| {
+            value.0.x >= cam.x1 && value.0.x <= cam.x2 && value.0.y >= cam.y1 && value.0.y <= cam.y2
+        })
+        .collect();
+
+    for p in values_in_camera {
+        let arr_index = to_matrix(*p.0, length.into());
+        match p.1 {
+            State::Alive => {
+                let s = Square {
+                    x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
+                        - center_absolute.x,
+                    y: arr_index.row as i64 * subdivision_size as i64
+                        + settings.gap as i64
+                        + center_absolute.y,
+                    size: subdivision_size as u64 - settings.gap as u64 * 2,
+                };
+                holder.draw_square(s, ALIVE_COLOR.to_string());
+            }
+            _ => {}
+        }
+    }
 }
 
 pub enum Command {
@@ -289,11 +304,13 @@ pub fn app_set_preset(preset: String) {
     if let Some(selected_preset) = get_preset(&preset) {
         MODEL.with(|i| {
             let mut model = i.borrow_mut();
+            model.settings.cam = get_camera(&selected_preset);
             model.universe = selected_preset;
             model.settings.preset = Some(preset);
         });
         on_change(Prop::Universe);
         on_change(Prop::Preset);
+        on_change(Prop::Cam);
     }
 }
 
@@ -328,29 +345,10 @@ pub fn app_toggle_by_point(point: CartesianPoint) {
 pub fn app_toggle_model_cell_by_absolute_point(point: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        let length = get_length(&model.settings.cam);
-        let center = get_center(&model.settings.cam);
-        let subdivision_size = get_subdivision_size(&model.settings.cam, model.settings.dim);
-        if subdivision_size <= 0 {
-            return;
-        }
-        let col = subdivide(point.x, subdivision_size.into());
-        let row = subdivide(point.y, subdivision_size.into());
-        if col > 0 && row > 0 {
-            let point = from_matrix(
-                MatrixPoint {
-                    row: row.try_into().unwrap(),
-                    col: col.try_into().unwrap(),
-                },
-                length.into(),
-            );
-            let cell = CartesianPoint {
-                x: point.x + center.x,
-                y: point.y + center.y,
-            };
-            toggle_cell(&mut model.universe, cell);
-            model.settings.preset = None;
-        }
+        let cam = &model.settings.clone().cam;
+        let dim = model.settings.clone().dim;
+        toggle_cell_by_absolute_point(&mut model.universe, point, cam, dim);
+        model.settings.preset = None;
     });
     on_change(Prop::Universe);
     on_change(Prop::Preset);

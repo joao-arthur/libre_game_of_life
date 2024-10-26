@@ -13,7 +13,10 @@ use crate::domain::{
     },
 };
 
-use super::camera::{center, Rect};
+use super::{
+    camera::{center, get_length, get_subdivision_size, Rect},
+    plane::cartesian::subdivide,
+};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
@@ -142,6 +145,36 @@ pub fn toggle_cell(u: &mut Universe, point: CartesianPoint) {
         State::Alive => {
             u.value.insert(point, new_cell);
         }
+    }
+}
+
+pub fn toggle_cell_by_absolute_point(
+    u: &mut Universe,
+    point: CartesianPoint,
+    camera: &Rect,
+    size: u16,
+) {
+    let length = get_length(camera);
+    let center = get_center(camera);
+    let subdivision_size = get_subdivision_size(camera, size);
+    if subdivision_size <= 0 {
+        return;
+    }
+    let col = subdivide(point.x, subdivision_size.into());
+    let row = subdivide(point.y, subdivision_size.into());
+    if col > 0 && row > 0 {
+        let point = from_matrix(
+            MatrixPoint {
+                row: row.try_into().unwrap(),
+                col: col.try_into().unwrap(),
+            },
+            length.into(),
+        );
+        let cell = CartesianPoint {
+            x: point.x + center.x,
+            y: point.y + center.y,
+        };
+        toggle_cell(u, cell);
     }
 }
 
