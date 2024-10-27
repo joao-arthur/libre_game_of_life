@@ -356,6 +356,10 @@ mod test {
             CartesianPoint::from(0, 0)
         );
         assert_eq!(
+            get_center_absolute(&Rect::from(-10, -10, 10, 10), 100),
+            CartesianPoint::from(0, 0)
+        );
+        assert_eq!(
             get_center_absolute(&Rect::from(1, 1, 10, 10), 50),
             CartesianPoint::from(25, 25)
         );
@@ -367,7 +371,24 @@ mod test {
             get_center_absolute(&Rect::from(5, 5, 5, 5), 1),
             CartesianPoint::from(5, 5)
         );
+        assert_eq!(
+            get_center_absolute(&Rect::from(-5, -4, 4, 5), 1000),
+            CartesianPoint::from(0, 0)
+        );  
+           assert_eq!(
+            get_center_absolute(&Rect::from(-4, -4, 5, 5), 1000),
+            CartesianPoint::from(0, 0)
+        );
+        assert_eq!(
+            get_center_absolute(&Rect::from(-5, -4, 3, 5), 1000),
+            CartesianPoint::from(-100, 0)
+        );
+        assert_eq!(
+            get_center_absolute(&Rect::from(-6, -4, 2, 5), 1000),
+            CartesianPoint::from(-200, 0)
+        );
     }
+
 
     #[test]
     fn test_center() {

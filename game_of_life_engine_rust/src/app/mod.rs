@@ -186,7 +186,6 @@ fn render() {
         size: settings.dim.into(),
     };
     holder.draw_square(background, DEAD_COLOR.to_string());
-
     let values_in_camera: Vec<(&CartesianPoint, &State)> = universe
         .value
         .iter()
@@ -194,17 +193,13 @@ fn render() {
             value.0.x >= cam.x1 && value.0.x <= cam.x2 && value.0.y >= cam.y1 && value.0.y <= cam.y2
         })
         .collect();
-
     for p in values_in_camera {
         let arr_index = to_matrix(*p.0, length.into());
         match p.1 {
             State::Alive => {
                 let s = Square {
-                    x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
-                        - center_absolute.x,
-                    y: arr_index.row as i64 * subdivision_size as i64
-                        + settings.gap as i64
-                        + center_absolute.y,
+                    x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64 - center_absolute.x,
+                    y: arr_index.row as i64 * subdivision_size as i64 + settings.gap as i64 + center_absolute.y,
                     size: subdivision_size as u64 - settings.gap as u64 * 2,
                 };
                 holder.draw_square(s, ALIVE_COLOR.to_string());
