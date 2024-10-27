@@ -24,19 +24,19 @@ pub fn subdivide(value: i64, unit_size: u64) -> i64 {
     value / u
 }
 
-pub fn from_matrix(point: MatrixPoint, length: u64) -> CartesianPoint {
+pub fn from_matrix(p: MatrixPoint, length: u64) -> CartesianPoint {
     let len: i64 = length.try_into().unwrap();
-    let col: i64 = point.col.try_into().unwrap();
-    let row: i64 = point.row.try_into().unwrap();
+    let col: i64 = p.col.try_into().unwrap();
+    let row: i64 = p.row.try_into().unwrap();
     let half = len / 2;
     CartesianPoint::from(-(half) + col, half - row)
 }
 
-pub fn to_matrix(point: CartesianPoint, length: u64) -> MatrixPoint {
+pub fn to_matrix(p: CartesianPoint, length: u64) -> MatrixPoint {
     let len: i64 = length.try_into().unwrap();
     let half = len / 2;
-    let row = half - point.y;
-    let col = half + point.x;
+    let row = half - p.y;
+    let col = half + p.x;
     MatrixPoint::from(row.try_into().unwrap(), col.try_into().unwrap())
 }
 

@@ -4,7 +4,7 @@ use crate::{
         app_set_dimension, app_set_fps, app_set_gap, app_set_preset, app_single_iteration,
         app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
     },
-    domain::{plane::cartesian::CartesianPoint, preset::get_preset_groups},
+    domain::{plane::{cartesian::CartesianPoint, matrix::MatrixPoint}, preset::get_preset_groups},
 };
 use js_sys::Function;
 use serde::Serialize;
@@ -23,6 +23,21 @@ impl EngineCartesianPoint {
     #[wasm_bindgen(constructor)]
     pub fn new(x: i64, y: i64) -> EngineCartesianPoint {
         EngineCartesianPoint { x, y }
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct EngineMatrixPoint {
+    pub row: u64,
+    pub col: u64,
+}
+
+#[wasm_bindgen]
+impl EngineMatrixPoint {
+    #[wasm_bindgen(constructor)]
+    pub fn new(row: u64, col: u64) -> EngineMatrixPoint {
+        EngineMatrixPoint { row, col }
     }
 }
 
@@ -104,10 +119,10 @@ pub fn main_single_iteration() {
 }
 
 #[wasm_bindgen(js_name = "engineToggle")]
-pub fn main_toggle(point: EngineCartesianPoint) {
-    let cp = CartesianPoint {
-        x: point.x,
-        y: point.y,
+pub fn main_toggle(point: EngineMatrixPoint) {
+    let cp = MatrixPoint {
+        row: point.row,
+        col: point.col,
     };
     app_toggle_model_cell_by_absolute_point(cp);
 }

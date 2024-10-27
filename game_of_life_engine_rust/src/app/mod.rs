@@ -8,7 +8,7 @@ use crate::domain::{
         Rect,
     },
     cell::State,
-    plane::cartesian::{to_matrix, CartesianPoint},
+    plane::{cartesian::{to_matrix, CartesianPoint}, matrix::MatrixPoint},
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
 };
@@ -332,22 +332,22 @@ pub fn app_iterate() {
     on_change(Prop::Universe);
 }
 
-pub fn app_toggle_by_point(point: CartesianPoint) {
+pub fn app_toggle_by_point(p: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        toggle_cell(&mut model.universe, point);
+        toggle_cell(&mut model.universe, p);
         model.settings.preset = None;
     });
     on_change(Prop::Universe);
     on_change(Prop::Preset);
 }
 
-pub fn app_toggle_model_cell_by_absolute_point(point: CartesianPoint) {
+pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         let cam = &model.settings.clone().cam;
         let dim = model.settings.clone().dim;
-        toggle_cell_by_absolute_point(&mut model.universe, point, cam, dim);
+        toggle_cell_by_absolute_point(&mut model.universe, p, cam, dim);
         model.settings.preset = None;
     });
     on_change(Prop::Universe);

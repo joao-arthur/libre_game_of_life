@@ -75,12 +75,12 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     }
     let mut value = HashMap::<CartesianPoint, State>::new();
     let len = as_str.len();
-    let lines_len: HashSet<usize> = as_str.iter().map(|row| row.len()).collect();
+    let lines_len: HashSet<usize> = as_str.iter().map(|row| row.chars().count()).collect();
     if lines_len.len() > 1 {
         return Err(FromStringError::InvalidLength(InvalidLengthError));
     }
-    let lines_len = as_str.get(0).unwrap().len();
-    if lines_len / 3 != len {
+    let lines_len = as_str.get(0).unwrap().chars().count();
+    if lines_len != len {
         return Err(FromStringError::InvalidLength(InvalidLengthError));
     }
     let row_iter = as_str.iter().enumerate();
@@ -104,8 +104,8 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     Ok(Universe::from(value))
 }
 
-pub fn get_value(u: &Universe, point: CartesianPoint) -> State {
-    if u.value.get(&point).unwrap_or(&State::Dead) == &State::Alive {
+pub fn get_value(u: &Universe, p: CartesianPoint) -> State {
+    if u.value.get(&p).unwrap_or(&State::Dead) == &State::Alive {
         State::Alive
     } else {
         State::Dead
@@ -146,46 +146,41 @@ pub fn iterate(u: &mut Universe) {
     u.value = entries;
 }
 
-pub fn toggle_cell(u: &mut Universe, point: CartesianPoint) {
-    let new_cell = cell::toggle(u.value.get(&point).unwrap_or(&State::Dead));
+pub fn toggle_cell(u: &mut Universe, p: CartesianPoint) {
+    let new_cell = cell::toggle(u.value.get(&p).unwrap_or(&State::Dead));
     match new_cell {
         State::Dead => {
-            u.value.remove(&point);
+            u.value.remove(&p);
         }
         State::Alive => {
-            u.value.insert(point, new_cell);
+            u.value.insert(p, new_cell);
         }
     }
 }
 
 pub fn toggle_cell_by_absolute_point(
     u: &mut Universe,
-    point: CartesianPoint,
-    camera: &Rect,
+    p: MatrixPoint,
+    cam: &Rect,
     size: u16,
 ) {
-    let length = get_length(camera);
-    let center = get_center(camera);
-    let subdivision_size = get_subdivision_size(camera, size);
-    if subdivision_size <= 0 {
-        return;
-    }
-    let col = subdivide(point.x, subdivision_size.into());
-    let row = subdivide(point.y, subdivision_size.into());
-    if col > 0 && row > 0 {
-        let point = from_matrix(
-            MatrixPoint {
-                row: row.try_into().unwrap(),
-                col: col.try_into().unwrap(),
-            },
-            length.into(),
-        );
-        let cell = CartesianPoint {
-            x: point.x + center.x,
-            y: point.y + center.y,
-        };
-        toggle_cell(u, cell);
-    }
+    let length = get_length(cam);
+    let center = get_center(cam);
+    let subdivision_size = get_subdivision_size(cam, size);
+    let col = subdivide(p.col.try_into().unwrap(), subdivision_size.into());
+    let row = subdivide(p.row.try_into().unwrap(), subdivision_size.into());
+    let point = from_matrix(
+        MatrixPoint {
+            row: row.try_into().unwrap(),
+            col: col.try_into().unwrap(),
+        },
+        length.into(),
+    );
+    let cell = CartesianPoint {
+        x: point.x + center.x,
+        y: point.y + center.y,
+    };
+    toggle_cell(u, cell);
 }
 
 pub fn get_camera(u: &Universe) -> Rect {
@@ -195,12 +190,6 @@ pub fn get_camera(u: &Universe) -> Rect {
     let mut min_y = yy.iter().min().unwrap().to_owned();
     let mut max_x = xx.iter().max().unwrap().to_owned();
     let mut max_y = yy.iter().max().unwrap().to_owned();
-    let points = Rect {
-        x1: min_x,
-        y1: min_y,
-        x2: max_x,
-        y2: max_y,
-    };
     let len_x = max_x - min_x + 1;
     let len_y = max_y - min_y + 1;
     if len_x > len_y {
@@ -363,8 +352,6 @@ mod test {
             "⬜⬜⬜⬜".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(-2, 2));
-        assert_eq!(u, state1);
         let state2 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
@@ -372,8 +359,6 @@ mod test {
             "⬜⬜⬜⬜".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(-1, 1));
-        assert_eq!(u, state2);
         let state3 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
@@ -381,8 +366,6 @@ mod test {
             "⬜⬜⬜⬜".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(0, 0));
-        assert_eq!(u, state3);
         let state4 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
@@ -390,8 +373,6 @@ mod test {
             "⬜⬜⬜⬛".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(1, -1));
-        assert_eq!(u, state4);
         let state5 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
@@ -399,8 +380,6 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(-2, -1));
-        assert_eq!(u, state5);
         let state6 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬛⬛".to_string(),
@@ -408,8 +387,6 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(-1, 0));
-        assert_eq!(u, state6);
         let state7 = from_string(vec![
             "⬜⬛⬛⬛".to_string(),
             "⬛⬜⬜⬛".to_string(),
@@ -417,8 +394,6 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(0, 1));
-        assert_eq!(u, state7);
         let state8 = from_string(vec![
             "⬜⬛⬛⬜".to_string(),
             "⬛⬜⬜⬛".to_string(),
@@ -426,7 +401,148 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
         ])
         .unwrap();
+        toggle_cell(&mut u, CartesianPoint::from(-2, 2));
+        assert_eq!(u, state1);
+        toggle_cell(&mut u, CartesianPoint::from(-1, 1));
+        assert_eq!(u, state2);
+        toggle_cell(&mut u, CartesianPoint::from(0, 0));
+        assert_eq!(u, state3);
+        toggle_cell(&mut u, CartesianPoint::from(1, -1));
+        assert_eq!(u, state4);
+        toggle_cell(&mut u, CartesianPoint::from(-2, -1));
+        assert_eq!(u, state5);
+        toggle_cell(&mut u, CartesianPoint::from(-1, 0));
+        assert_eq!(u, state6);
+        toggle_cell(&mut u, CartesianPoint::from(0, 1));
+        assert_eq!(u, state7);
         toggle_cell(&mut u, CartesianPoint::from(1, 2));
+        assert_eq!(u, state8);
+    }
+
+    #[test]
+    fn test_toggle_cell_by_absolute_point() {
+        let cam = Rect::from(-5, -4, 4, 5);
+        let size: u16 = 1000;
+        let mut u = Universe::default();
+        let state1 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+        ])
+        .unwrap();
+        let state2 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+        ])
+        .unwrap();
+        let state3 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+        ])
+        .unwrap();
+        let state4 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+        ])
+        .unwrap();
+        let state5 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+        ])
+        .unwrap();
+        let state6 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+        ])
+        .unwrap();
+        let state7 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+        ])
+        .unwrap();
+        let state8 = from_string(vec![
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".to_string(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+        ])
+        .unwrap();
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(10, 10), &cam, size);
+        assert_eq!(u, state1);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(990, 10), &cam, size);
+        assert_eq!(u, state2);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(10, 990), &cam, size);
+        assert_eq!(u, state3);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(990, 990), &cam, size);
+        assert_eq!(u, state4);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(110, 110), &cam, size);
+        assert_eq!(u, state5);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(890, 110), &cam, size);
+        assert_eq!(u, state6);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(110, 890), &cam, size);
+        assert_eq!(u, state7);
+        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(890, 890), &cam, size);
         assert_eq!(u, state8);
     }
 

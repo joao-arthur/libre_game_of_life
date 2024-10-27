@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import initWASM, {
     EngineCartesianPoint,
     engineGetPresets,
+    EngineMatrixPoint,
     engineMoveBy,
     enginePause,
     engineResume,
@@ -42,15 +43,19 @@ export default function Main(): ReactElement {
         function onKeyPress(e: KeyboardEvent) {
             switch (e.key) {
                 case "w":
+                    console.log("engineMoveBy");
                     engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(1)));
                     break;
                 case "a":
+                    console.log("engineMoveBy");
                     engineMoveBy(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
                     break;
                 case "s":
+                    console.log("engineMoveBy");
                     engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
                     break;
                 case "d":
+                    console.log("engineMoveBy");
                     engineMoveBy(new EngineCartesianPoint(BigInt(1), BigInt(0)));
                     break;
                 case "+":
@@ -71,11 +76,12 @@ export default function Main(): ReactElement {
         if (!model) {
             return;
         }
-        const x = e.pageX - e.currentTarget.offsetLeft;
-        const y = e.pageY - e.currentTarget.offsetTop;
-        const point = new EngineCartesianPoint(
-            BigInt(Number(x)),
-            BigInt(Number(y)),
+        const row = e.pageX - e.currentTarget.offsetLeft;
+        const col = e.pageY - e.currentTarget.offsetTop;
+        console.log({col, row});
+        const point = new EngineMatrixPoint(
+            BigInt(Number(col)),
+            BigInt(Number(row)),
         );
         engineToggle(point);
     }
