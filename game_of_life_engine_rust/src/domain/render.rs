@@ -1,4 +1,12 @@
-use super::{camera::{get_center_absolute, get_length, get_subdivision_size}, cell::State, plane::{cartesian::{self, CartesianPoint}, shape::{Rect, Square}}, universe::Universe};
+use super::{
+    camera::{get_center_absolute, get_length, get_subdivision_size},
+    cell::State,
+    plane::{
+        cartesian::{self, CartesianPoint},
+        shape::{Rect, Square},
+    },
+    universe::Universe,
+};
 
 const DEAD_COLOR: &str = "#dbdbdb";
 const ALIVE_COLOR: &str = "#2e2e2e";
@@ -29,7 +37,9 @@ fn render(universe: Universe, dim: u16, cam: Rect, gap: u16) {
                 let s = Square {
                     x: arr_index.col as i64 * subdivision_size as i64 + gap as i64
                         - center_absolute.x,
-                    y: arr_index.row as i64 * subdivision_size as i64 + gap as i64 + center_absolute.y,
+                    y: arr_index.row as i64 * subdivision_size as i64
+                        + gap as i64
+                        + center_absolute.y,
                     size: subdivision_size as u64 - gap as u64 * 2,
                 };
             }

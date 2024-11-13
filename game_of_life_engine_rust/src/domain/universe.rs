@@ -10,7 +10,7 @@ use crate::domain::{
     plane::{
         cartesian::{from_matrix, subdivide, CartesianPoint},
         matrix::MatrixPoint,
-        shape::Rect
+        shape::Rect,
     },
 };
 
