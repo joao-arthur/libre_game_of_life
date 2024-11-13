@@ -388,7 +388,7 @@ pub struct AppInfo {
     pub size: u16,
     pub fps: u16,
     pub status: Status,
-    pub iter: u64,
+    pub age: u64,
 }
 
 pub fn app_get_settings() -> AppInfo {
@@ -402,7 +402,7 @@ pub fn app_get_settings() -> AppInfo {
             size: get_length(&s.cam).try_into().unwrap(),
             fps: s.fps,
             status: s.status,
-            iter: u.iter,
+            age: u.age,
         }
     })
 }
@@ -439,7 +439,7 @@ mod test {
                 size: 10,
                 fps: 4,
                 status: Status::Paused,
-                iter: 0,
+                age: 0,
             },
             settings
         );
@@ -539,7 +539,7 @@ mod test {
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
-                iter: 1,
+                age: 1,
                 value: block.value.clone()
             }
         );
@@ -559,7 +559,7 @@ mod test {
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
-                iter: 2,
+                age: 2,
                 value: block.value.clone()
             }
         );
@@ -616,7 +616,7 @@ mod test {
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
-                iter: 2,
+                age: 2,
                 value: block.value.clone()
             }
         );
@@ -625,7 +625,7 @@ mod test {
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
-                iter: 2,
+                age: 2,
                 value: HashMap::from([
                     (CartesianPoint::from(-1, 1), State::Alive),
                     (CartesianPoint::from(0, 1), State::Alive),

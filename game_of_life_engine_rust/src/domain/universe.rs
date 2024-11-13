@@ -17,7 +17,7 @@ use crate::domain::{
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
     pub value: HashMap<CartesianPoint, State>,
-    pub iter: u64,
+    pub age: u64,
 }
 
 impl Universe {
@@ -33,7 +33,7 @@ impl Default for Universe {
     fn default() -> Self {
         Universe {
             value: HashMap::new(),
-            iter: 0,
+            age: 0,
         }
     }
 }
@@ -143,7 +143,7 @@ pub fn iterate(u: &mut Universe) {
             }
         })
         .collect();
-    u.iter += 1;
+    u.age += 1;
     u.value = entries;
 }
 
@@ -221,7 +221,7 @@ mod test {
             Universe::default(),
             Universe {
                 value: HashMap::new(),
-                iter: 0,
+                age: 0,
             }
         );
         assert_eq!(
@@ -238,7 +238,7 @@ mod test {
                     (CartesianPoint::from(1, -1), State::Alive),
                     (CartesianPoint::from(1, 1), State::Alive),
                 ]),
-                iter: 0,
+                age: 0,
             }
         );
     }
@@ -546,13 +546,13 @@ mod test {
     fn test_iterate() {
         let mut model1x1iter0 = from_string(vec!["⬜".to_string()]).unwrap();
         let mut model1x1iter1 = from_string(vec!["⬛".to_string()]).unwrap();
-        model1x1iter1.iter = 1;
+        model1x1iter1.age = 1;
         iterate(&mut model1x1iter0);
         assert_eq!(model1x1iter0, model1x1iter1);
 
         let mut model2x2iter0 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]).unwrap();
         let mut model2x2iter1 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]).unwrap();
-        model2x2iter1.iter = 1;
+        model2x2iter1.age = 1;
         iterate(&mut model2x2iter0);
         assert_eq!(model2x2iter0, model2x2iter1);
 
@@ -568,7 +568,7 @@ mod test {
             "⬛⬛⬛".to_string(),
         ])
         .unwrap();
-        model3x3_1_iter1.iter = 1;
+        model3x3_1_iter1.age = 1;
         iterate(&mut model3x3_1_iter0);
         assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
 
@@ -584,7 +584,7 @@ mod test {
             "⬛⬜⬛".to_string(),
         ])
         .unwrap();
-        model3x3_2_iter1.iter = 1;
+        model3x3_2_iter1.age = 1;
         iterate(&mut model3x3_2_iter0);
         assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
 
@@ -600,7 +600,7 @@ mod test {
             "⬛⬜⬛".to_string(),
         ])
         .unwrap();
-        model3x3_3_iter1.iter = 1;
+        model3x3_3_iter1.age = 1;
         iterate(&mut model3x3_3_iter0);
         assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
 
@@ -616,7 +616,7 @@ mod test {
             "⬛⬜⬜".to_string(),
         ])
         .unwrap();
-        model3x3_4_iter1.iter = 1;
+        model3x3_4_iter1.age = 1;
         iterate(&mut model3x3_4_iter0);
         assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
 
@@ -632,7 +632,7 @@ mod test {
             "⬜⬜⬜".to_string(),
         ])
         .unwrap();
-        model3x3_5_iter1.iter = 1;
+        model3x3_5_iter1.age = 1;
         iterate(&mut model3x3_5_iter0);
         assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
     }

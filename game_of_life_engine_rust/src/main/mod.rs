@@ -58,7 +58,7 @@ pub struct EngineInfo {
     pub size: u16,
     pub fps: u16,
     pub status: EngineStatus,
-    pub iter: u64,
+    pub age: u64,
 }
 
 #[wasm_bindgen]
@@ -166,7 +166,7 @@ pub fn main_get_settings() -> EngineInfo {
             Status::Paused => EngineStatus::Paused,
             Status::Resumed => EngineStatus::Resumed,
         },
-        iter: settings.iter,
+        age: settings.age,
     }
 }
 
