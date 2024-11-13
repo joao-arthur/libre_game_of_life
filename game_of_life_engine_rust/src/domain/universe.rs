@@ -4,12 +4,13 @@ use std::{
 };
 
 use crate::domain::{
-    camera::{get_center, get_length, get_subdivision_size, Rect},
+    camera::{get_center, get_length, get_subdivision_size},
     cell::{self, State},
     neighbor::number_of_alive_from_model,
     plane::{
         cartesian::{from_matrix, subdivide, CartesianPoint},
         matrix::MatrixPoint,
+        shape::Rect
     },
 };
 
@@ -158,12 +159,7 @@ pub fn toggle_cell(u: &mut Universe, p: CartesianPoint) {
     }
 }
 
-pub fn toggle_cell_by_absolute_point(
-    u: &mut Universe,
-    p: MatrixPoint,
-    cam: &Rect,
-    size: u16,
-) {
+pub fn toggle_cell_by_absolute_point(u: &mut Universe, p: MatrixPoint, cam: &Rect, size: u16) {
     let length = get_length(cam);
     let center = get_center(cam);
     let subdivision_size = get_subdivision_size(cam, size);

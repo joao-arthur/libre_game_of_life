@@ -5,10 +5,13 @@ use web_sys::CanvasRenderingContext2d;
 use crate::domain::{
     camera::{
         get_center_absolute, get_length, get_subdivision_size, move_by, zoom_in, zoom_out, zoom_to,
-        Rect,
     },
     cell::State,
-    plane::{cartesian::{to_matrix, CartesianPoint}, matrix::MatrixPoint},
+    plane::{
+        cartesian::{to_matrix, CartesianPoint},
+        matrix::MatrixPoint,
+        shape::{Rect, Square},
+    },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
 };
@@ -54,12 +57,6 @@ pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
                 .collect(),
         })
         .collect()
-}
-
-pub struct Square {
-    pub x: i64,
-    pub y: i64,
-    pub size: u64,
 }
 
 pub trait DrawContext {
@@ -198,8 +195,11 @@ fn render() {
         match p.1 {
             State::Alive => {
                 let s = Square {
-                    x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64 - center_absolute.x,
-                    y: arr_index.row as i64 * subdivision_size as i64 + settings.gap as i64 + center_absolute.y,
+                    x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
+                        - center_absolute.x,
+                    y: arr_index.row as i64 * subdivision_size as i64
+                        + settings.gap as i64
+                        + center_absolute.y,
                     size: subdivision_size as u64 - settings.gap as u64 * 2,
                 };
                 holder.draw_square(s, ALIVE_COLOR.to_string());

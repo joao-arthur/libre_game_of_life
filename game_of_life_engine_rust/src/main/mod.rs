@@ -4,7 +4,10 @@ use crate::{
         app_set_dimension, app_set_fps, app_set_gap, app_set_preset, app_single_iteration,
         app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
     },
-    domain::{plane::{cartesian::CartesianPoint, matrix::MatrixPoint}, preset::get_preset_groups},
+    domain::{
+        plane::{cartesian::CartesianPoint, matrix::MatrixPoint},
+        preset::get_preset_groups,
+    },
 };
 use js_sys::Function;
 use serde::Serialize;
