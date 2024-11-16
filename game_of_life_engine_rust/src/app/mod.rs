@@ -3,14 +3,14 @@ use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    camera::{
-        get_center_absolute, get_length, get_subdivision_size, move_by, zoom_in, zoom_out, zoom_to,
-    },
     cell::State,
     plane::{
         cartesian::{to_matrix, CartesianPoint},
         matrix::MatrixPoint,
-        shape::{Rect, Square},
+    },
+    poligon::{
+        rect::{self, Rect},
+        square::Square,
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
@@ -173,9 +173,9 @@ fn render() {
         (m.universe.clone(), m.settings.clone(), m.holder.clone())
     });
     let holder = holder.unwrap();
-    let length = get_length(&settings.cam);
-    let subdivision_size = get_subdivision_size(&settings.cam, settings.dim);
-    let center_absolute = get_center_absolute(&settings.cam, settings.dim);
+    let length = rect::get_length(&settings.cam);
+    let subdivision_size = rect::get_subdivision_size(&settings.cam, settings.dim);
+    let center_absolute = rect::get_center_absolute(&settings.cam, settings.dim);
     let cam = settings.cam;
     let background = Square {
         x: 0,
@@ -352,7 +352,7 @@ pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
 pub fn app_zoom_in() {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        zoom_in(&mut model.settings.cam);
+        rect::zoom_in(&mut model.settings.cam);
     });
     on_change(Prop::Cam);
 }
@@ -360,7 +360,7 @@ pub fn app_zoom_in() {
 pub fn app_zoom_out() {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        zoom_out(&mut model.settings.cam);
+        rect::zoom_out(&mut model.settings.cam);
     });
     on_change(Prop::Cam);
 }
@@ -368,7 +368,7 @@ pub fn app_zoom_out() {
 pub fn app_zoom_to(new_size: u16) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        zoom_to(&mut model.settings.cam, new_size);
+        rect::zoom_to(&mut model.settings.cam, new_size);
     });
     on_change(Prop::Cam);
 }
@@ -376,7 +376,7 @@ pub fn app_zoom_to(new_size: u16) {
 pub fn app_move_model(delta: CartesianPoint) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        move_by(&mut model.settings.cam, delta);
+        rect::move_by(&mut model.settings.cam, delta);
     });
     on_change(Prop::Universe);
 }
@@ -399,7 +399,7 @@ pub fn app_get_settings() -> AppInfo {
         AppInfo {
             preset: s.preset,
             gap: s.gap,
-            size: get_length(&s.cam).try_into().unwrap(),
+            size: rect::get_length(&s.cam).try_into().unwrap(),
             fps: s.fps,
             status: s.status,
             age: u.age,

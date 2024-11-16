@@ -1,9 +1,9 @@
 use super::{
-    camera::{get_center_absolute, get_length, get_subdivision_size},
     cell::State,
-    plane::{
-        cartesian::{self, CartesianPoint},
-        shape::{Rect, Square},
+    plane::cartesian::{self, CartesianPoint},
+    poligon::{
+        rect::{self, Rect},
+        square::Square,
     },
     universe::Universe,
 };
@@ -12,9 +12,9 @@ const DEAD_COLOR: &str = "#dbdbdb";
 const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render(universe: Universe, dim: u16, cam: Rect, gap: u16) {
-    let length = get_length(&cam);
-    let subdivision_size = get_subdivision_size(&cam, dim);
-    let center_absolute = get_center_absolute(&cam, dim);
+    let length = rect::get_length(&cam);
+    let subdivision_size = rect::get_subdivision_size(&cam, dim);
+    let center_absolute = rect::get_center_absolute(&cam, dim);
 
     let cam = cam;
     let background = Square {
