@@ -8,7 +8,7 @@ use crate::{
         app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
     },
     domain::{
-        coordinate::{CartesianP, MatrixP},
+        geometry::coordinate::{CartesianP, MatrixP},
         preset::get_preset_groups,
     },
 };

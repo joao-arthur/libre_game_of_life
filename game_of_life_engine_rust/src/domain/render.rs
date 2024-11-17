@@ -1,12 +1,14 @@
 use super::{
     cell::State,
-    coordinate::cartesian_to_matrix,
-    operations::{get_center_absolute, get_subdivision_size},
-    poligon::{
-        rect::{get_length, Rect},
-        square::Sq,
-    },
     universe::Universe,
+    geometry::{
+        coordinate::cartesian_to_matrix,
+        poligon::{
+            rect::{get_length, Rect},
+            square::Sq,
+        },
+        operation::{get_center_absolute, get_subdivision_size},
+    }
 };
 
 #[derive(Debug, PartialEq, Clone)]

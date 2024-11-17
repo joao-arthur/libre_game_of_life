@@ -1,4 +1,4 @@
-use crate::domain::{cell::State, coordinate::CartesianP, universe::Universe};
+use crate::domain::{cell::State, geometry::coordinate::CartesianP, universe::Universe};
 
 use super::universe::get_value;
 

@@ -5,10 +5,12 @@ use std::{
 
 use crate::domain::{
     cell::{self, State},
-    coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
     neighbor::number_of_alive_from_model,
-    operations::{get_subdivision_size, subdivide},
-    poligon::rect::{get_center, get_length, Rect},
+    geometry::{
+        coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
+        poligon::rect::{get_center, get_length, Rect},
+        operation::{get_subdivision_size, subdivide},
+    }
 };
 
 #[derive(Debug, PartialEq, Clone)]

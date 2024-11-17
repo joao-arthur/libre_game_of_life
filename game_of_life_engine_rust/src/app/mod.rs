@@ -3,10 +3,12 @@ use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    coordinate::{CartesianP, MatrixP},
-    poligon::{
-        rect::{get_length, move_by, zoom_in, zoom_out, zoom_to},
-        square::Sq,
+    geometry::{
+        coordinate::{CartesianP, MatrixP},
+        poligon::{
+            rect::{get_length, move_by, zoom_in, zoom_out, zoom_to},
+            square::Sq,
+        },
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     render::{get_values_to_render, RenderSettings},
