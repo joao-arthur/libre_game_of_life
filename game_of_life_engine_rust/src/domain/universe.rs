@@ -5,7 +5,7 @@ use std::{
 
 use crate::domain::{
     cell::{self, State},
-    coordinate::{cartesian::CartesianP, convert::matrix_to_cartesian, matrix::MatrixP},
+    coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
     neighbor::number_of_alive_from_model,
     poligon::rect::{self, Rect},
 };

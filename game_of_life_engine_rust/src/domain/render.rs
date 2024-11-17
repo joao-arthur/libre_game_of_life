@@ -1,6 +1,6 @@
 use super::{
     cell::State,
-    coordinate::convert::cartesian_to_matrix,
+    coordinate::cartesian_to_matrix,
     operations::{get_center_absolute, get_subdivision_size},
     poligon::{
         rect::{self, Rect},
@@ -9,10 +9,10 @@ use super::{
     universe::Universe,
 };
 
-fn render(universe: Universe, dim: u16, cam: Rect, gap: u16) -> Vec<Sq> {
+pub fn get_values_to_render(universe: &Universe, dim: u16, cam: &Rect, gap: u16) -> Vec<Sq> {
     let length = rect::get_length(&cam);
-    let subdivision_size = get_subdivision_size(&cam, dim);
-    let center_absolute = get_center_absolute(&cam, dim);
+    let subdivision_size = get_subdivision_size(cam, dim);
+    let center_absolute = get_center_absolute(cam, dim);
     universe
         .value
         .iter()

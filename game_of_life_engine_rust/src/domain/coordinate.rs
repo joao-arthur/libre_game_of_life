@@ -1,5 +1,40 @@
-use super::cartesian::CartesianP;
-use super::matrix::MatrixP;
+use std::fmt;
+
+#[derive(Debug, PartialEq)]
+pub struct MatrixP {
+    pub row: u64,
+    pub col: u64,
+}
+
+impl MatrixP {
+    pub fn from(row: u64, col: u64) -> Self {
+        MatrixP { row, col }
+    }
+}
+
+impl fmt::Display for MatrixP {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.row, self.col)
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+pub struct CartesianP {
+    pub x: i64,
+    pub y: i64,
+}
+
+impl CartesianP {
+    pub fn from(x: i64, y: i64) -> Self {
+        CartesianP { x, y }
+    }
+}
+
+impl fmt::Display for CartesianP {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
 
 pub fn matrix_to_cartesian(p: MatrixP, length: u64) -> CartesianP {
     let len: i64 = length.try_into().unwrap();
@@ -20,6 +55,20 @@ pub fn cartesian_to_matrix(p: CartesianP, length: u64) -> MatrixP {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_matrix_point() {
+        let p = MatrixP::from(23, 38);
+        assert_eq!(p, MatrixP { row: 23, col: 38 });
+        assert_eq!(format!("{p}"), "(23, 38)");
+    }
+
+    #[test]
+    fn test_cartesian_point() {
+        let p = CartesianP::from(-23, 38);
+        assert_eq!(p, CartesianP { x: -23, y: 38 });
+        assert_eq!(format!("{p}"), "(-23, 38)");
+    }
 
     #[test]
     fn test_index_to_point_1x1_grid() {

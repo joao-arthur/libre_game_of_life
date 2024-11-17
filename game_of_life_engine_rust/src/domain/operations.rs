@@ -1,5 +1,5 @@
 use super::{
-    coordinate::cartesian::CartesianP,
+    coordinate::CartesianP,
     poligon::rect::{self, Rect},
 };
 

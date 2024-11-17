@@ -1,4 +1,4 @@
-use crate::domain::{cell::State, coordinate::cartesian::CartesianP, universe::Universe};
+use crate::domain::{cell::State, coordinate::CartesianP, universe::Universe};
 
 pub type Neighbor<'a> = Option<&'a State>;
 

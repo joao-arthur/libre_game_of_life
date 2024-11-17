@@ -3,10 +3,14 @@ use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    cell::State, coordinate::{cartesian::CartesianP, convert::cartesian_to_matrix, matrix::MatrixP}, operations::{get_center_absolute, get_subdivision_size}, poligon::{
+    coordinate::{CartesianP, MatrixP},
+    poligon::{
         rect::{self, Rect},
         square::Sq,
-    }, preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset}, universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe}
+    },
+    preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
+    render::get_values_to_render,
+    universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
 };
 
 pub struct PresetOptionItem {
@@ -165,39 +169,21 @@ fn render() {
         let m = i.borrow();
         (m.universe.clone(), m.settings.clone(), m.holder.clone())
     });
-    let holder = holder.unwrap();
-    let length = rect::get_length(&settings.cam);
-    let subdivision_size = get_subdivision_size(&settings.cam, settings.dim);
-    let center_absolute = get_center_absolute(&settings.cam, settings.dim);
-    let cam = settings.cam;
-    let background = Sq {
-        x: 0,
-        y: 0,
-        size: settings.dim.into(),
-    };
-    holder.draw_square(background, DEAD_COLOR.to_string());
-    let values_in_camera: Vec<(&CartesianP, &State)> = universe
-        .value
-        .iter()
-        .filter(|value| {
-            value.0.x >= cam.x1 && value.0.x <= cam.x2 && value.0.y >= cam.y1 && value.0.y <= cam.y2
-        })
-        .collect();
-    for p in values_in_camera {
-        let arr_index = cartesian_to_matrix(*p.0, length.into());
-        match p.1 {
-            State::Alive => {
-                let s = Sq {
-                    x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
-                        - center_absolute.x,
-                    y: arr_index.row as i64 * subdivision_size as i64
-                        + settings.gap as i64
-                        + center_absolute.y,
-                    size: subdivision_size as u64 - settings.gap as u64 * 2,
-                };
-                holder.draw_square(s, ALIVE_COLOR.to_string());
-            }
-            _ => {}
+    if let Some(holder) = holder {
+        let bg = Sq {
+            x: 0,
+            y: 0,
+            size: settings.dim.into(),
+        };
+        holder.draw_square(bg, DEAD_COLOR.to_string());
+        let values_to_render = get_values_to_render(
+            &universe, 
+            settings.dim,
+            &settings.cam,
+            settings.gap
+        );
+        for sq in values_to_render {
+            holder.draw_square(sq, ALIVE_COLOR.to_string());
         }
     }
 }
