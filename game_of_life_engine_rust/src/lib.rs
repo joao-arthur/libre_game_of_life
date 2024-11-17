@@ -197,6 +197,5 @@ pub fn main_get_presets() -> JsValue {
     serde_wasm_bindgen::to_value(&groups).unwrap()
 }
 
-// TODO fix main module
 // todo fix mover camera -0.5 0.5
 // render em float

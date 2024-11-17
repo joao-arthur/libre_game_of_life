@@ -4,14 +4,15 @@ use std::{
 };
 
 use crate::domain::{
-    cell::{self, State},
-    neighbor::number_of_alive_from_model,
+    cell::{self, toggle, State},
     geometry::{
         coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
-        poligon::rect::{get_center, get_length, Rect},
-        operation::{get_subdivision_size, subdivide},
-    }
+        poligon::rect::{get_length, Rect},
+    },
+    neighbor::number_of_alive_from_model,
 };
+
+use super::render::RenderSettings;
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
@@ -130,7 +131,7 @@ pub fn iterate(u: &mut Universe) {
 }
 
 pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
-    let new_cell = cell::toggle(&get_value(u, &p));
+    let new_cell = toggle(&get_value(u, &p));
     match new_cell {
         State::Dead => {
             u.value.remove(&p);
@@ -141,18 +142,12 @@ pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
     }
 }
 
-pub fn toggle_cell_by_absolute_point(u: &mut Universe, p: MatrixP, cam: &Rect, dim: u16) {
-    let length = get_length(cam);
-    let center = get_center(cam);
-    let subdivision_size = get_subdivision_size(cam, dim);
-    let col = subdivide(p.col.try_into().unwrap(), subdivision_size.into());
-    let row = subdivide(p.row.try_into().unwrap(), subdivision_size.into());
-    let point = matrix_to_cartesian(
-        MatrixP { row: row.try_into().unwrap(), col: col.try_into().unwrap() },
-        length.into(),
-    );
-    let cell = CartesianP { x: point.x + center.x, y: point.y + center.y };
-    toggle_cell(u, cell);
+pub fn toggle_cell_by_absolute_point(u: &mut Universe, s: &RenderSettings, p: MatrixP) {
+    let length = get_length(&s.cam);
+    let subdivision_size = s.dim as u64 / length;
+    let matrix_point = MatrixP { row: p.row / subdivision_size, col: p.col / subdivision_size };
+    let cartesian_point = matrix_to_cartesian(matrix_point, length.into());
+    toggle_cell(u, cartesian_point);
 }
 
 pub fn get_camera(u: &Universe) -> Rect {
@@ -379,8 +374,6 @@ mod test {
 
     #[test]
     fn test_toggle_cell_by_absolute_point() {
-        let cam = Rect::from(-5, -4, 4, 5);
-        let size: u16 = 1000;
         let mut u = Universe::default();
         let state1 = from_string(vec![
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
@@ -486,22 +479,71 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(10, 10), &cam, size);
+        let state9 = from_string(vec![
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+        ])
+        .unwrap();
+        let cam = Rect::from(-5, -4, 4, 5);
+        let dim: u16 = 1000;
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 10),);
         assert_eq!(u, state1);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(990, 10), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(990, 10),
+        );
         assert_eq!(u, state2);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(10, 990), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(10, 990),
+        );
         assert_eq!(u, state3);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(990, 990), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(990, 990),
+        );
         assert_eq!(u, state4);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(110, 110), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(110, 110),
+        );
         assert_eq!(u, state5);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(890, 110), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(890, 110),
+        );
         assert_eq!(u, state6);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(110, 890), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(110, 890),
+        );
         assert_eq!(u, state7);
-        toggle_cell_by_absolute_point(&mut u, MatrixP::from(890, 890), &cam, size);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(890, 890),
+        );
         assert_eq!(u, state8);
+        toggle_cell_by_absolute_point(
+            &mut u,
+            &RenderSettings { cam, dim, gap: 0 },
+            MatrixP::from(710, 350),
+        );
+        assert_eq!(u, state9);
     }
 
     #[test]

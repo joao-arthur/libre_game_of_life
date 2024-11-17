@@ -1,14 +1,13 @@
 use super::{
     cell::State,
-    universe::Universe,
     geometry::{
-        coordinate::cartesian_to_matrix,
+        coordinate::{cartesian_to_matrix, CartesianP},
         poligon::{
-            rect::{get_length, Rect},
+            rect::{get_center, get_length, Rect},
             square::Sq,
         },
-        operation::{get_center_absolute, get_subdivision_size},
-    }
+    },
+    universe::Universe,
 };
 
 #[derive(Debug, PartialEq, Clone)]
@@ -18,26 +17,29 @@ pub struct RenderSettings {
     pub gap: u8,
 }
 
-pub fn get_values_to_render(universe: &Universe, render_settings: &RenderSettings) -> Vec<Sq> {
-    let length = get_length(&render_settings.cam);
-    let subdivision_size = get_subdivision_size(&render_settings.cam, render_settings.dim);
-    let center_absolute = get_center_absolute(&render_settings.cam, render_settings.dim);
-    let mut values_to_render: Vec<Sq> = universe
+pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<Sq> {
+    let length = get_length(&s.cam);
+    let center = get_center(&s.cam);
+    let subdivision_size = s.dim as u64 / length;
+    let center_absolute =
+        CartesianP { x: center.x * subdivision_size as i64, y: center.y * subdivision_size as i64 };
+    let mut values_to_render: Vec<Sq> = u
         .value
         .iter()
         .filter(|value| {
-            value.0.x >= render_settings.cam.x1
-                && value.0.x <= render_settings.cam.x2
-                && value.0.y >= render_settings.cam.y1
-                && value.0.y <= render_settings.cam.y2
+            value.0.x >= s.cam.x1
+                && value.0.x <= s.cam.x2
+                && value.0.y >= s.cam.y1
+                && value.0.y <= s.cam.y2
         })
         .filter(|value| value.1 == &State::Alive)
         .map(|value| {
             let arr_index = cartesian_to_matrix(*value.0, length.into());
+            let gap = s.gap;
             Sq {
-                x: arr_index.col as i64 * subdivision_size as i64 + render_settings.gap as i64 - center_absolute.x,
-                y: arr_index.row as i64 * subdivision_size as i64 + render_settings.gap as i64 + center_absolute.y,
-                size: subdivision_size as u64 - render_settings.gap as u64 * 2,
+                x: arr_index.col as i64 * subdivision_size as i64 + gap as i64 - center_absolute.x,
+                y: arr_index.row as i64 * subdivision_size as i64 + gap as i64 + center_absolute.y,
+                size: subdivision_size as u64 - gap as u64 * 2,
             }
         })
         .collect();
@@ -54,7 +56,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_render() {
+    fn test_render_gap() {
         let model = from_string(vec![
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
             String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
@@ -68,21 +70,12 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        let render_settings_gap0 = RenderSettings {
-            cam: Rect::from(-5, -4, 4, 5),
-            dim: 1000,
-            gap: 0
-        };
-        let render_settings_gap1 = RenderSettings {
-            cam: Rect::from(-5, -4, 4, 5),
-            dim: 1000,
-            gap: 1
-        };
-        let render_settings_gap2 = RenderSettings {
-            cam: Rect::from(-5, -4, 4, 5),
-            dim: 1000,
-            gap: 2
-        };    
+        let render_settings_gap0 =
+            RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 1000, gap: 0 };
+        let render_settings_gap1 =
+            RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 1000, gap: 1 };
+        let render_settings_gap2 =
+            RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 1000, gap: 2 };
         assert_eq!(
             get_values_to_render(&model, &render_settings_gap0),
             vec![

@@ -180,7 +180,7 @@ export default function Main(): ReactElement {
                 </div>
                 <span className="my-1">
                     <label>
-                        Iteration: {model ? Number(model.iter) : 0}
+                        Iteration: {model ? Number(model.age) : 0}
                     </label>
                 </span>
                 <Button

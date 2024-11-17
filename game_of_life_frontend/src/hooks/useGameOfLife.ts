@@ -39,7 +39,7 @@ export function useGameOfLife(): GameOfLife {
                 fps: obj.fps,
                 gap: obj.gap,
                 preset: obj.preset,
-                iter: obj.iter,
+                age: obj.age,
                 status: obj.status,
             } as any);
         });

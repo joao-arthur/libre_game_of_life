@@ -303,9 +303,8 @@ pub fn app_toggle_by_point(p: CartesianP) {
 pub fn app_toggle_model_cell_by_absolute_point(p: MatrixP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        let dim = model.settings.render_settings.dim;
-        let cam = model.settings.render_settings.cam.clone();
-        toggle_cell_by_absolute_point(&mut model.universe, p, &cam, dim);
+        let render_settings = model.settings.render_settings.clone();
+        toggle_cell_by_absolute_point(&mut model.universe, &render_settings, p);
         model.settings.preset = None;
     });
     on_change(Prop::Universe);
@@ -372,7 +371,7 @@ pub fn app_get_settings() -> AppInfo {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::{cell::State, poligon::rect::Rect};
+    use crate::domain::{cell::State, geometry::poligon::rect::Rect};
     use std::collections::HashMap;
 
     use super::*;
