@@ -3,17 +3,10 @@ use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
 use crate::domain::{
-    cell::State,
-    plane::{
-        cartesian::{to_matrix, CartesianPoint},
-        matrix::MatrixPoint,
-    },
-    poligon::{
+    cell::State, coordinate::{cartesian::CartesianP, convert::cartesian_to_matrix, matrix::MatrixP}, operations::{get_center_absolute, get_subdivision_size}, poligon::{
         rect::{self, Rect},
-        square::Square,
-    },
-    preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
-    universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
+        square::Sq,
+    }, preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset}, universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe}
 };
 
 pub struct PresetOptionItem {
@@ -60,8 +53,8 @@ pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
 }
 
 pub trait DrawContext {
-    fn clear(&self, s: Square);
-    fn draw_square(&self, s: Square, color: String);
+    fn clear(&self, s: Sq);
+    fn draw_square(&self, s: Sq, color: String);
 }
 
 #[derive(Clone)]
@@ -70,13 +63,13 @@ pub struct Holder {
 }
 
 impl DrawContext for Holder {
-    fn clear(&self, s: Square) {
+    fn clear(&self, s: Sq) {
         self.context.set_fill_style_str("white");
         self.context
             .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 
-    fn draw_square(&self, s: Square, color: String) {
+    fn draw_square(&self, s: Sq, color: String) {
         self.context.set_fill_style(&color.into());
         self.context
             .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
@@ -174,16 +167,16 @@ fn render() {
     });
     let holder = holder.unwrap();
     let length = rect::get_length(&settings.cam);
-    let subdivision_size = rect::get_subdivision_size(&settings.cam, settings.dim);
-    let center_absolute = rect::get_center_absolute(&settings.cam, settings.dim);
+    let subdivision_size = get_subdivision_size(&settings.cam, settings.dim);
+    let center_absolute = get_center_absolute(&settings.cam, settings.dim);
     let cam = settings.cam;
-    let background = Square {
+    let background = Sq {
         x: 0,
         y: 0,
         size: settings.dim.into(),
     };
     holder.draw_square(background, DEAD_COLOR.to_string());
-    let values_in_camera: Vec<(&CartesianPoint, &State)> = universe
+    let values_in_camera: Vec<(&CartesianP, &State)> = universe
         .value
         .iter()
         .filter(|value| {
@@ -191,10 +184,10 @@ fn render() {
         })
         .collect();
     for p in values_in_camera {
-        let arr_index = to_matrix(*p.0, length.into());
+        let arr_index = cartesian_to_matrix(*p.0, length.into());
         match p.1 {
             State::Alive => {
-                let s = Square {
+                let s = Sq {
                     x: arr_index.col as i64 * subdivision_size as i64 + settings.gap as i64
                         - center_absolute.x,
                     y: arr_index.row as i64 * subdivision_size as i64
@@ -327,7 +320,7 @@ pub fn app_iterate() {
     on_change(Prop::Universe);
 }
 
-pub fn app_toggle_by_point(p: CartesianPoint) {
+pub fn app_toggle_by_point(p: CartesianP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         toggle_cell(&mut model.universe, p);
@@ -337,7 +330,7 @@ pub fn app_toggle_by_point(p: CartesianPoint) {
     on_change(Prop::Preset);
 }
 
-pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
+pub fn app_toggle_model_cell_by_absolute_point(p: MatrixP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         let cam = &model.settings.clone().cam;
@@ -373,7 +366,7 @@ pub fn app_zoom_to(new_size: u16) {
     on_change(Prop::Cam);
 }
 
-pub fn app_move_model(delta: CartesianPoint) {
+pub fn app_move_model(delta: CartesianP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         rect::move_by(&mut model.settings.cam, delta);
@@ -612,7 +605,7 @@ mod test {
             }
         );
 
-        app_move_model(CartesianPoint::from(20, 20));
+        app_move_model(CartesianP::from(20, 20));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
@@ -621,15 +614,15 @@ mod test {
             }
         );
 
-        app_toggle_by_point(CartesianPoint::from(0, 0));
+        app_toggle_by_point(CartesianP::from(0, 0));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 age: 2,
                 value: HashMap::from([
-                    (CartesianPoint::from(-1, 1), State::Alive),
-                    (CartesianPoint::from(0, 1), State::Alive),
-                    (CartesianPoint::from(-1, 0), State::Alive),
+                    (CartesianP::from(-1, 1), State::Alive),
+                    (CartesianP::from(0, 1), State::Alive),
+                    (CartesianP::from(-1, 0), State::Alive),
                 ])
             }
         );

@@ -8,7 +8,7 @@ use crate::{
         app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
     },
     domain::{
-        plane::{cartesian::CartesianPoint, matrix::MatrixPoint},
+        coordinate::{cartesian::CartesianP, matrix::MatrixP},
         preset::get_preset_groups,
     },
 };
@@ -126,7 +126,7 @@ pub fn main_single_iteration() {
 
 #[wasm_bindgen(js_name = "engineToggle")]
 pub fn main_toggle(point: EngineMatrixPoint) {
-    let cp = MatrixPoint {
+    let cp = MatrixP {
         row: point.row,
         col: point.col,
     };
@@ -150,7 +150,7 @@ pub fn main_zoom_by(new_size: u16) {
 
 #[wasm_bindgen(js_name = "engineMoveBy")]
 pub fn main_move_model(delta: EngineCartesianPoint) {
-    let cp = CartesianPoint {
+    let cp = CartesianP {
         x: delta.x,
         y: delta.y,
     };

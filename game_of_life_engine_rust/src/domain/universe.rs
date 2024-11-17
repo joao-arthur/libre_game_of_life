@@ -5,22 +5,21 @@ use std::{
 
 use crate::domain::{
     cell::{self, State},
+    coordinate::{cartesian::CartesianP, convert::matrix_to_cartesian, matrix::MatrixP},
     neighbor::number_of_alive_from_model,
-    plane::{
-        cartesian::{from_matrix, subdivide, CartesianPoint},
-        matrix::MatrixPoint,
-    },
     poligon::rect::{self, Rect},
 };
 
+use super::operations::{get_center, get_subdivision_size, subdivide};
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
-    pub value: HashMap<CartesianPoint, State>,
+    pub value: HashMap<CartesianP, State>,
     pub age: u64,
 }
 
 impl Universe {
-    pub fn from(value: HashMap<CartesianPoint, State>) -> Self {
+    pub fn from(value: HashMap<CartesianP, State>) -> Self {
         Universe {
             value,
             ..Default::default()
@@ -73,7 +72,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     {
         return Err(FromStringError::InvalidCharacter(InvalidCharacterError));
     }
-    let mut value = HashMap::<CartesianPoint, State>::new();
+    let mut value = HashMap::<CartesianP, State>::new();
     let len = as_str.len();
     let lines_len: HashSet<usize> = as_str.iter().map(|row| row.chars().count()).collect();
     if lines_len.len() > 1 {
@@ -89,8 +88,8 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
         for (col, col_str) in col_iter {
             if col_str == '⬜' {
                 value.insert(
-                    from_matrix(
-                        MatrixPoint {
+                    matrix_to_cartesian(
+                        MatrixP {
                             row: row.try_into().unwrap(),
                             col: col.try_into().unwrap(),
                         },
@@ -104,7 +103,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     Ok(Universe::from(value))
 }
 
-pub fn get_value(u: &Universe, p: CartesianPoint) -> State {
+pub fn get_value(u: &Universe, p: CartesianP) -> State {
     if u.value.get(&p).unwrap_or(&State::Dead) == &State::Alive {
         State::Alive
     } else {
@@ -113,24 +112,24 @@ pub fn get_value(u: &Universe, p: CartesianPoint) -> State {
 }
 
 pub fn iterate(u: &mut Universe) {
-    let points: HashSet<CartesianPoint> = u
+    let points: HashSet<CartesianP> = u
         .value
         .keys()
         .flat_map(|point| {
             [
-                CartesianPoint::from(point.x - 1, point.y + 1),
-                CartesianPoint::from(point.x, point.y + 1),
-                CartesianPoint::from(point.x + 1, point.y + 1),
-                CartesianPoint::from(point.x - 1, point.y),
+                CartesianP::from(point.x - 1, point.y + 1),
+                CartesianP::from(point.x, point.y + 1),
+                CartesianP::from(point.x + 1, point.y + 1),
+                CartesianP::from(point.x - 1, point.y),
                 point.clone(),
-                CartesianPoint::from(point.x + 1, point.y),
-                CartesianPoint::from(point.x - 1, point.y - 1),
-                CartesianPoint::from(point.x, point.y - 1),
-                CartesianPoint::from(point.x + 1, point.y - 1),
+                CartesianP::from(point.x + 1, point.y),
+                CartesianP::from(point.x - 1, point.y - 1),
+                CartesianP::from(point.x, point.y - 1),
+                CartesianP::from(point.x + 1, point.y - 1),
             ]
         })
         .collect();
-    let entries: HashMap<CartesianPoint, State> = points
+    let entries: HashMap<CartesianP, State> = points
         .iter()
         .filter_map(|point| {
             let s = u.value.get(point).unwrap_or(&State::Dead);
@@ -146,7 +145,7 @@ pub fn iterate(u: &mut Universe) {
     u.value = entries;
 }
 
-pub fn toggle_cell(u: &mut Universe, p: CartesianPoint) {
+pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
     let new_cell = cell::toggle(u.value.get(&p).unwrap_or(&State::Dead));
     match new_cell {
         State::Dead => {
@@ -158,20 +157,20 @@ pub fn toggle_cell(u: &mut Universe, p: CartesianPoint) {
     }
 }
 
-pub fn toggle_cell_by_absolute_point(u: &mut Universe, p: MatrixPoint, cam: &Rect, size: u16) {
+pub fn toggle_cell_by_absolute_point(u: &mut Universe, p: MatrixP, cam: &Rect, size: u16) {
     let length = rect::get_length(cam);
-    let center = rect::get_center(cam);
-    let subdivision_size = rect::get_subdivision_size(cam, size);
+    let center = get_center(cam);
+    let subdivision_size = get_subdivision_size(cam, size);
     let col = subdivide(p.col.try_into().unwrap(), subdivision_size.into());
     let row = subdivide(p.row.try_into().unwrap(), subdivision_size.into());
-    let point = from_matrix(
-        MatrixPoint {
+    let point = matrix_to_cartesian(
+        MatrixP {
             row: row.try_into().unwrap(),
             col: col.try_into().unwrap(),
         },
         length.into(),
     );
-    let cell = CartesianPoint {
+    let cell = CartesianP {
         x: point.x + center.x,
         y: point.y + center.y,
     };
@@ -225,17 +224,17 @@ mod test {
         );
         assert_eq!(
             Universe::from(HashMap::from([
-                (CartesianPoint::from(-1, -1), State::Alive),
-                (CartesianPoint::from(-1, 1), State::Alive),
-                (CartesianPoint::from(1, -1), State::Alive),
-                (CartesianPoint::from(1, 1), State::Alive),
+                (CartesianP::from(-1, -1), State::Alive),
+                (CartesianP::from(-1, 1), State::Alive),
+                (CartesianP::from(1, -1), State::Alive),
+                (CartesianP::from(1, 1), State::Alive),
             ])),
             Universe {
                 value: HashMap::from([
-                    (CartesianPoint::from(-1, -1), State::Alive),
-                    (CartesianPoint::from(-1, 1), State::Alive),
-                    (CartesianPoint::from(1, -1), State::Alive),
-                    (CartesianPoint::from(1, 1), State::Alive),
+                    (CartesianP::from(-1, -1), State::Alive),
+                    (CartesianP::from(-1, 1), State::Alive),
+                    (CartesianP::from(1, -1), State::Alive),
+                    (CartesianP::from(1, 1), State::Alive),
                 ]),
                 age: 0,
             }
@@ -279,7 +278,7 @@ mod test {
         );
         assert_eq!(
             from_string(vec!["⬜".to_string()]).unwrap(),
-            Universe::from(HashMap::from([(CartesianPoint::from(0, 0), State::Alive)])),
+            Universe::from(HashMap::from([(CartesianP::from(0, 0), State::Alive)])),
         );
         assert_eq!(
             from_string(vec![
@@ -290,9 +289,9 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianPoint::from(1, 2), State::Alive),
-                (CartesianPoint::from(-2, 1), State::Alive),
-                (CartesianPoint::from(0, 0), State::Alive),
+                (CartesianP::from(1, 2), State::Alive),
+                (CartesianP::from(-2, 1), State::Alive),
+                (CartesianP::from(0, 0), State::Alive),
             ]))
         );
         assert_eq!(
@@ -306,10 +305,10 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianPoint::from(0, 0), State::Alive),
-                (CartesianPoint::from(0, 1), State::Alive),
-                (CartesianPoint::from(-1, 0), State::Alive),
-                (CartesianPoint::from(-1, 1), State::Alive),
+                (CartesianP::from(0, 0), State::Alive),
+                (CartesianP::from(0, 1), State::Alive),
+                (CartesianP::from(-1, 0), State::Alive),
+                (CartesianP::from(-1, 1), State::Alive),
             ]),)
         );
         assert_eq!(
@@ -324,9 +323,9 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianPoint::from(0, -1), State::Alive),
-                (CartesianPoint::from(0, 0), State::Alive),
-                (CartesianPoint::from(0, 1), State::Alive),
+                (CartesianP::from(0, -1), State::Alive),
+                (CartesianP::from(0, 0), State::Alive),
+                (CartesianP::from(0, 1), State::Alive),
             ]),)
         );
     }
@@ -396,21 +395,21 @@ mod test {
             "⬛⬜⬜⬛".to_string(),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianPoint::from(-2, 2));
+        toggle_cell(&mut u, CartesianP::from(-2, 2));
         assert_eq!(u, state1);
-        toggle_cell(&mut u, CartesianPoint::from(-1, 1));
+        toggle_cell(&mut u, CartesianP::from(-1, 1));
         assert_eq!(u, state2);
-        toggle_cell(&mut u, CartesianPoint::from(0, 0));
+        toggle_cell(&mut u, CartesianP::from(0, 0));
         assert_eq!(u, state3);
-        toggle_cell(&mut u, CartesianPoint::from(1, -1));
+        toggle_cell(&mut u, CartesianP::from(1, -1));
         assert_eq!(u, state4);
-        toggle_cell(&mut u, CartesianPoint::from(-2, -1));
+        toggle_cell(&mut u, CartesianP::from(-2, -1));
         assert_eq!(u, state5);
-        toggle_cell(&mut u, CartesianPoint::from(-1, 0));
+        toggle_cell(&mut u, CartesianP::from(-1, 0));
         assert_eq!(u, state6);
-        toggle_cell(&mut u, CartesianPoint::from(0, 1));
+        toggle_cell(&mut u, CartesianP::from(0, 1));
         assert_eq!(u, state7);
-        toggle_cell(&mut u, CartesianPoint::from(1, 2));
+        toggle_cell(&mut u, CartesianP::from(1, 2));
         assert_eq!(u, state8);
     }
 
@@ -523,21 +522,21 @@ mod test {
             "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
         ])
         .unwrap();
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(10, 10), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(10, 10), &cam, size);
         assert_eq!(u, state1);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(990, 10), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(990, 10), &cam, size);
         assert_eq!(u, state2);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(10, 990), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(10, 990), &cam, size);
         assert_eq!(u, state3);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(990, 990), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(990, 990), &cam, size);
         assert_eq!(u, state4);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(110, 110), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(110, 110), &cam, size);
         assert_eq!(u, state5);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(890, 110), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(890, 110), &cam, size);
         assert_eq!(u, state6);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(110, 890), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(110, 890), &cam, size);
         assert_eq!(u, state7);
-        toggle_cell_by_absolute_point(&mut u, MatrixPoint::from(890, 890), &cam, size);
+        toggle_cell_by_absolute_point(&mut u, MatrixP::from(890, 890), &cam, size);
         assert_eq!(u, state8);
     }
 
@@ -669,25 +668,25 @@ mod test {
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
-                (CartesianPoint::from(2, 2), State::Alive),
-                (CartesianPoint::from(3, 5), State::Alive),
-                (CartesianPoint::from(5, 3), State::Alive),
+                (CartesianP::from(2, 2), State::Alive),
+                (CartesianP::from(3, 5), State::Alive),
+                (CartesianP::from(5, 3), State::Alive),
             ]))),
             Rect::from(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
-                (CartesianPoint::from(2, 2), State::Alive),
-                (CartesianPoint::from(3, 4), State::Alive),
-                (CartesianPoint::from(5, 3), State::Alive),
+                (CartesianP::from(2, 2), State::Alive),
+                (CartesianP::from(3, 4), State::Alive),
+                (CartesianP::from(5, 3), State::Alive),
             ]))),
             Rect::from(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
-                (CartesianPoint::from(2, 2), State::Alive),
-                (CartesianPoint::from(3, 4), State::Alive),
-                (CartesianPoint::from(4, 3), State::Alive),
+                (CartesianP::from(2, 2), State::Alive),
+                (CartesianP::from(3, 4), State::Alive),
+                (CartesianP::from(4, 3), State::Alive),
             ]))),
             Rect::from(-2, -2, 8, 8)
         );
