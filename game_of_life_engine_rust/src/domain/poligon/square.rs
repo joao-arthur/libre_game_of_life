@@ -18,12 +18,8 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_rect() {
-        let sq = Sq {
-            x: -23,
-            y: 38,
-            size: 63,
-        };
+    fn test_sq() {
+        let sq = Sq { x: -23, y: 38, size: 63 };
         assert_eq!(format!("{sq}"), "((-23, 38), 63)");
     }
 }

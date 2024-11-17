@@ -17,20 +17,16 @@ impl Rect {
 
 impl fmt::Display for Rect {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "(({}, {}), ({}, {}))",
-            self.x1, self.y1, self.x2, self.y2
-        )
+        write!(f, "(({}, {}), ({}, {}))", self.x1, self.y1, self.x2, self.y2)
     }
 }
 
 fn delta_x(r: &Rect) -> u64 {
-    (r.x2 - r.x1).try_into().unwrap()
+    (r.x2 - r.x1).unsigned_abs()
 }
 
 fn delta_y(r: &Rect) -> u64 {
-    (r.y2 - r.y1).try_into().unwrap()
+    (r.y2 - r.y1).unsigned_abs()
 }
 
 pub fn get_length(r: &Rect) -> u64 {
@@ -41,6 +37,10 @@ pub fn get_length(r: &Rect) -> u64 {
     } else {
         d_y + 1
     }
+}
+
+pub fn get_center(r: &Rect) -> CartesianP {
+    CartesianP::from((r.x1 + r.x2) / 2, (r.y1 + r.y2) / 2)
 }
 
 pub fn center(r: &mut Rect, p: CartesianP) {
@@ -103,15 +103,7 @@ mod test {
     #[test]
     fn test_rect() {
         let r = Rect::from(-23, 38, 198, 7);
-        assert_eq!(
-            r,
-            Rect {
-                x1: -23,
-                y1: 38,
-                x2: 198,
-                y2: 7
-            }
-        );
+        assert_eq!(r, Rect { x1: -23, y1: 38, x2: 198, y2: 7 });
         assert_eq!(format!("{r}"), "((-23, 38), (198, 7))");
     }
 
@@ -137,6 +129,31 @@ mod test {
         assert_eq!(delta_x(&Rect::from(-3, -3, 3, 3)), 6);
         assert_eq!(delta_x(&Rect::from(-4, -4, 4, 4)), 8);
         assert_eq!(delta_x(&Rect::from(-5, -5, 5, 5)), 10);
+    }
+
+    #[test]
+    fn test_get_length() {
+        assert_eq!(get_length(&Rect::from(-10, -10, 10, 10)), 21);
+        assert_eq!(get_length(&Rect::from(-10, -10, 9, 9)), 20);
+        assert_eq!(get_length(&Rect::from(0, 0, 10, 10)), 11);
+        assert_eq!(get_length(&Rect::from(0, 0, 9, 9)), 10);
+        assert_eq!(get_length(&Rect::from(1, 1, 10, 10)), 10);
+        assert_eq!(get_length(&Rect::from(4, 4, 5, 5)), 2);
+        assert_eq!(get_length(&Rect::from(5, 5, 5, 5)), 1);
+    }
+
+    #[test]
+    fn test_get_length_not_square() {
+        assert_eq!(get_length(&Rect::from(-10, -5, 10, 5)), 21);
+        assert_eq!(get_length(&Rect::from(-5, -10, 5, 10)), 21);
+    }
+
+    #[test]
+    fn test_get_center() {
+        assert_eq!(get_center(&Rect::from(-10, -10, 10, 10)), CartesianP::from(0, 0));
+        assert_eq!(get_center(&Rect::from(1, 1, 10, 10)), CartesianP::from(5, 5));
+        assert_eq!(get_center(&Rect::from(4, 4, 5, 5)), CartesianP::from(4, 4));
+        assert_eq!(get_center(&Rect::from(5, 5, 5, 5)), CartesianP::from(5, 5));
     }
 
     #[test]
@@ -290,17 +307,6 @@ mod test {
         assert_eq!(r, Rect::from(-5, -5, 15, 15));
         move_by(&mut r, CartesianP::from(-15, 5));
         assert_eq!(r, Rect::from(-20, 0, 0, 20));
-    }
-
-    #[test]
-    fn test_get_length() {
-        assert_eq!(get_length(&Rect::from(-10, -10, 10, 10)), 21);
-        assert_eq!(get_length(&Rect::from(-10, -10, 9, 9)), 20);
-        assert_eq!(get_length(&Rect::from(0, 0, 10, 10)), 11);
-        assert_eq!(get_length(&Rect::from(0, 0, 9, 9)), 10);
-        assert_eq!(get_length(&Rect::from(1, 1, 10, 10)), 10);
-        assert_eq!(get_length(&Rect::from(4, 4, 5, 5)), 2);
-        assert_eq!(get_length(&Rect::from(5, 5, 5, 5)), 1);
     }
 
     #[test]

@@ -71,274 +71,94 @@ mod test {
     }
 
     #[test]
-    fn test_index_to_point_1x1_grid() {
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 0), 1),
-            CartesianP::from(0, 0)
-        );
+    fn test_matrix_to_cartesian_1x1_grid() {
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 0), 1), CartesianP::from(0, 0));
     }
 
     #[test]
-    fn test_index_to_point_2x2_grid() {
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 0), 2),
-            CartesianP::from(-1, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 1), 2),
-            CartesianP::from(0, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 0), 2),
-            CartesianP::from(-1, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 1), 2),
-            CartesianP::from(0, 0)
-        );
+    fn test_matrix_to_cartesian_2x2_grid() {
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 0), 2), CartesianP::from(-1, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 1), 2), CartesianP::from(0, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 0), 2), CartesianP::from(-1, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 1), 2), CartesianP::from(0, 0));
     }
 
     #[test]
-    fn test_index_to_point_3x3_grid() {
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 0), 3),
-            CartesianP::from(-1, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 1), 3),
-            CartesianP::from(0, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 2), 3),
-            CartesianP::from(1, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 0), 3),
-            CartesianP::from(-1, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 1), 3),
-            CartesianP::from(0, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 2), 3),
-            CartesianP::from(1, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 0), 3),
-            CartesianP::from(-1, -1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 1), 3),
-            CartesianP::from(0, -1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 2), 3),
-            CartesianP::from(1, -1)
-        );
+    fn test_matrix_to_cartesian_3x3_grid() {
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 0), 3), CartesianP::from(-1, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 1), 3), CartesianP::from(0, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 2), 3), CartesianP::from(1, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 0), 3), CartesianP::from(-1, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 1), 3), CartesianP::from(0, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 2), 3), CartesianP::from(1, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 0), 3), CartesianP::from(-1, -1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 1), 3), CartesianP::from(0, -1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 2), 3), CartesianP::from(1, -1));
     }
 
     #[test]
-    fn test_index_to_point_4x4_grid() {
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 0), 4),
-            CartesianP::from(-2, 2)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 1), 4),
-            CartesianP::from(-1, 2)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 2), 4),
-            CartesianP::from(0, 2)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(0, 3), 4),
-            CartesianP::from(1, 2)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 0), 4),
-            CartesianP::from(-2, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 1), 4),
-            CartesianP::from(-1, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 2), 4),
-            CartesianP::from(0, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(1, 3), 4),
-            CartesianP::from(1, 1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 0), 4),
-            CartesianP::from(-2, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 1), 4),
-            CartesianP::from(-1, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 2), 4),
-            CartesianP::from(0, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(2, 3), 4),
-            CartesianP::from(1, 0)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(3, 0), 4),
-            CartesianP::from(-2, -1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(3, 1), 4),
-            CartesianP::from(-1, -1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(3, 2), 4),
-            CartesianP::from(0, -1)
-        );
-        assert_eq!(
-            matrix_to_cartesian(MatrixP::from(3, 3), 4),
-            CartesianP::from(1, -1)
-        );
+    fn test_matrix_to_cartesian_4x4_grid() {
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 0), 4), CartesianP::from(-2, 2));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 1), 4), CartesianP::from(-1, 2));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 2), 4), CartesianP::from(0, 2));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(0, 3), 4), CartesianP::from(1, 2));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 0), 4), CartesianP::from(-2, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 1), 4), CartesianP::from(-1, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 2), 4), CartesianP::from(0, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(1, 3), 4), CartesianP::from(1, 1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 0), 4), CartesianP::from(-2, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 1), 4), CartesianP::from(-1, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 2), 4), CartesianP::from(0, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(2, 3), 4), CartesianP::from(1, 0));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(3, 0), 4), CartesianP::from(-2, -1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(3, 1), 4), CartesianP::from(-1, -1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(3, 2), 4), CartesianP::from(0, -1));
+        assert_eq!(matrix_to_cartesian(MatrixP::from(3, 3), 4), CartesianP::from(1, -1));
     }
 
     #[test]
-    fn test_point_to_index_1x1_grid() {
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 0), 1),
-            MatrixP::from(0, 0)
-        );
+    fn test_cartesian_to_matrix_1x1_grid() {
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 0), 1), MatrixP::from(0, 0));
     }
 
     #[test]
-    fn test_point_to_index_2x2_grid() {
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 1), 2),
-            MatrixP::from(0, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 1), 2),
-            MatrixP::from(0, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 0), 2),
-            MatrixP::from(1, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 0), 2),
-            MatrixP::from(1, 1)
-        );
+    fn test_cartesian_to_matrix_2x2_grid() {
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 1), 2), MatrixP::from(0, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 1), 2), MatrixP::from(0, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 0), 2), MatrixP::from(1, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 0), 2), MatrixP::from(1, 1));
     }
 
     #[test]
-    fn test_point_to_index_3x3_grid() {
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 1), 3),
-            MatrixP::from(0, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 1), 3),
-            MatrixP::from(0, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, 1), 3),
-            MatrixP::from(0, 2)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 0), 3),
-            MatrixP::from(1, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 0), 3),
-            MatrixP::from(1, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, 0), 3),
-            MatrixP::from(1, 2)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, -1), 3),
-            MatrixP::from(2, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, -1), 3),
-            MatrixP::from(2, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, -1), 3),
-            MatrixP::from(2, 2)
-        );
+    fn test_cartesian_to_matrix_3x3_grid() {
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 1), 3), MatrixP::from(0, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 1), 3), MatrixP::from(0, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, 1), 3), MatrixP::from(0, 2));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 0), 3), MatrixP::from(1, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 0), 3), MatrixP::from(1, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, 0), 3), MatrixP::from(1, 2));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, -1), 3), MatrixP::from(2, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, -1), 3), MatrixP::from(2, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, -1), 3), MatrixP::from(2, 2));
     }
 
     #[test]
-    fn test_point_to_index_4x4_grid() {
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-2, 2), 4),
-            MatrixP::from(0, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 2), 4),
-            MatrixP::from(0, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 2), 4),
-            MatrixP::from(0, 2)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, 2), 4),
-            MatrixP::from(0, 3)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-2, 1), 4),
-            MatrixP::from(1, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 1), 4),
-            MatrixP::from(1, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 1), 4),
-            MatrixP::from(1, 2)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, 1), 4),
-            MatrixP::from(1, 3)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-2, 0), 4),
-            MatrixP::from(2, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, 0), 4),
-            MatrixP::from(2, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, 0), 4),
-            MatrixP::from(2, 2)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, 0), 4),
-            MatrixP::from(2, 3)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-2, -1), 4),
-            MatrixP::from(3, 0)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(-1, -1), 4),
-            MatrixP::from(3, 1)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(0, -1), 4),
-            MatrixP::from(3, 2)
-        );
-        assert_eq!(
-            cartesian_to_matrix(CartesianP::from(1, -1), 4),
-            MatrixP::from(3, 3)
-        );
+    fn test_cartesian_to_matrix_4x4_grid() {
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-2, 2), 4), MatrixP::from(0, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 2), 4), MatrixP::from(0, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 2), 4), MatrixP::from(0, 2));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, 2), 4), MatrixP::from(0, 3));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-2, 1), 4), MatrixP::from(1, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 1), 4), MatrixP::from(1, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 1), 4), MatrixP::from(1, 2));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, 1), 4), MatrixP::from(1, 3));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-2, 0), 4), MatrixP::from(2, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, 0), 4), MatrixP::from(2, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, 0), 4), MatrixP::from(2, 2));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, 0), 4), MatrixP::from(2, 3));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-2, -1), 4), MatrixP::from(3, 0));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(-1, -1), 4), MatrixP::from(3, 1));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(0, -1), 4), MatrixP::from(3, 2));
+        assert_eq!(cartesian_to_matrix(CartesianP::from(1, -1), 4), MatrixP::from(3, 3));
     }
 }

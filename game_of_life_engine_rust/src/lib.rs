@@ -57,7 +57,7 @@ pub enum EngineStatus {
 #[wasm_bindgen]
 pub struct EngineInfo {
     preset: Option<String>,
-    pub gap: u16,
+    pub gap: u8,
     pub size: u16,
     pub fps: u16,
     pub status: EngineStatus,
@@ -105,7 +105,7 @@ pub fn main_set_dimension(dim: u16) {
 }
 
 #[wasm_bindgen(js_name = "engineSetGap")]
-pub fn main_set_gap(gap: u16) {
+pub fn main_set_gap(gap: u8) {
     app_set_gap(gap);
 }
 
@@ -126,10 +126,7 @@ pub fn main_single_iteration() {
 
 #[wasm_bindgen(js_name = "engineToggle")]
 pub fn main_toggle(point: EngineMatrixPoint) {
-    let cp = MatrixP {
-        row: point.row,
-        col: point.col,
-    };
+    let cp = MatrixP { row: point.row, col: point.col };
     app_toggle_model_cell_by_absolute_point(cp);
 }
 
@@ -150,10 +147,7 @@ pub fn main_zoom_by(new_size: u16) {
 
 #[wasm_bindgen(js_name = "engineMoveBy")]
 pub fn main_move_model(delta: EngineCartesianPoint) {
-    let cp = CartesianP {
-        x: delta.x,
-        y: delta.y,
-    };
+    let cp = CartesianP { x: delta.x, y: delta.y };
     app_move_model(cp);
 }
 
@@ -186,10 +180,7 @@ pub fn main_get_presets() -> JsValue {
     let groups: Vec<EnginePresetGroup> = get_preset_groups()
         .iter()
         .map(|g| EnginePresetGroup {
-            info: EnginePresetInfo {
-                id: g.info.id.clone(),
-                name: g.info.name.clone(),
-            },
+            info: EnginePresetInfo { id: g.info.id.clone(), name: g.info.name.clone() },
             items: g
                 .sub_groups
                 .iter()
@@ -197,10 +188,7 @@ pub fn main_get_presets() -> JsValue {
                     sub_group
                         .items
                         .iter()
-                        .map(|i| EnginePresetInfo {
-                            id: i.id.clone(),
-                            name: i.name.clone(),
-                        })
+                        .map(|i| EnginePresetInfo { id: i.id.clone(), name: i.name.clone() })
                         .collect::<Vec<EnginePresetInfo>>()
                 })
                 .collect(),

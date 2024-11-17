@@ -5,11 +5,11 @@ use web_sys::CanvasRenderingContext2d;
 use crate::domain::{
     coordinate::{CartesianP, MatrixP},
     poligon::{
-        rect::{self, Rect},
+        rect::{get_length, move_by, zoom_in, zoom_out, zoom_to},
         square::Sq,
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
-    render::get_values_to_render,
+    render::{get_values_to_render, RenderSettings},
     universe::{get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point, Universe},
 };
 
@@ -47,10 +47,7 @@ pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
                 .sub_groups
                 .iter()
                 .flat_map(|sub_group| sub_group.items.clone())
-                .map(|item| PresetOptionItem {
-                    label: item.name,
-                    value: item.id,
-                })
+                .map(|item| PresetOptionItem { label: item.name, value: item.id })
                 .collect(),
         })
         .collect()
@@ -69,38 +66,34 @@ pub struct Holder {
 impl DrawContext for Holder {
     fn clear(&self, s: Sq) {
         self.context.set_fill_style_str("white");
-        self.context
-            .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
+        self.context.fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 
     fn draw_square(&self, s: Sq, color: String) {
         self.context.set_fill_style(&color.into());
-        self.context
-            .fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
+        self.context.fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
     }
 }
 
 unsafe impl Send for Holder {}
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Status {
     Resumed,
     Paused,
 }
 
-#[derive(Clone, Debug, PartialEq)]
-pub struct Settings {
+#[derive(Debug, PartialEq, Clone)]
+pub struct AppSettings {
     pub preset: Option<String>,
-    pub gap: u16,
     pub fps: u16,
     pub status: Status,
-    pub dim: u16,
-    pub cam: Rect,
+    pub render_settings: RenderSettings,
 }
 
 pub struct Model {
     pub universe: Universe,
-    pub settings: Settings,
+    pub settings: AppSettings,
     pub holder: Option<Holder>,
 }
 
@@ -110,13 +103,11 @@ impl Default for Model {
         let cam = get_camera(&universe);
         Model {
             universe,
-            settings: Settings {
+            settings: AppSettings {
                 preset: Some(String::from("block")),
-                dim: 0,
-                gap: 0,
                 fps: 4,
                 status: Status::Paused,
-                cam,
+                render_settings: RenderSettings { cam, dim: 0, gap: 0 },
             },
             holder: None,
         }
@@ -170,18 +161,9 @@ fn render() {
         (m.universe.clone(), m.settings.clone(), m.holder.clone())
     });
     if let Some(holder) = holder {
-        let bg = Sq {
-            x: 0,
-            y: 0,
-            size: settings.dim.into(),
-        };
+        let bg = Sq { x: 0, y: 0, size: settings.render_settings.dim.into() };
         holder.draw_square(bg, DEAD_COLOR.to_string());
-        let values_to_render = get_values_to_render(
-            &universe, 
-            settings.dim,
-            &settings.cam,
-            settings.gap
-        );
+        let values_to_render = get_values_to_render(&universe, &settings.render_settings);
         for sq in values_to_render {
             holder.draw_square(sq, ALIVE_COLOR.to_string());
         }
@@ -253,15 +235,15 @@ pub fn app_resume() {
 pub fn app_set_dimension(dim: u16) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        model.settings.dim = dim;
+        model.settings.render_settings.dim = dim;
     });
     on_change(Prop::Dim);
 }
 
-pub fn app_set_gap(gap: u16) {
+pub fn app_set_gap(gap: u8) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        model.settings.gap = gap;
+        model.settings.render_settings.gap = gap;
     });
     on_change(Prop::Gap);
 }
@@ -278,7 +260,7 @@ pub fn app_set_preset(preset: String) {
     if let Some(selected_preset) = get_preset(&preset) {
         MODEL.with(|i| {
             let mut model = i.borrow_mut();
-            model.settings.cam = get_camera(&selected_preset);
+            model.settings.render_settings.cam = get_camera(&selected_preset);
             model.universe = selected_preset;
             model.settings.preset = Some(preset);
         });
@@ -319,9 +301,9 @@ pub fn app_toggle_by_point(p: CartesianP) {
 pub fn app_toggle_model_cell_by_absolute_point(p: MatrixP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        let cam = &model.settings.clone().cam;
-        let dim = model.settings.clone().dim;
-        toggle_cell_by_absolute_point(&mut model.universe, p, cam, dim);
+        let dim = model.settings.render_settings.dim;
+        let cam = model.settings.render_settings.cam.clone();
+        toggle_cell_by_absolute_point(&mut model.universe, p, &cam, dim);
         model.settings.preset = None;
     });
     on_change(Prop::Universe);
@@ -331,7 +313,7 @@ pub fn app_toggle_model_cell_by_absolute_point(p: MatrixP) {
 pub fn app_zoom_in() {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        rect::zoom_in(&mut model.settings.cam);
+        zoom_in(&mut model.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
@@ -339,7 +321,7 @@ pub fn app_zoom_in() {
 pub fn app_zoom_out() {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        rect::zoom_out(&mut model.settings.cam);
+        zoom_out(&mut model.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
@@ -347,7 +329,7 @@ pub fn app_zoom_out() {
 pub fn app_zoom_to(new_size: u16) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        rect::zoom_to(&mut model.settings.cam, new_size);
+        zoom_to(&mut model.settings.render_settings.cam, new_size);
     });
     on_change(Prop::Cam);
 }
@@ -355,7 +337,7 @@ pub fn app_zoom_to(new_size: u16) {
 pub fn app_move_model(delta: CartesianP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
-        rect::move_by(&mut model.settings.cam, delta);
+        move_by(&mut model.settings.render_settings.cam, delta);
     });
     on_change(Prop::Universe);
 }
@@ -363,7 +345,7 @@ pub fn app_move_model(delta: CartesianP) {
 #[derive(Debug, PartialEq)]
 pub struct AppInfo {
     pub preset: Option<String>,
-    pub gap: u16,
+    pub gap: u8,
     pub size: u16,
     pub fps: u16,
     pub status: Status,
@@ -377,8 +359,8 @@ pub fn app_get_settings() -> AppInfo {
         let u = m.universe.clone();
         AppInfo {
             preset: s.preset,
-            gap: s.gap,
-            size: rect::get_length(&s.cam).try_into().unwrap(),
+            gap: s.render_settings.gap,
+            size: get_length(&s.render_settings.cam).try_into().unwrap(),
             fps: s.fps,
             status: s.status,
             age: u.age,
@@ -388,7 +370,7 @@ pub fn app_get_settings() -> AppInfo {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::cell::State;
+    use crate::domain::{cell::State, poligon::rect::Rect};
     use std::collections::HashMap;
 
     use super::*;
@@ -397,19 +379,14 @@ mod test {
     fn test_instance() {
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 0,
-                gap: 0,
                 fps: 4,
                 status: Status::Paused,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 0, gap: 0 }
             }
         );
-        assert_eq!(
-            MODEL.with(|i| i.borrow().universe.clone()),
-            get_preset_unsafe("block")
-        );
+        assert_eq!(MODEL.with(|i| i.borrow().universe.clone()), get_preset_unsafe("block"));
         let settings = app_get_settings();
         assert_eq!(
             AppInfo {
@@ -426,90 +403,96 @@ mod test {
         app_pause();
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 0,
-                gap: 0,
                 fps: 4,
                 status: Status::Paused,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 0, gap: 0 }
             }
         );
 
         app_resume();
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 0,
-                gap: 0,
                 fps: 4,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 0, gap: 0 }
             }
         );
 
         app_set_dimension(1080);
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 0,
                 fps: 4,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -4, 4, 5),
+                    dim: 1080,
+                    gap: 0
+                }
             }
         );
 
         app_set_gap(2);
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 4,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -4, 4, 5),
+                    dim: 1080,
+                    gap: 2
+                }
             }
         );
 
         app_set_fps(60);
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -4, 4, 5),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
 
         app_set_preset("Gaius Julius Caesar".to_string());
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -4, 4, 5),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
         app_set_preset("r_pentomino".to_string());
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("r_pentomino")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -5, 5, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -5, 5, 5),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
         app_set_preset("block".to_string());
@@ -517,87 +500,88 @@ mod test {
         let block = get_preset_unsafe("block");
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
-            Universe {
-                age: 1,
-                value: block.value.clone()
-            }
+            Universe { age: 1, value: block.value.clone() }
         );
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Resumed,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -4, 4, 5),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
 
         app_single_iteration();
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
-            Universe {
-                age: 2,
-                value: block.value.clone()
-            }
+            Universe { age: 2, value: block.value.clone() }
         );
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-5, -4, 4, 5),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-5, -4, 4, 5),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
 
         app_zoom_to(40);
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-20, -19, 19, 20),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-20, -19, 19, 20),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
         app_zoom_in();
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-19, -18, 18, 19),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-19, -18, 18, 19),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
         app_zoom_out();
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
-            Settings {
+            AppSettings {
                 preset: Some(String::from("block")),
-                dim: 1080,
-                gap: 2,
                 fps: 60,
                 status: Status::Paused,
-                cam: Rect::from(-20, -19, 19, 20),
+                render_settings: RenderSettings {
+                    cam: Rect::from(-20, -19, 19, 20),
+                    dim: 1080,
+                    gap: 2,
+                }
             }
         );
 
         app_move_model(CartesianP::from(20, 20));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
-            Universe {
-                age: 2,
-                value: block.value.clone()
-            }
+            Universe { age: 2, value: block.value.clone() }
         );
 
         app_toggle_by_point(CartesianP::from(0, 0));

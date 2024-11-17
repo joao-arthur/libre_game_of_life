@@ -7,10 +7,9 @@ use crate::domain::{
     cell::{self, State},
     coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
     neighbor::number_of_alive_from_model,
-    poligon::rect::{self, Rect},
+    operations::{get_subdivision_size, subdivide},
+    poligon::rect::{get_center, get_length, Rect},
 };
-
-use super::operations::{get_center, get_subdivision_size, subdivide};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Universe {
@@ -20,19 +19,13 @@ pub struct Universe {
 
 impl Universe {
     pub fn from(value: HashMap<CartesianP, State>) -> Self {
-        Universe {
-            value,
-            ..Default::default()
-        }
+        Universe { value, ..Default::default() }
     }
 }
 
 impl Default for Universe {
     fn default() -> Self {
-        Universe {
-            value: HashMap::new(),
-            age: 0,
-        }
+        Universe { value: HashMap::new(), age: 0 }
     }
 }
 
@@ -50,10 +43,7 @@ pub struct InvalidLengthError;
 
 impl fmt::Display for InvalidLengthError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "The length of every line and the number of lines must be equal!"
-        )
+        write!(f, "The length of every line and the number of lines must be equal!")
     }
 }
 
@@ -64,12 +54,7 @@ pub enum FromStringError {
 }
 
 pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
-    if !as_str
-        .join("")
-        .replace("⬜", "")
-        .replace("⬛", "")
-        .is_empty()
-    {
+    if !as_str.join("").replace("⬜", "").replace("⬛", "").is_empty() {
         return Err(FromStringError::InvalidCharacter(InvalidCharacterError));
     }
     let mut value = HashMap::<CartesianP, State>::new();
@@ -89,10 +74,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
             if col_str == '⬜' {
                 value.insert(
                     matrix_to_cartesian(
-                        MatrixP {
-                            row: row.try_into().unwrap(),
-                            col: col.try_into().unwrap(),
-                        },
+                        MatrixP { row: row.try_into().unwrap(), col: col.try_into().unwrap() },
                         len.try_into().unwrap(),
                     ),
                     State::Alive,
@@ -103,7 +85,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     Ok(Universe::from(value))
 }
 
-pub fn get_value(u: &Universe, p: CartesianP) -> State {
+pub fn get_value(u: &Universe, p: &CartesianP) -> State {
     if u.value.get(&p).unwrap_or(&State::Dead) == &State::Alive {
         State::Alive
     } else {
@@ -132,8 +114,8 @@ pub fn iterate(u: &mut Universe) {
     let entries: HashMap<CartesianP, State> = points
         .iter()
         .filter_map(|point| {
-            let s = u.value.get(point).unwrap_or(&State::Dead);
-            let number_of_alive_neighbors = number_of_alive_from_model(u, point.clone());
+            let s = get_value(&u, point);
+            let number_of_alive_neighbors = number_of_alive_from_model(u, point);
             let new_cell = cell::iterate(s.clone(), number_of_alive_neighbors);
             match new_cell {
                 State::Dead => None,
@@ -146,7 +128,7 @@ pub fn iterate(u: &mut Universe) {
 }
 
 pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
-    let new_cell = cell::toggle(u.value.get(&p).unwrap_or(&State::Dead));
+    let new_cell = cell::toggle(&get_value(u, &p));
     match new_cell {
         State::Dead => {
             u.value.remove(&p);
@@ -157,23 +139,17 @@ pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
     }
 }
 
-pub fn toggle_cell_by_absolute_point(u: &mut Universe, p: MatrixP, cam: &Rect, size: u16) {
-    let length = rect::get_length(cam);
+pub fn toggle_cell_by_absolute_point(u: &mut Universe, p: MatrixP, cam: &Rect, dim: u16) {
+    let length = get_length(cam);
     let center = get_center(cam);
-    let subdivision_size = get_subdivision_size(cam, size);
+    let subdivision_size = get_subdivision_size(cam, dim);
     let col = subdivide(p.col.try_into().unwrap(), subdivision_size.into());
     let row = subdivide(p.row.try_into().unwrap(), subdivision_size.into());
     let point = matrix_to_cartesian(
-        MatrixP {
-            row: row.try_into().unwrap(),
-            col: col.try_into().unwrap(),
-        },
+        MatrixP { row: row.try_into().unwrap(), col: col.try_into().unwrap() },
         length.into(),
     );
-    let cell = CartesianP {
-        x: point.x + center.x,
-        y: point.y + center.y,
-    };
+    let cell = CartesianP { x: point.x + center.x, y: point.y + center.y };
     toggle_cell(u, cell);
 }
 
@@ -200,12 +176,7 @@ pub fn get_camera(u: &Universe) -> Rect {
         min_x -= diff_start;
         max_x += diff_end;
     }
-    Rect {
-        x1: min_x - 4,
-        y1: min_y - 4,
-        x2: max_x + 4,
-        y2: max_y + 4,
-    }
+    Rect { x1: min_x - 4, y1: min_y - 4, x2: max_x + 4, y2: max_y + 4 }
 }
 
 #[cfg(test)]
@@ -215,13 +186,7 @@ mod test {
 
     #[test]
     fn test_model() {
-        assert_eq!(
-            Universe::default(),
-            Universe {
-                value: HashMap::new(),
-                age: 0,
-            }
-        );
+        assert_eq!(Universe::default(), Universe { value: HashMap::new(), age: 0 });
         assert_eq!(
             Universe::from(HashMap::from([
                 (CartesianP::from(-1, -1), State::Alive),
@@ -244,27 +209,27 @@ mod test {
     #[test]
     fn test_from_string_error() {
         assert_eq!(
-            from_string(vec!["".to_string()]),
+            from_string(vec![String::from("")]),
             Err(FromStringError::InvalidLength(InvalidLengthError)),
         );
         assert_eq!(
-            from_string(vec!["abcdefg".to_string()]),
+            from_string(vec![String::from("abcdefg")]),
             Err(FromStringError::InvalidCharacter(InvalidCharacterError)),
         );
         assert_eq!(
             from_string(vec![
-                "⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛".to_string(),
+                String::from("⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛"),
             ]),
             Err(FromStringError::InvalidLength(InvalidLengthError)),
         );
         assert_eq!(
             from_string(vec![
-                "⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛".to_string(),
+                String::from("⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛"),
             ]),
             Err(FromStringError::InvalidLength(InvalidLengthError)),
         );
@@ -272,20 +237,17 @@ mod test {
 
     #[test]
     fn test_from_string() {
+        assert_eq!(from_string(vec![String::from("⬛")]).unwrap(), Universe::default());
         assert_eq!(
-            from_string(vec!["⬛".to_string()]).unwrap(),
-            Universe::default()
-        );
-        assert_eq!(
-            from_string(vec!["⬜".to_string()]).unwrap(),
+            from_string(vec![String::from("⬜")]).unwrap(),
             Universe::from(HashMap::from([(CartesianP::from(0, 0), State::Alive)])),
         );
         assert_eq!(
             from_string(vec![
-                "⬛⬛⬛⬜".to_string(),
-                "⬜⬛⬛⬛".to_string(),
-                "⬛⬛⬜⬛".to_string(),
-                "⬛⬛⬛⬛".to_string(),
+                String::from("⬛⬛⬛⬜"),
+                String::from("⬜⬛⬛⬛"),
+                String::from("⬛⬛⬜⬛"),
+                String::from("⬛⬛⬛⬛"),
             ])
             .unwrap(),
             Universe::from(HashMap::from([
@@ -296,12 +258,12 @@ mod test {
         );
         assert_eq!(
             from_string(vec![
-                "⬛⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬜⬜⬛⬛".to_string(),
-                "⬛⬛⬜⬜⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛⬛".to_string(),
+                String::from("⬛⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬜⬜⬛⬛"),
+                String::from("⬛⬛⬜⬜⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛⬛"),
             ])
             .unwrap(),
             Universe::from(HashMap::from([
@@ -313,13 +275,13 @@ mod test {
         );
         assert_eq!(
             from_string(vec![
-                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬜⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬜⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬜⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
-                "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬜⬛⬛⬛"),
+                String::from("⬛⬛⬛⬜⬛⬛⬛"),
+                String::from("⬛⬛⬛⬜⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                String::from("⬛⬛⬛⬛⬛⬛⬛"),
             ])
             .unwrap(),
             Universe::from(HashMap::from([
@@ -333,66 +295,66 @@ mod test {
     #[test]
     fn test_toggle_model() {
         let mut u = from_string(vec![
-            "⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛".to_string(),
-            "⬜⬜⬜⬜".to_string(),
-            "⬜⬜⬜⬜".to_string(),
+            String::from("⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛"),
+            String::from("⬜⬜⬜⬜"),
+            String::from("⬜⬜⬜⬜"),
         ])
         .unwrap();
         let state1 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛".to_string(),
-            "⬜⬜⬜⬜".to_string(),
-            "⬜⬜⬜⬜".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛"),
+            String::from("⬜⬜⬜⬜"),
+            String::from("⬜⬜⬜⬜"),
         ])
         .unwrap();
         let state2 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛".to_string(),
-            "⬜⬜⬜⬜".to_string(),
-            "⬜⬜⬜⬜".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛"),
+            String::from("⬜⬜⬜⬜"),
+            String::from("⬜⬜⬜⬜"),
         ])
         .unwrap();
         let state3 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛".to_string(),
-            "⬜⬜⬛⬜".to_string(),
-            "⬜⬜⬜⬜".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛"),
+            String::from("⬜⬜⬛⬜"),
+            String::from("⬜⬜⬜⬜"),
         ])
         .unwrap();
         let state4 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛".to_string(),
-            "⬜⬜⬛⬜".to_string(),
-            "⬜⬜⬜⬛".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛"),
+            String::from("⬜⬜⬛⬜"),
+            String::from("⬜⬜⬜⬛"),
         ])
         .unwrap();
         let state5 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛".to_string(),
-            "⬜⬜⬛⬜".to_string(),
-            "⬛⬜⬜⬛".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛"),
+            String::from("⬜⬜⬛⬜"),
+            String::from("⬛⬜⬜⬛"),
         ])
         .unwrap();
         let state6 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛".to_string(),
-            "⬜⬛⬛⬜".to_string(),
-            "⬛⬜⬜⬛".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛"),
+            String::from("⬜⬛⬛⬜"),
+            String::from("⬛⬜⬜⬛"),
         ])
         .unwrap();
         let state7 = from_string(vec![
-            "⬜⬛⬛⬛".to_string(),
-            "⬛⬜⬜⬛".to_string(),
-            "⬜⬛⬛⬜".to_string(),
-            "⬛⬜⬜⬛".to_string(),
+            String::from("⬜⬛⬛⬛"),
+            String::from("⬛⬜⬜⬛"),
+            String::from("⬜⬛⬛⬜"),
+            String::from("⬛⬜⬜⬛"),
         ])
         .unwrap();
         let state8 = from_string(vec![
-            "⬜⬛⬛⬜".to_string(),
-            "⬛⬜⬜⬛".to_string(),
-            "⬜⬛⬛⬜".to_string(),
-            "⬛⬜⬜⬛".to_string(),
+            String::from("⬜⬛⬛⬜"),
+            String::from("⬛⬜⬜⬛"),
+            String::from("⬜⬛⬛⬜"),
+            String::from("⬛⬜⬜⬛"),
         ])
         .unwrap();
         toggle_cell(&mut u, CartesianP::from(-2, 2));
@@ -419,107 +381,107 @@ mod test {
         let size: u16 = 1000;
         let mut u = Universe::default();
         let state1 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
         ])
         .unwrap();
         let state2 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
         ])
         .unwrap();
         let state3 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
         ])
         .unwrap();
         let state4 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
         let state5 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
         let state6 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
         let state7 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
         let state8 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".to_string(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".to_string(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".to_string(),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
         toggle_cell_by_absolute_point(&mut u, MatrixP::from(10, 10), &cam, size);
@@ -542,28 +504,30 @@ mod test {
 
     #[test]
     fn test_iterate() {
-        let mut model1x1iter0 = from_string(vec!["⬜".to_string()]).unwrap();
-        let mut model1x1iter1 = from_string(vec!["⬛".to_string()]).unwrap();
+        let mut model1x1iter0 = from_string(vec![String::from("⬜")]).unwrap();
+        let mut model1x1iter1 = from_string(vec![String::from("⬛")]).unwrap();
         model1x1iter1.age = 1;
         iterate(&mut model1x1iter0);
         assert_eq!(model1x1iter0, model1x1iter1);
 
-        let mut model2x2iter0 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]).unwrap();
-        let mut model2x2iter1 = from_string(vec!["⬜⬜".to_string(), "⬜⬜".to_string()]).unwrap();
+        let mut model2x2iter0 =
+            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
+        let mut model2x2iter1 =
+            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
         model2x2iter1.age = 1;
         iterate(&mut model2x2iter0);
         assert_eq!(model2x2iter0, model2x2iter1);
 
         let mut model3x3_1_iter0 = from_string(vec![
-            "⬛⬜⬛".to_string(),
-            "⬛⬜⬛".to_string(),
-            "⬛⬜⬛".to_string(),
+            String::from("⬛⬜⬛"),
+            String::from("⬛⬜⬛"),
+            String::from("⬛⬜⬛"),
         ])
         .unwrap();
         let mut model3x3_1_iter1 = from_string(vec![
-            "⬛⬛⬛".to_string(),
-            "⬜⬜⬜".to_string(),
-            "⬛⬛⬛".to_string(),
+            String::from("⬛⬛⬛"),
+            String::from("⬜⬜⬜"),
+            String::from("⬛⬛⬛"),
         ])
         .unwrap();
         model3x3_1_iter1.age = 1;
@@ -571,15 +535,15 @@ mod test {
         assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
 
         let mut model3x3_2_iter0 = from_string(vec![
-            "⬛⬛⬛".to_string(),
-            "⬜⬜⬜".to_string(),
-            "⬛⬛⬛".to_string(),
+            String::from("⬛⬛⬛"),
+            String::from("⬜⬜⬜"),
+            String::from("⬛⬛⬛"),
         ])
         .unwrap();
         let mut model3x3_2_iter1 = from_string(vec![
-            "⬛⬜⬛".to_string(),
-            "⬛⬜⬛".to_string(),
-            "⬛⬜⬛".to_string(),
+            String::from("⬛⬜⬛"),
+            String::from("⬛⬜⬛"),
+            String::from("⬛⬜⬛"),
         ])
         .unwrap();
         model3x3_2_iter1.age = 1;
@@ -587,15 +551,15 @@ mod test {
         assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
 
         let mut model3x3_3_iter0 = from_string(vec![
-            "⬛⬛⬜".to_string(),
-            "⬜⬜⬜".to_string(),
-            "⬛⬛⬛".to_string(),
+            String::from("⬛⬛⬜"),
+            String::from("⬜⬜⬜"),
+            String::from("⬛⬛⬛"),
         ])
         .unwrap();
         let mut model3x3_3_iter1 = from_string(vec![
-            "⬛⬛⬜".to_string(),
-            "⬛⬜⬜".to_string(),
-            "⬛⬜⬛".to_string(),
+            String::from("⬛⬛⬜"),
+            String::from("⬛⬜⬜"),
+            String::from("⬛⬜⬛"),
         ])
         .unwrap();
         model3x3_3_iter1.age = 1;
@@ -603,15 +567,15 @@ mod test {
         assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
 
         let mut model3x3_4_iter0 = from_string(vec![
-            "⬛⬛⬜".to_string(),
-            "⬛⬜⬜".to_string(),
-            "⬛⬜⬛".to_string(),
+            String::from("⬛⬛⬜"),
+            String::from("⬛⬜⬜"),
+            String::from("⬛⬜⬛"),
         ])
         .unwrap();
         let mut model3x3_4_iter1 = from_string(vec![
-            "⬛⬜⬜".to_string(),
-            "⬛⬜⬜".to_string(),
-            "⬛⬜⬜".to_string(),
+            String::from("⬛⬜⬜"),
+            String::from("⬛⬜⬜"),
+            String::from("⬛⬜⬜"),
         ])
         .unwrap();
         model3x3_4_iter1.age = 1;
@@ -619,15 +583,15 @@ mod test {
         assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
 
         let mut model3x3_5_iter0 = from_string(vec![
-            "⬜⬜⬛".to_string(),
-            "⬜⬜⬜".to_string(),
-            "⬛⬜⬛".to_string(),
+            String::from("⬜⬜⬛"),
+            String::from("⬜⬜⬜"),
+            String::from("⬛⬜⬛"),
         ])
         .unwrap();
         let mut model3x3_5_iter1 = from_string(vec![
-            "⬜⬛⬜".to_string(),
-            "⬛⬛⬜".to_string(),
-            "⬜⬜⬜".to_string(),
+            String::from("⬜⬛⬜"),
+            String::from("⬛⬛⬜"),
+            String::from("⬜⬜⬜"),
         ])
         .unwrap();
         model3x3_5_iter1.age = 1;
@@ -640,12 +604,12 @@ mod test {
         assert_eq!(
             get_camera(
                 &from_string(vec![
-                    "⬛⬛⬛⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬛⬛⬛".to_string(),
-                    "⬛⬛⬜⬜⬛⬛".to_string(),
-                    "⬛⬛⬜⬜⬛⬛".to_string(),
-                    "⬛⬛⬛⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬛⬛⬛".to_string(),
+                    String::from("⬛⬛⬛⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬛⬛⬛"),
+                    String::from("⬛⬛⬜⬜⬛⬛"),
+                    String::from("⬛⬛⬜⬜⬛⬛"),
+                    String::from("⬛⬛⬛⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬛⬛⬛"),
                 ])
                 .unwrap()
             ),
@@ -654,13 +618,13 @@ mod test {
         assert_eq!(
             get_camera(
                 &from_string(vec![
-                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬜⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬜⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬜⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
-                    "⬛⬛⬛⬛⬛⬛⬛".to_string(),
+                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬜⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬜⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬜⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
                 ])
                 .unwrap()
             ),
