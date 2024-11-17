@@ -1,18 +1,18 @@
 use std::fmt;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-pub struct CartesianPoint {
+pub struct CartesianP {
     pub x: i64,
     pub y: i64,
 }
 
-impl CartesianPoint {
+impl CartesianP {
     pub fn from(x: i64, y: i64) -> Self {
-        CartesianPoint { x, y }
+        CartesianP { x, y }
     }
 }
 
-impl fmt::Display for CartesianPoint {
+impl fmt::Display for CartesianP {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {})", self.x, self.y)
     }
@@ -24,8 +24,8 @@ mod test {
 
     #[test]
     fn test_cartesian_point() {
-        let p = CartesianPoint::from(-23, 38);
-        assert_eq!(p, CartesianPoint { x: -23, y: 38 });
+        let p = CartesianP::from(-23, 38);
+        assert_eq!(p, CartesianP { x: -23, y: 38 });
         assert_eq!(format!("{p}"), "(-23, 38)");
     }
 }

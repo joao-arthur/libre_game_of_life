@@ -1,4 +1,4 @@
-use crate::domain::{cell::State, plane::cartesian::CartesianPoint, universe::Universe};
+use crate::domain::{cell::State, coordinate::cartesian::CartesianP, universe::Universe};
 
 pub type Neighbor<'a> = Option<&'a State>;
 
@@ -9,20 +9,20 @@ fn number_of_alive(neighbors: [Neighbor; 8]) -> u8 {
         .count() as u8
 }
 
-fn from_point_in_rectangular_grid(u: &Universe, p: CartesianPoint) -> [Neighbor; 8] {
+fn from_point_in_rectangular_grid(u: &Universe, p: CartesianP) -> [Neighbor; 8] {
     [
-        u.value.get(&CartesianPoint::from(p.x - 1, p.y + 1)),
-        u.value.get(&CartesianPoint::from(p.x, p.y + 1)),
-        u.value.get(&CartesianPoint::from(p.x + 1, p.y + 1)),
-        u.value.get(&CartesianPoint::from(p.x - 1, p.y)),
-        u.value.get(&CartesianPoint::from(p.x + 1, p.y)),
-        u.value.get(&CartesianPoint::from(p.x - 1, p.y - 1)),
-        u.value.get(&CartesianPoint::from(p.x, p.y - 1)),
-        u.value.get(&CartesianPoint::from(p.x + 1, p.y - 1)),
+        u.value.get(&CartesianP::from(p.x - 1, p.y + 1)),
+        u.value.get(&CartesianP::from(p.x, p.y + 1)),
+        u.value.get(&CartesianP::from(p.x + 1, p.y + 1)),
+        u.value.get(&CartesianP::from(p.x - 1, p.y)),
+        u.value.get(&CartesianP::from(p.x + 1, p.y)),
+        u.value.get(&CartesianP::from(p.x - 1, p.y - 1)),
+        u.value.get(&CartesianP::from(p.x, p.y - 1)),
+        u.value.get(&CartesianP::from(p.x + 1, p.y - 1)),
     ]
 }
 
-pub fn number_of_alive_from_model(u: &Universe, p: CartesianPoint) -> u8 {
+pub fn number_of_alive_from_model(u: &Universe, p: CartesianP) -> u8 {
     number_of_alive(from_point_in_rectangular_grid(u, p))
 }
 
