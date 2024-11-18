@@ -59,6 +59,9 @@ pub struct Holder {
 
 impl Holder {
     fn draw_square(&self, r: Rect, color: String) {
+        if self.context.is_undefined() || self.context.is_null() {
+            return;
+        }
         self.context.set_fill_style(&color.into());
         self.context.fill_rect(
             r.x1 as f64,
@@ -154,6 +157,9 @@ fn render() {
         let m = i.borrow();
         (m.universe.clone(), m.settings.clone(), m.holder.clone())
     });
+    if settings.render_settings.dim == 0 {
+        return;
+    }
     if let Some(holder) = holder {
         let bg = Rect {
             x1: 0,

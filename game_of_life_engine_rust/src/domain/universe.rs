@@ -152,8 +152,7 @@ pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
 }
 
 pub fn toggle_cell_by_absolute_point(u: &mut Universe, s: &RenderSettings, p: MatrixP) {
-    let len = get_length(&s.cam);
-    let subdivision_size = s.dim as u64 / len;
+    let subdivision_size = s.dim as u64 / get_length(&s.cam);
     let matrix_point = MatrixP { row: p.row / subdivision_size, col: p.col / subdivision_size };
     let cartesian_point = matrix_to_cartesian(&matrix_point, &s.cam);
     toggle_cell(u, cartesian_point);
@@ -501,6 +500,32 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
+        let state10 = from_string(vec![
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+        ])
+        .unwrap();
+        let state11 = from_string(vec![
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛"),
+            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
+            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+        ])
+        .unwrap();
         let cam = Rect::from(-5, -5, 4, 4);
         let dim: u16 = 1000;
         toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 10));
@@ -521,6 +546,10 @@ mod test {
         assert_eq!(u, state8);
         toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(710, 350));
         assert_eq!(u, state9);
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam: Rect::from(-4, -4, 5, 5), dim, gap: 0 }, MatrixP::from(110, 890));
+        assert_eq!(u, state10);
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim, gap: 0 }, MatrixP::from(110, 890));
+        assert_eq!(u, state11);
     }
 
     #[test]

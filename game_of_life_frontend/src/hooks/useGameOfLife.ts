@@ -19,7 +19,7 @@ export function useGameOfLife(): GameOfLife {
     const dimension = useWindowDimension();
 
     useEffect(() => {
-        if (hasInited) {
+        if (hasInited && dimension > 0) {
             engineSetDimension(dimension);
         }
     }, [dimension, hasInited]);
@@ -29,9 +29,7 @@ export function useGameOfLife(): GameOfLife {
         if (!context) {
             return;
         }
-
         engineInit(context);
-
         engineAddOnChangeListener(() => {
             let obj = engineGetSettings();
             setModel({

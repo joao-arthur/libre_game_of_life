@@ -1,8 +1,8 @@
 use super::{
     cell::State,
     geometry::{
-        coordinate::{cartesian_to_matrix, CartesianP},
-        poligon::rect::{get_center, get_length, Rect},
+        coordinate::cartesian_to_matrix,
+        poligon::rect::{get_length, Rect},
     },
     universe::Universe,
 };
@@ -15,11 +15,7 @@ pub struct RenderSettings {
 }
 
 pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<Rect> {
-    let len = get_length(&s.cam);
-    let center = get_center(&s.cam);
-    let subdivision_size = s.dim as u64 / len;
-    let center_absolute =
-        CartesianP { x: center.x * subdivision_size as i64, y: center.y * subdivision_size as i64 };
+    let subdivision_size = s.dim as u64 / get_length(&s.cam);
     let mut values_to_render: Vec<Rect> = u
         .value
         .iter()
@@ -33,8 +29,8 @@ pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<Rect> {
         .map(|value| {
             let arr_index = cartesian_to_matrix(value.0, &s.cam);
             let gap = s.gap;
-            let x = arr_index.col as i64 * subdivision_size as i64 + gap as i64 - center_absolute.x;
-            let y = arr_index.row as i64 * subdivision_size as i64 + gap as i64 + center_absolute.y;
+            let x = arr_index.col as i64 * subdivision_size as i64 + gap as i64;
+            let y = arr_index.row as i64 * subdivision_size as i64 + gap as i64;
 
             Rect {
                 x1: x,

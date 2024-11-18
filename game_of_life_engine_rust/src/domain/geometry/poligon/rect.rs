@@ -39,10 +39,6 @@ pub fn get_length(r: &Rect) -> u64 {
     }
 }
 
-pub fn get_center(r: &Rect) -> CartesianP {
-    CartesianP::from((r.x1 + r.x2) / 2, (r.y1 + r.y2) / 2)
-}
-
 pub fn center(r: &mut Rect, p: CartesianP) {
     let len_x = r.x2 - r.x1;
     let len_y = r.y2 - r.y1;
@@ -146,14 +142,6 @@ mod test {
     fn test_get_length_not_square() {
         assert_eq!(get_length(&Rect::from(-10, -5, 10, 5)), 21);
         assert_eq!(get_length(&Rect::from(-5, -10, 5, 10)), 21);
-    }
-
-    #[test]
-    fn test_get_center() {
-        assert_eq!(get_center(&Rect::from(-10, -10, 10, 10)), CartesianP::from(0, 0));
-        assert_eq!(get_center(&Rect::from(1, 1, 10, 10)), CartesianP::from(5, 5));
-        assert_eq!(get_center(&Rect::from(4, 4, 5, 5)), CartesianP::from(4, 4));
-        assert_eq!(get_center(&Rect::from(5, 5, 5, 5)), CartesianP::from(5, 5));
     }
 
     #[test]
