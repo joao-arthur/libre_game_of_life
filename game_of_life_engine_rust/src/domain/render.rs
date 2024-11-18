@@ -67,12 +67,10 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        let render_settings_gap0 =
-            RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 1000, gap: 0 };
-        let render_settings_gap1 =
-            RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 1000, gap: 1 };
-        let render_settings_gap2 =
-            RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 1000, gap: 2 };
+        let cam = Rect::from(-5, -5, 4, 4);
+        let render_settings_gap0 = RenderSettings { cam, dim: 1000, gap: 0 };
+        let render_settings_gap1 = RenderSettings { cam, dim: 1000, gap: 1 };
+        let render_settings_gap2 = RenderSettings { cam, dim: 1000, gap: 2 };
         assert_eq!(
             get_values_to_render(&model, &render_settings_gap0),
             vec![

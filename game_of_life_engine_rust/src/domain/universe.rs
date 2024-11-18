@@ -526,29 +526,31 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        let cam = Rect::from(-5, -5, 4, 4);
         let dim: u16 = 1000;
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 10));
+        let s1 = RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim, gap: 0 };
+        let s2 = RenderSettings { cam: Rect::from(-4, -4, 5, 5), dim, gap: 0 };
+        let s3 = RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim, gap: 0 };
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(10, 10));
         assert_eq!(u, state1);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(990, 10));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(990, 10));
         assert_eq!(u, state2);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 990));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(10, 990));
         assert_eq!(u, state3);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(990, 990));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(990, 990));
         assert_eq!(u, state4);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(110, 110));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(110, 110));
         assert_eq!(u, state5);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(890, 110));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(890, 110));
         assert_eq!(u, state6);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(110, 890));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(110, 890));
         assert_eq!(u, state7);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(890, 890));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(890, 890));
         assert_eq!(u, state8);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(710, 350));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(710, 350));
         assert_eq!(u, state9);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam: Rect::from(-4, -4, 5, 5), dim, gap: 0 }, MatrixP::from(110, 890));
+        toggle_cell_by_absolute_point(&mut u, &s2, MatrixP::from(110, 890));
         assert_eq!(u, state10);
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim, gap: 0 }, MatrixP::from(110, 890));
+        toggle_cell_by_absolute_point(&mut u, &s3, MatrixP::from(110, 890));
         assert_eq!(u, state11);
     }
 
@@ -560,8 +562,10 @@ mod test {
         iterate(&mut model1x1iter0);
         assert_eq!(model1x1iter0, model1x1iter1);
 
-        let mut model2x2iter0 = from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
-        let mut model2x2iter1 = from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
+        let mut model2x2iter0 =
+            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
+        let mut model2x2iter1 =
+            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
         model2x2iter1.age = 1;
         iterate(&mut model2x2iter0);
         assert_eq!(model2x2iter0, model2x2iter1);
