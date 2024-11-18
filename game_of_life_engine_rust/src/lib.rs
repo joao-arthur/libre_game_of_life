@@ -3,7 +3,7 @@ pub mod domain;
 
 use crate::{
     app::{
-        add_on_change_listener, app_get_settings, app_init, app_move_model, app_pause, app_resume,
+        add_on_change_listener, app_get_settings, app_init, app_move_cam, app_pause, app_resume,
         app_set_dimension, app_set_fps, app_set_gap, app_set_preset, app_single_iteration,
         app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
     },
@@ -148,7 +148,7 @@ pub fn main_zoom_by(new_size: u16) {
 #[wasm_bindgen(js_name = "engineMoveBy")]
 pub fn main_move_model(delta: EngineCartesianPoint) {
     let cp = CartesianP { x: delta.x, y: delta.y };
-    app_move_model(cp);
+    app_move_cam(cp);
 }
 
 #[wasm_bindgen(js_name = "engineGetSettings")]

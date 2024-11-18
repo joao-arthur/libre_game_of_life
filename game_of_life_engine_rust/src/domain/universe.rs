@@ -71,14 +71,23 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
         return Err(FromStringError::InvalidLength(InvalidLengthError));
     }
     let row_iter = as_str.iter().enumerate();
+
+    let rect_len = len as i64;
+    let half = rect_len as i64 / 2;
+    let x1 = -half as i64;
+    let y1 = -half as i64;
+    let x2 = x1 as i64 + rect_len as i64 - 1;
+    let y2 = y1 as i64 + rect_len as i64 - 1;
+    let cam = Rect { x1, y1, x2, y2 };
+
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
         for (col, col_str) in col_iter {
             if col_str == '⬜' {
                 value.insert(
                     matrix_to_cartesian(
-                        MatrixP { row: row.try_into().unwrap(), col: col.try_into().unwrap() },
-                        len.try_into().unwrap(),
+                        &MatrixP { row: row.try_into().unwrap(), col: col.try_into().unwrap() },
+                        &cam,
                     ),
                     State::Alive,
                 );
@@ -143,10 +152,10 @@ pub fn toggle_cell(u: &mut Universe, p: CartesianP) {
 }
 
 pub fn toggle_cell_by_absolute_point(u: &mut Universe, s: &RenderSettings, p: MatrixP) {
-    let length = get_length(&s.cam);
-    let subdivision_size = s.dim as u64 / length;
+    let len = get_length(&s.cam);
+    let subdivision_size = s.dim as u64 / len;
     let matrix_point = MatrixP { row: p.row / subdivision_size, col: p.col / subdivision_size };
-    let cartesian_point = matrix_to_cartesian(matrix_point, length.into());
+    let cartesian_point = matrix_to_cartesian(&matrix_point, &s.cam);
     toggle_cell(u, cartesian_point);
 }
 
@@ -248,9 +257,9 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianP::from(1, 2), State::Alive),
-                (CartesianP::from(-2, 1), State::Alive),
-                (CartesianP::from(0, 0), State::Alive),
+                (CartesianP::from(-2, 0), State::Alive),
+                (CartesianP::from(0, -1), State::Alive),
+                (CartesianP::from(1, 1), State::Alive),
             ]))
         );
         assert_eq!(
@@ -264,10 +273,10 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianP::from(0, 0), State::Alive),
-                (CartesianP::from(0, 1), State::Alive),
+                (CartesianP::from(-1, -1), State::Alive),
                 (CartesianP::from(-1, 0), State::Alive),
-                (CartesianP::from(-1, 1), State::Alive),
+                (CartesianP::from(0, -1), State::Alive),
+                (CartesianP::from(0, 0), State::Alive),
             ]),)
         );
         assert_eq!(
@@ -354,21 +363,21 @@ mod test {
             String::from("⬛⬜⬜⬛"),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianP::from(-2, 2));
+        toggle_cell(&mut u, CartesianP::from(-2, 1));
         assert_eq!(u, state1);
-        toggle_cell(&mut u, CartesianP::from(-1, 1));
-        assert_eq!(u, state2);
-        toggle_cell(&mut u, CartesianP::from(0, 0));
-        assert_eq!(u, state3);
-        toggle_cell(&mut u, CartesianP::from(1, -1));
-        assert_eq!(u, state4);
-        toggle_cell(&mut u, CartesianP::from(-2, -1));
-        assert_eq!(u, state5);
         toggle_cell(&mut u, CartesianP::from(-1, 0));
+        assert_eq!(u, state2);
+        toggle_cell(&mut u, CartesianP::from(0, -1));
+        assert_eq!(u, state3);
+        toggle_cell(&mut u, CartesianP::from(1, -2));
+        assert_eq!(u, state4);
+        toggle_cell(&mut u, CartesianP::from(-2, -2));
+        assert_eq!(u, state5);
+        toggle_cell(&mut u, CartesianP::from(-1, -1));
         assert_eq!(u, state6);
-        toggle_cell(&mut u, CartesianP::from(0, 1));
+        toggle_cell(&mut u, CartesianP::from(0, 0));
         assert_eq!(u, state7);
-        toggle_cell(&mut u, CartesianP::from(1, 2));
+        toggle_cell(&mut u, CartesianP::from(1, 1));
         assert_eq!(u, state8);
     }
 
@@ -492,57 +501,25 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        let cam = Rect::from(-5, -4, 4, 5);
+        let cam = Rect::from(-5, -5, 4, 4);
         let dim: u16 = 1000;
-        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 10),);
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 10));
         assert_eq!(u, state1);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(990, 10),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(990, 10));
         assert_eq!(u, state2);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(10, 990),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(10, 990));
         assert_eq!(u, state3);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(990, 990),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(990, 990));
         assert_eq!(u, state4);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(110, 110),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(110, 110));
         assert_eq!(u, state5);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(890, 110),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(890, 110));
         assert_eq!(u, state6);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(110, 890),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(110, 890));
         assert_eq!(u, state7);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(890, 890),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(890, 890));
         assert_eq!(u, state8);
-        toggle_cell_by_absolute_point(
-            &mut u,
-            &RenderSettings { cam, dim, gap: 0 },
-            MatrixP::from(710, 350),
-        );
+        toggle_cell_by_absolute_point(&mut u, &RenderSettings { cam, dim, gap: 0 }, MatrixP::from(710, 350));
         assert_eq!(u, state9);
     }
 
@@ -554,10 +531,8 @@ mod test {
         iterate(&mut model1x1iter0);
         assert_eq!(model1x1iter0, model1x1iter1);
 
-        let mut model2x2iter0 =
-            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
-        let mut model2x2iter1 =
-            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
+        let mut model2x2iter0 = from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
+        let mut model2x2iter1 = from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
         model2x2iter1.age = 1;
         iterate(&mut model2x2iter0);
         assert_eq!(model2x2iter0, model2x2iter1);
@@ -657,7 +632,7 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-5, -4, 4, 5)
+            Rect::from(-5, -5, 4, 4)
         );
         assert_eq!(
             get_camera(

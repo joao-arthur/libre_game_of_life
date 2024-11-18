@@ -5,10 +5,7 @@ use web_sys::CanvasRenderingContext2d;
 use crate::domain::{
     geometry::{
         coordinate::{CartesianP, MatrixP},
-        poligon::{
-            rect::{get_length, move_by, zoom_in, zoom_out, zoom_to},
-            square::Sq,
-        },
+        poligon::rect::{get_length, move_by, zoom_in, zoom_out, zoom_to, Rect},
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     render::{get_values_to_render, RenderSettings},
@@ -55,25 +52,20 @@ pub fn build_preset_option_groups() -> Vec<PresetOptionGroup> {
         .collect()
 }
 
-pub trait DrawContext {
-    fn clear(&self, s: Sq);
-    fn draw_square(&self, s: Sq, color: String);
-}
-
 #[derive(Clone)]
 pub struct Holder {
     context: CanvasRenderingContext2d,
 }
 
-impl DrawContext for Holder {
-    fn clear(&self, s: Sq) {
-        self.context.set_fill_style_str("white");
-        self.context.fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
-    }
-
-    fn draw_square(&self, s: Sq, color: String) {
+impl Holder {
+    fn draw_square(&self, r: Rect, color: String) {
         self.context.set_fill_style(&color.into());
-        self.context.fill_rect(s.x as f64, s.y as f64, s.size as f64, s.size as f64);
+        self.context.fill_rect(
+            r.x1 as f64,
+            r.y1 as f64,
+            r.x2 as f64 - r.x1 as f64,
+            r.y2 as f64 - r.y1 as f64,
+        );
     }
 }
 
@@ -163,7 +155,12 @@ fn render() {
         (m.universe.clone(), m.settings.clone(), m.holder.clone())
     });
     if let Some(holder) = holder {
-        let bg = Sq { x: 0, y: 0, size: settings.render_settings.dim.into() };
+        let bg = Rect {
+            x1: 0,
+            y1: 0,
+            x2: settings.render_settings.dim.into(),
+            y2: settings.render_settings.dim.into(),
+        };
         holder.draw_square(bg, DEAD_COLOR.to_string());
         let values_to_render = get_values_to_render(&universe, &settings.render_settings);
         for sq in values_to_render {
@@ -335,7 +332,7 @@ pub fn app_zoom_to(new_size: u16) {
     on_change(Prop::Cam);
 }
 
-pub fn app_move_model(delta: CartesianP) {
+pub fn app_move_cam(delta: CartesianP) {
     MODEL.with(|i| {
         let mut model = i.borrow_mut();
         move_by(&mut model.settings.render_settings.cam, delta);
@@ -384,7 +381,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
         assert_eq!(MODEL.with(|i| i.borrow().universe.clone()), get_preset_unsafe("block"));
@@ -408,7 +405,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -419,7 +416,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -431,7 +428,7 @@ mod test {
                 fps: 4,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-5, -4, 4, 5),
+                    cam: Rect::from(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 0
                 }
@@ -446,7 +443,7 @@ mod test {
                 fps: 4,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-5, -4, 4, 5),
+                    cam: Rect::from(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2
                 }
@@ -461,7 +458,7 @@ mod test {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-5, -4, 4, 5),
+                    cam: Rect::from(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2,
                 }
@@ -476,7 +473,7 @@ mod test {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-5, -4, 4, 5),
+                    cam: Rect::from(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2,
                 }
@@ -510,7 +507,7 @@ mod test {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-5, -4, 4, 5),
+                    cam: Rect::from(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2,
                 }
@@ -529,7 +526,7 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-5, -4, 4, 5),
+                    cam: Rect::from(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2,
                 }
@@ -544,7 +541,7 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-20, -19, 19, 20),
+                    cam: Rect::from(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }
@@ -558,7 +555,7 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-19, -18, 18, 19),
+                    cam: Rect::from(-19, -19, 18, 18),
                     dim: 1080,
                     gap: 2,
                 }
@@ -572,14 +569,14 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-20, -19, 19, 20),
+                    cam: Rect::from(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }
             }
         );
 
-        app_move_model(CartesianP::from(20, 20));
+        app_move_cam(CartesianP::from(20, 20));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe { age: 2, value: block.value.clone() }
@@ -591,9 +588,9 @@ mod test {
             Universe {
                 age: 2,
                 value: HashMap::from([
-                    (CartesianP::from(-1, 1), State::Alive),
-                    (CartesianP::from(0, 1), State::Alive),
+                    (CartesianP::from(-1, -1), State::Alive),
                     (CartesianP::from(-1, 0), State::Alive),
+                    (CartesianP::from(0, -1), State::Alive),
                 ])
             }
         );
