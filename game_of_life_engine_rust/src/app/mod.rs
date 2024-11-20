@@ -218,7 +218,6 @@ pub fn app_init(context: CanvasRenderingContext2d) {
         }
     });
     render();
-    //app_pause();
 }
 
 pub fn app_pause() {
