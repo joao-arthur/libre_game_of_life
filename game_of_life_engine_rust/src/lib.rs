@@ -196,5 +196,3 @@ pub fn main_get_presets() -> JsValue {
         .collect();
     serde_wasm_bindgen::to_value(&groups).unwrap()
 }
-
-// render em float

@@ -5,7 +5,7 @@ use web_sys::CanvasRenderingContext2d;
 use crate::domain::{
     geometry::{
         coordinate::{CartesianP, MatrixP},
-        poligon::rect::{get_length, move_by, zoom_in, zoom_out, zoom_to, Rect},
+        poligon::rect::{get_length, move_by, zoom_in, zoom_out, zoom_to, RectF64},
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
     render::{get_values_to_render, RenderSettings},
@@ -58,7 +58,7 @@ pub struct Holder {
 }
 
 impl Holder {
-    fn draw_square(&self, r: Rect, color: String) {
+    fn draw_square(&self, r: RectF64, color: String) {
         if self.context.is_undefined() || self.context.is_null() {
             return;
         }
@@ -161,9 +161,9 @@ fn render() {
         return;
     }
     if let Some(holder) = holder {
-        let bg = Rect {
-            x1: 0,
-            y1: 0,
+        let bg = RectF64 {
+            x1: 0.0,
+            y1: 0.0,
             x2: settings.render_settings.dim.into(),
             y2: settings.render_settings.dim.into(),
         };
@@ -548,7 +548,6 @@ mod test {
                 }
             }
         );
-
 
         app_zoom_to(4);
         app_zoom_in();

@@ -9,6 +9,14 @@ pub struct Rect {
     pub y2: i64,
 }
 
+#[derive(Debug, PartialEq)]
+pub struct RectF64 {
+    pub x1: f64,
+    pub y1: f64,
+    pub x2: f64,
+    pub y2: f64,
+}
+
 impl Rect {
     pub fn from(x1: i64, y1: i64, x2: i64, y2: i64) -> Self {
         Rect { x1, y1, x2, y2 }
@@ -70,7 +78,7 @@ pub fn zoom_to(r: &mut Rect, size: u16) {
     if size < 3 {
         return;
     }
-    let size: i64 = size.into();
+    let size = i64::from(size);
     let d_x: i64 = delta_x(r).try_into().unwrap();
     let d_y: i64 = delta_y(r).try_into().unwrap();
     let len_x: i64 = d_x + 1;
