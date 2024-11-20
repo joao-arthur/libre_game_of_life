@@ -70,25 +70,16 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
     if lines_len != len {
         return Err(FromStringError::InvalidLength(InvalidLengthError));
     }
-    let row_iter = as_str.iter().enumerate();
-
     let rect_len = len as i64;
-    let half = rect_len as i64 / 2;
-    let x1 = -half as i64;
-    let y1 = -half as i64;
-    let x2 = x1 as i64 + rect_len as i64 - 1;
-    let y2 = y1 as i64 + rect_len as i64 - 1;
-    let cam = Rect { x1, y1, x2, y2 };
-
+    let half = rect_len / 2;
+    let cam = Rect { x1: -half, y1: -half, x2: -half + rect_len - 1, y2: -half + rect_len - 1 };
+    let row_iter = as_str.iter().enumerate();
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
         for (col, col_str) in col_iter {
             if col_str == '⬜' {
                 value.insert(
-                    matrix_to_cartesian(
-                        &MatrixP { row: row.try_into().unwrap(), col: col.try_into().unwrap() },
-                        &cam,
-                    ),
+                    matrix_to_cartesian(&MatrixP { row: row as u64, col: col as u64 }, &cam),
                     State::Alive,
                 );
             }
@@ -526,10 +517,9 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        let dim: u16 = 1000;
-        let s1 = RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim, gap: 0 };
-        let s2 = RenderSettings { cam: Rect::from(-4, -4, 5, 5), dim, gap: 0 };
-        let s3 = RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim, gap: 0 };
+        let s1 = RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 1000, gap: 0 };
+        let s2 = RenderSettings { cam: Rect::from(-4, -4, 5, 5), dim: 1000, gap: 0 };
+        let s3 = RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 1000, gap: 0 };
         toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(10, 10));
         assert_eq!(u, state1);
         toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(990, 10));
@@ -681,6 +671,32 @@ mod test {
                 .unwrap()
             ),
             Rect::from(-5, -5, 5, 5)
+        );
+        assert_eq!(
+            get_camera(
+                &from_string(vec![
+                    String::from("⬛⬛⬛"),
+                    String::from("⬜⬜⬜"),
+                    String::from("⬛⬛⬛"),
+                ])
+                .unwrap()
+            ),
+            Rect::from(-5, -5, 5, 5)
+        );
+        assert_eq!(
+            get_camera(
+                &from_string(vec![
+                    String::from("⬛⬜⬛"),
+                    String::from("⬜⬜⬜"),
+                    String::from("⬛⬜⬛"),
+                ])
+                .unwrap()
+            ),
+            Rect::from(-5, -5, 5, 5)
+        );
+        assert_eq!(
+            get_camera(&from_string(vec![String::from("⬜"),]).unwrap()),
+            Rect::from(-4, -4, 4, 4)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([

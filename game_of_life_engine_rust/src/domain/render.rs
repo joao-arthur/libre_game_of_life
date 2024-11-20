@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use super::{
     cell::State,
     geometry::{
@@ -15,9 +17,9 @@ pub struct RenderSettings {
 }
 
 pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<RectF64> {
-    let dimf: f64 = s.dim.into();
-    let lenf: f64 = get_length(&s.cam) as f64;
-    let subdivision_size = dimf / lenf;
+    let dim = f64::from(s.dim);
+    let len = get_length(&s.cam) as f64;
+    let cell_size = dim / len;
     let mut values_to_render: Vec<RectF64> = u
         .value
         .iter()
@@ -30,26 +32,19 @@ pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<RectF64> {
         .filter(|value| value.1 == &State::Alive)
         .map(|value| {
             let arr_index = cartesian_to_matrix(value.0, &s.cam);
-            let gap_start_f: f64 = s.gap.into();
-            let gap_end_f: f64 = gap_start_f * 2.0;
-
-            let col_f: f64 = arr_index.col as f64;
-            let row_f: f64 = arr_index.row as f64;
-
-            let x = col_f * subdivision_size + gap_start_f;
-            let y = row_f * subdivision_size + gap_start_f;
-
+            let gap = f64::from(s.gap);
+            let col = arr_index.col as f64;
+            let row = arr_index.row as f64;
             RectF64 {
-                x1: x,
-                y1: y,
-                x2: x + subdivision_size - gap_end_f,
-                y2: y + subdivision_size - gap_end_f,
+                x1: col * cell_size + gap,
+                y1: row * cell_size + gap,
+                x2: col * cell_size + cell_size - gap,
+                y2: row * cell_size + cell_size - gap,
             }
         })
         .collect();
-    values_to_render.sort_by(|a, b| a.y1.partial_cmp(&b.y1).unwrap());
-    values_to_render.sort_by(|a, b| a.x1.partial_cmp(&b.x1).unwrap());
-
+    values_to_render.sort_by(|a, b| a.y1.partial_cmp(&b.y1).unwrap_or(std::cmp::Ordering::Greater));
+    values_to_render.sort_by(|a, b| a.x1.partial_cmp(&b.x1).unwrap_or(std::cmp::Ordering::Greater));
     values_to_render
 }
 

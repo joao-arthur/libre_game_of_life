@@ -126,8 +126,7 @@ pub fn main_single_iteration() {
 
 #[wasm_bindgen(js_name = "engineToggle")]
 pub fn main_toggle(point: EngineMatrixPoint) {
-    let cp = MatrixP { row: point.row, col: point.col };
-    app_toggle_model_cell_by_absolute_point(cp);
+    app_toggle_model_cell_by_absolute_point(MatrixP { row: point.row, col: point.col });
 }
 
 #[wasm_bindgen(js_name = "engineZoomIn")]
@@ -147,8 +146,7 @@ pub fn main_zoom_by(new_size: u16) {
 
 #[wasm_bindgen(js_name = "engineMoveBy")]
 pub fn main_move_model(delta: EngineCartesianPoint) {
-    let cp = CartesianP { x: delta.x, y: delta.y };
-    app_move_cam(cp);
+    app_move_cam(CartesianP { x: delta.x, y: delta.y });
 }
 
 #[wasm_bindgen(js_name = "engineGetSettings")]
@@ -170,8 +168,7 @@ pub fn main_get_settings() -> EngineInfo {
 #[wasm_bindgen(js_name = "engineAddOnChangeListener")]
 pub fn main_add_on_change_listener(cb: Function) {
     add_on_change_listener(move |_| {
-        let this = JsValue::null();
-        cb.call0(&this).unwrap();
+        cb.call0(&JsValue::null()).unwrap();
     });
 }
 

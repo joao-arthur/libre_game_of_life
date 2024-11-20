@@ -63,12 +63,7 @@ impl Holder {
             return;
         }
         self.context.set_fill_style(&color.into());
-        self.context.fill_rect(
-            r.x1 as f64,
-            r.y1 as f64,
-            r.x2 as f64 - r.x1 as f64,
-            r.y2 as f64 - r.y1 as f64,
-        );
+        self.context.fill_rect(r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
     }
 }
 
@@ -164,8 +159,8 @@ fn render() {
         let bg = RectF64 {
             x1: 0.0,
             y1: 0.0,
-            x2: settings.render_settings.dim.into(),
-            y2: settings.render_settings.dim.into(),
+            x2: f64::from(settings.render_settings.dim),
+            y2: f64::from(settings.render_settings.dim),
         };
         holder.draw_square(bg, DEAD_COLOR.to_string());
         let values_to_render = get_values_to_render(&universe, &settings.render_settings);
@@ -183,7 +178,6 @@ pub enum Command {
 pub fn app_init(context: CanvasRenderingContext2d) {
     MODEL.with(|i| i.borrow_mut().holder = Some(Holder { context }));
     let mut interval: Option<Interval> = None;
-
     add_on_change_listener({
         move |prop| {
             let status = MODEL.with(|i| i.borrow().settings.status.clone());
@@ -196,7 +190,7 @@ pub fn app_init(context: CanvasRenderingContext2d) {
                             }
                         }
                         let fps = MODEL.with(|i| i.borrow().settings.fps);
-                        interval = Some(Interval::new(fps_to_mili(fps).into(), || {
+                        interval = Some(Interval::new(u32::from(fps_to_mili(fps)), || {
                             app_iterate();
                             render();
                         }))
@@ -374,7 +368,7 @@ pub fn app_get_settings() -> AppInfo {
         AppInfo {
             preset: s.preset,
             gap: s.render_settings.gap,
-            size: get_length(&s.render_settings.cam).try_into().unwrap(),
+            size: get_length(&s.render_settings.cam) as u16,
             fps: s.fps,
             status: s.status,
             age: u.age,

@@ -79,12 +79,12 @@ pub fn zoom_to(r: &mut Rect, size: u16) {
         return;
     }
     let size = i64::from(size);
-    let d_x: i64 = delta_x(r).try_into().unwrap();
-    let d_y: i64 = delta_y(r).try_into().unwrap();
-    let len_x: i64 = d_x + 1;
-    let len_y: i64 = d_y + 1;
-    let diff_x: i64 = len_x - size;
-    let diff_y: i64 = len_y - size;
+    let d_x = delta_x(r) as i64;
+    let d_y = delta_y(r) as i64;
+    let len_x = d_x + 1;
+    let len_y = d_y + 1;
+    let diff_x = len_x - size;
+    let diff_y = len_y - size;
     r.x1 += diff_x / 2;
     r.y1 += diff_y / 2;
     r.x2 -= diff_x / 2;
