@@ -153,7 +153,7 @@ mod test {
     }
 
     #[test]
-    fn test_render_float_size_cell() {
+    fn test_render_float_cell_size() {
         let u = get_universe();
         let s = RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 996, gap: 0 };
         assert_eq!(
