@@ -53,12 +53,10 @@ pub fn center(r: &mut Rect, p: CartesianP) {
 }
 
 pub fn zoom_in(r: &mut Rect) {
-    if delta_x(&r) > 2 && delta_y(r) > 2 {
-        r.x1 += 1;
-        r.y1 += 1;
-        r.x2 -= 1;
-        r.y2 -= 1;
-    }
+    r.x1 += 1;
+    r.y1 += 1;
+    r.x2 -= 1;
+    r.y2 -= 1;
 }
 
 pub fn zoom_out(r: &mut Rect) {
@@ -156,7 +154,7 @@ mod test {
         zoom_in(&mut r);
         assert_eq!(r, Rect::from(-1, -1, 1, 1));
         zoom_in(&mut r);
-        assert_eq!(r, Rect::from(-1, -1, 1, 1));
+        assert_eq!(r, Rect::from(0, 0, 0, 0));
     }
 
     #[test]
@@ -171,7 +169,7 @@ mod test {
         zoom_in(&mut r);
         assert_eq!(r, Rect::from(-1, -1, 0, 0));
         zoom_in(&mut r);
-        assert_eq!(r, Rect::from(-1, -1, 0, 0));
+        assert_eq!(r, Rect::from(0, 0, -1, -1));
     }
 
     #[test]
@@ -186,7 +184,7 @@ mod test {
         zoom_in(&mut r);
         assert_eq!(r, Rect::from(0, 0, 1, 1));
         zoom_in(&mut r);
-        assert_eq!(r, Rect::from(0, 0, 1, 1));
+        assert_eq!(r, Rect::from(1, 1, 0, 0));
     }
 
     #[test]

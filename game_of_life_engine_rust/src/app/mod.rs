@@ -222,40 +222,40 @@ pub fn app_init(context: CanvasRenderingContext2d) {
 
 pub fn app_pause() {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        model.settings.status = Status::Paused;
+        let mut m = i.borrow_mut();
+        m.settings.status = Status::Paused;
     });
     on_change(Prop::Status);
 }
 
 pub fn app_resume() {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        model.settings.status = Status::Resumed;
+        let mut m = i.borrow_mut();
+        m.settings.status = Status::Resumed;
     });
     on_change(Prop::Status);
 }
 
 pub fn app_set_dimension(dim: u16) {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        model.settings.render_settings.dim = dim;
+        let mut m = i.borrow_mut();
+        m.settings.render_settings.dim = dim;
     });
     on_change(Prop::Dim);
 }
 
 pub fn app_set_gap(gap: u8) {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        model.settings.render_settings.gap = gap;
+        let mut m = i.borrow_mut();
+        m.settings.render_settings.gap = gap;
     });
     on_change(Prop::Gap);
 }
 
 pub fn app_set_fps(fps: u16) {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        model.settings.fps = fps;
+        let mut m = i.borrow_mut();
+        m.settings.fps = fps;
     });
     on_change(Prop::FPS);
 }
@@ -263,10 +263,10 @@ pub fn app_set_fps(fps: u16) {
 pub fn app_set_preset(preset: String) {
     if let Some(selected_preset) = get_preset(&preset) {
         MODEL.with(|i| {
-            let mut model = i.borrow_mut();
-            model.settings.render_settings.cam = get_camera(&selected_preset);
-            model.universe = selected_preset;
-            model.settings.preset = Some(preset);
+            let mut m = i.borrow_mut();
+            m.settings.render_settings.cam = get_camera(&selected_preset);
+            m.universe = selected_preset;
+            m.settings.preset = Some(preset);
         });
         on_change(Prop::Universe);
         on_change(Prop::Preset);
@@ -276,9 +276,9 @@ pub fn app_set_preset(preset: String) {
 
 pub fn app_single_iteration() {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        model.settings.status = Status::Paused;
-        iterate(&mut model.universe);
+        let mut m = i.borrow_mut();
+        m.settings.status = Status::Paused;
+        iterate(&mut m.universe);
     });
     on_change(Prop::Status);
     on_change(Prop::Universe);
@@ -286,17 +286,17 @@ pub fn app_single_iteration() {
 
 pub fn app_iterate() {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        iterate(&mut model.universe);
+        let mut m = i.borrow_mut();
+        iterate(&mut m.universe);
     });
     on_change(Prop::Universe);
 }
 
 pub fn app_toggle_by_point(p: CartesianP) {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        toggle_cell(&mut model.universe, p);
-        model.settings.preset = None;
+        let mut m = i.borrow_mut();
+        toggle_cell(&mut m.universe, p);
+        m.settings.preset = None;
     });
     on_change(Prop::Universe);
     on_change(Prop::Preset);
@@ -304,43 +304,54 @@ pub fn app_toggle_by_point(p: CartesianP) {
 
 pub fn app_toggle_model_cell_by_absolute_point(p: MatrixP) {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        let render_settings = model.settings.render_settings.clone();
-        toggle_cell_by_absolute_point(&mut model.universe, &render_settings, p);
-        model.settings.preset = None;
+        let mut m = i.borrow_mut();
+        let render_settings = m.settings.render_settings.clone();
+        toggle_cell_by_absolute_point(&mut m.universe, &render_settings, p);
+        m.settings.preset = None;
     });
     on_change(Prop::Universe);
     on_change(Prop::Preset);
 }
 
 pub fn app_zoom_in() {
+    let cam = MODEL.with(|i| i.borrow().settings.render_settings.cam.clone());
+    if get_length(&cam) <= 2 {
+        return;
+    }
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        zoom_in(&mut model.settings.render_settings.cam);
+        let mut m = i.borrow_mut();
+        zoom_in(&mut m.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
 
 pub fn app_zoom_out() {
+    let cam = MODEL.with(|i| i.borrow().settings.render_settings.cam.clone());
+    if get_length(&cam) >= 200 {
+        return;
+    }
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        zoom_out(&mut model.settings.render_settings.cam);
+        let mut m = i.borrow_mut();
+        zoom_out(&mut m.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
 
 pub fn app_zoom_to(new_size: u16) {
+    if new_size < 2 || new_size > 200 {
+        return;
+    }
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        zoom_to(&mut model.settings.render_settings.cam, new_size);
+        let mut m = i.borrow_mut();
+        zoom_to(&mut m.settings.render_settings.cam, new_size);
     });
     on_change(Prop::Cam);
 }
 
 pub fn app_move_cam(delta: CartesianP) {
     MODEL.with(|i| {
-        let mut model = i.borrow_mut();
-        move_by(&mut model.settings.render_settings.cam, delta);
+        let mut m = i.borrow_mut();
+        move_by(&mut m.settings.render_settings.cam, delta);
     });
     on_change(Prop::Universe);
 }
@@ -532,6 +543,44 @@ mod test {
                 status: Status::Paused,
                 render_settings: RenderSettings {
                     cam: Rect::from(-5, -5, 4, 4),
+                    dim: 1080,
+                    gap: 2,
+                }
+            }
+        );
+
+
+        app_zoom_to(4);
+        app_zoom_in();
+        app_zoom_in();
+        app_zoom_in();
+        app_zoom_in();
+        assert_eq!(
+            MODEL.with(|i| i.borrow().settings.clone()),
+            AppSettings {
+                preset: Some(String::from("block")),
+                fps: 60,
+                status: Status::Paused,
+                render_settings: RenderSettings {
+                    cam: Rect::from(-1, -1, 0, 0),
+                    dim: 1080,
+                    gap: 2,
+                }
+            }
+        );
+        app_zoom_to(198);
+        app_zoom_out();
+        app_zoom_out();
+        app_zoom_out();
+        app_zoom_out();
+        assert_eq!(
+            MODEL.with(|i| i.borrow().settings.clone()),
+            AppSettings {
+                preset: Some(String::from("block")),
+                fps: 60,
+                status: Status::Paused,
+                render_settings: RenderSettings {
+                    cam: Rect::from(-100, -100, 99, 99),
                     dim: 1080,
                     gap: 2,
                 }
