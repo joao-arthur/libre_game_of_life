@@ -162,10 +162,10 @@ fn render() {
             x2: f64::from(settings.render_settings.dim),
             y2: f64::from(settings.render_settings.dim),
         };
-        holder.draw_square(bg, DEAD_COLOR.to_string());
+        holder.draw_square(bg, String::from(DEAD_COLOR));
         let values_to_render = get_values_to_render(&universe, &settings.render_settings);
         for sq in values_to_render {
-            holder.draw_square(sq, ALIVE_COLOR.to_string());
+            holder.draw_square(sq, String::from(ALIVE_COLOR));
         }
     }
 }
@@ -398,7 +398,7 @@ mod test {
         let settings = app_get_settings();
         assert_eq!(
             AppInfo {
-                preset: Some("block".to_string()),
+                preset: Some(String::from("block")),
                 gap: 0,
                 size: 10,
                 fps: 4,
@@ -463,7 +463,7 @@ mod test {
             }
         );
 
-        app_set_preset("Gaius Julius Caesar".to_string());
+        app_set_preset(String::from("Gaius Julius Caesar"));
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
             AppSettings {
@@ -473,7 +473,7 @@ mod test {
                 render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
-        app_set_preset("r_pentomino".to_string());
+        app_set_preset(String::from("r_pentomino"));
         assert_eq!(
             MODEL.with(|i| i.borrow().settings.clone()),
             AppSettings {
@@ -483,7 +483,7 @@ mod test {
                 render_settings: RenderSettings { cam: Rect::of(-5, -5, 5, 5), dim: 1080, gap: 2 }
             }
         );
-        app_set_preset("block".to_string());
+        app_set_preset(String::from("block"));
         app_iterate();
         let block = get_preset_unsafe("block");
         assert_eq!(

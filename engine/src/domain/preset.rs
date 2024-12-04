@@ -35,7 +35,7 @@ pub struct PresetGroup {
 static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
     HashMap::from([
         (
-            "boat".to_string(),
+            String::from("boat"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛⬛"),
                 String::from("⬛⬜⬜⬛⬛"),
@@ -46,7 +46,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "block".to_string(),
+            String::from("block"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛"),
                 String::from("⬛⬜⬜⬛"),
@@ -56,7 +56,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "blinker".to_string(),
+            String::from("blinker"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛⬛"),
                 String::from("⬛⬛⬜⬛⬛"),
@@ -67,7 +67,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "r_pentomino".to_string(),
+            String::from("r_pentomino"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛⬛"),
                 String::from("⬛⬛⬜⬜⬛"),
@@ -78,7 +78,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "glider".to_string(),
+            String::from("glider"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛⬛"),
                 String::from("⬛⬜⬛⬜⬛"),
@@ -89,7 +89,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "gosper_glider_gun".to_string(),
+            String::from("gosper_glider_gun"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
                 String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
@@ -133,7 +133,7 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
             .unwrap(),
         ),
         (
-            "puffer1".to_string(),
+            String::from("puffer1"),
             from_string(vec![
                 String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
                 String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
@@ -184,93 +184,110 @@ pub fn get_preset(preset: &String) -> Option<Universe> {
 pub fn get_preset_groups() -> Vec<PresetGroup> {
     vec![
         PresetGroup {
-            info: PresetGroupInfo { name: "StillLife".to_string(), id: "stillLife".to_string() },
+            info: PresetGroupInfo {
+                name: String::from("StillLife"),
+                id: String::from("stillLife"),
+            },
             sub_groups: vec![
-                PresetSubGroup { name: "Ship".to_string(), id: "ship".to_string(), items: vec![] },
                 PresetSubGroup {
-                    name: "Boat".to_string(),
-                    id: "boat".to_string(),
+                    name: String::from("Ship"),
+                    id: String::from("ship"),
+                    items: vec![],
+                },
+                PresetSubGroup {
+                    name: String::from("Boat"),
+                    id: String::from("boat"),
                     items: vec![Preset {
-                        name: "Boat".to_string(),
-                        id: "boat".to_string(),
-                        discover: PresetDiscover { name: "JHC group".to_string(), year: 1970 },
+                        name: String::from("Boat"),
+                        id: String::from("boat"),
+                        discover: PresetDiscover { name: String::from("JHC group"), year: 1970 },
                     }],
                 },
-                PresetSubGroup { name: "Loaf".to_string(), id: "loaf".to_string(), items: vec![] },
                 PresetSubGroup {
-                    name: "General".to_string(),
-                    id: "general".to_string(),
+                    name: String::from("Loaf"),
+                    id: String::from("loaf"),
+                    items: vec![],
+                },
+                PresetSubGroup {
+                    name: String::from("General"),
+                    id: String::from("general"),
                     items: vec![Preset {
-                        name: "Block".to_string(),
-                        id: "block".to_string(),
-                        discover: PresetDiscover { name: "John Conway".to_string(), year: 1969 },
+                        name: String::from("Block"),
+                        id: String::from("block"),
+                        discover: PresetDiscover { name: String::from("John Conway"), year: 1969 },
                     }],
                 },
             ],
         },
         PresetGroup {
             info: PresetGroupInfo {
-                name: "Oscillators".to_string(),
-                id: "oscillators".to_string(),
+                name: String::from("Oscillators"),
+                id: String::from("oscillators"),
             },
             sub_groups: vec![PresetSubGroup {
-                name: "General".to_string(),
-                id: "general".to_string(),
+                name: String::from("General"),
+                id: String::from("general"),
                 items: vec![Preset {
-                    name: "Blinker".to_string(),
-                    id: "blinker".to_string(),
-                    discover: PresetDiscover { name: "John Conway".to_string(), year: 1969 },
+                    name: String::from("Blinker"),
+                    id: String::from("blinker"),
+                    discover: PresetDiscover { name: String::from("John Conway"), year: 1969 },
                 }],
             }],
         },
         PresetGroup {
             info: PresetGroupInfo {
-                name: "Methuselahs".to_string(),
-                id: "methuselahs".to_string(),
+                name: String::from("Methuselahs"),
+                id: String::from("methuselahs"),
             },
             sub_groups: vec![PresetSubGroup {
-                name: "General".to_string(),
-                id: "general".to_string(),
+                name: String::from("General"),
+                id: String::from("general"),
                 items: vec![Preset {
-                    name: "R-Pentomino".to_string(),
-                    id: "r_pentomino".to_string(),
-                    discover: PresetDiscover { name: "John Conway".to_string(), year: 1969 },
+                    name: String::from("R-Pentomino"),
+                    id: String::from("r_pentomino"),
+                    discover: PresetDiscover { name: String::from("John Conway"), year: 1969 },
                 }],
             }],
         },
         PresetGroup {
-            info: PresetGroupInfo { name: "Spaceships".to_string(), id: "spaceships".to_string() },
+            info: PresetGroupInfo {
+                name: String::from("Spaceships"),
+                id: String::from("spaceships"),
+            },
             sub_groups: vec![PresetSubGroup {
-                name: "General".to_string(),
-                id: "general".to_string(),
+                name: String::from("General"),
+                id: String::from("general"),
                 items: vec![Preset {
-                    name: "Glider".to_string(),
-                    id: "glider".to_string(),
-                    discover: PresetDiscover { name: "Richard K. Guy".to_string(), year: 1969 },
+                    name: String::from("Glider"),
+                    id: String::from("glider"),
+                    discover: PresetDiscover { name: String::from("Richard K. Guy"), year: 1969 },
                 }],
             }],
         },
         PresetGroup {
-            info: PresetGroupInfo { name: "Glider gun".to_string(), id: "gliderGun".to_string() },
+            info: PresetGroupInfo {
+                name: String::from("Glider gun"),
+                id: String::from("gliderGun"),
+            },
             sub_groups: vec![PresetSubGroup {
-                name: "General".to_string(),
-                id: "general".to_string(),
+                name: String::from("General"),
+                id: String::from("general"),
                 items: vec![Preset {
-                    name: "Gosper glider gun".to_string(),
-                    id: "gosper_glider_gun".to_string(),
-                    discover: PresetDiscover { name: "Bill Gosper".to_string(), year: 1970 },
+                    name: String::from("Gosper glider gun"),
+                    id: String::from("gosper_glider_gun"),
+                    discover: PresetDiscover { name: String::from("Bill Gosper"), year: 1970 },
                 }],
             }],
         },
         PresetGroup {
-            info: PresetGroupInfo { name: "Puffer".to_string(), id: "puffer".to_string() },
+            info: PresetGroupInfo { name: String::from("Puffer"), id: String::from("puffer") },
             sub_groups: vec![PresetSubGroup {
-                name: "General".to_string(),
-                id: "general".to_string(),
+                name: String::from("General"),
+                id: String::from("general"),
                 items: vec![Preset {
-                    name: "Puffer 1".to_string(),
-                    id: "puffer1".to_string(),
-                    discover: PresetDiscover { name: "Bill Gosper".to_string(), year: 1971 },
+                    name: String::from("Puffer 1"),
+                    id: String::from("puffer1"),
+                    discover: PresetDiscover { name: String::from("Bill Gosper"), year: 1971 },
                 }],
             }],
         },
