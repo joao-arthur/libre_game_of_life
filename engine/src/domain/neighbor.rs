@@ -8,14 +8,14 @@ fn number_of_alive(neighbors: [State; 8]) -> u8 {
 
 fn neighbors_in_rectangular_grid(u: &Universe, p: &CartesianP) -> [State; 8] {
     [
-        get_value(u, &CartesianP::from(p.x - 1, p.y + 1)),
-        get_value(u, &CartesianP::from(p.x, p.y + 1)),
-        get_value(u, &CartesianP::from(p.x + 1, p.y + 1)),
-        get_value(u, &CartesianP::from(p.x - 1, p.y)),
-        get_value(u, &CartesianP::from(p.x + 1, p.y)),
-        get_value(u, &CartesianP::from(p.x - 1, p.y - 1)),
-        get_value(u, &CartesianP::from(p.x, p.y - 1)),
-        get_value(u, &CartesianP::from(p.x + 1, p.y - 1)),
+        get_value(u, &CartesianP::of(p.x - 1, p.y + 1)),
+        get_value(u, &CartesianP::of(p.x, p.y + 1)),
+        get_value(u, &CartesianP::of(p.x + 1, p.y + 1)),
+        get_value(u, &CartesianP::of(p.x - 1, p.y)),
+        get_value(u, &CartesianP::of(p.x + 1, p.y)),
+        get_value(u, &CartesianP::of(p.x - 1, p.y - 1)),
+        get_value(u, &CartesianP::of(p.x, p.y - 1)),
+        get_value(u, &CartesianP::of(p.x + 1, p.y - 1)),
     ]
 }
 

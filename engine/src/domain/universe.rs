@@ -20,8 +20,8 @@ pub struct Universe {
     pub age: u64,
 }
 
-impl Universe {
-    pub fn from(value: HashMap<CartesianP, State>) -> Self {
+impl From<HashMap<CartesianP, State>> for Universe {
+    fn from(value: HashMap<CartesianP, State>) -> Self {
         Universe { value, ..Default::default() }
     }
 }
@@ -102,15 +102,15 @@ pub fn iterate(u: &mut Universe) {
         .keys()
         .flat_map(|point| {
             [
-                CartesianP::from(point.x - 1, point.y + 1),
-                CartesianP::from(point.x, point.y + 1),
-                CartesianP::from(point.x + 1, point.y + 1),
-                CartesianP::from(point.x - 1, point.y),
+                CartesianP::of(point.x - 1, point.y + 1),
+                CartesianP::of(point.x, point.y + 1),
+                CartesianP::of(point.x + 1, point.y + 1),
+                CartesianP::of(point.x - 1, point.y),
                 point.clone(),
-                CartesianP::from(point.x + 1, point.y),
-                CartesianP::from(point.x - 1, point.y - 1),
-                CartesianP::from(point.x, point.y - 1),
-                CartesianP::from(point.x + 1, point.y - 1),
+                CartesianP::of(point.x + 1, point.y),
+                CartesianP::of(point.x - 1, point.y - 1),
+                CartesianP::of(point.x, point.y - 1),
+                CartesianP::of(point.x + 1, point.y - 1),
             ]
         })
         .collect();
@@ -189,17 +189,17 @@ mod test {
         assert_eq!(Universe::default(), Universe { value: HashMap::new(), age: 0 });
         assert_eq!(
             Universe::from(HashMap::from([
-                (CartesianP::from(-1, -1), State::Alive),
-                (CartesianP::from(-1, 1), State::Alive),
-                (CartesianP::from(1, -1), State::Alive),
-                (CartesianP::from(1, 1), State::Alive),
+                (CartesianP::of(-1, -1), State::Alive),
+                (CartesianP::of(-1, 1), State::Alive),
+                (CartesianP::of(1, -1), State::Alive),
+                (CartesianP::of(1, 1), State::Alive),
             ])),
             Universe {
                 value: HashMap::from([
-                    (CartesianP::from(-1, -1), State::Alive),
-                    (CartesianP::from(-1, 1), State::Alive),
-                    (CartesianP::from(1, -1), State::Alive),
-                    (CartesianP::from(1, 1), State::Alive),
+                    (CartesianP::of(-1, -1), State::Alive),
+                    (CartesianP::of(-1, 1), State::Alive),
+                    (CartesianP::of(1, -1), State::Alive),
+                    (CartesianP::of(1, 1), State::Alive),
                 ]),
                 age: 0,
             }
@@ -240,7 +240,7 @@ mod test {
         assert_eq!(from_string(vec![String::from("⬛")]).unwrap(), Universe::default());
         assert_eq!(
             from_string(vec![String::from("⬜")]).unwrap(),
-            Universe::from(HashMap::from([(CartesianP::from(0, 0), State::Alive)])),
+            Universe::from(HashMap::from([(CartesianP::of(0, 0), State::Alive)])),
         );
         assert_eq!(
             from_string(vec![
@@ -251,9 +251,9 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianP::from(-2, 0), State::Alive),
-                (CartesianP::from(0, -1), State::Alive),
-                (CartesianP::from(1, 1), State::Alive),
+                (CartesianP::of(-2, 0), State::Alive),
+                (CartesianP::of(0, -1), State::Alive),
+                (CartesianP::of(1, 1), State::Alive),
             ]))
         );
         assert_eq!(
@@ -267,10 +267,10 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianP::from(-1, -1), State::Alive),
-                (CartesianP::from(-1, 0), State::Alive),
-                (CartesianP::from(0, -1), State::Alive),
-                (CartesianP::from(0, 0), State::Alive),
+                (CartesianP::of(-1, -1), State::Alive),
+                (CartesianP::of(-1, 0), State::Alive),
+                (CartesianP::of(0, -1), State::Alive),
+                (CartesianP::of(0, 0), State::Alive),
             ]),)
         );
         assert_eq!(
@@ -285,9 +285,9 @@ mod test {
             ])
             .unwrap(),
             Universe::from(HashMap::from([
-                (CartesianP::from(0, -1), State::Alive),
-                (CartesianP::from(0, 0), State::Alive),
-                (CartesianP::from(0, 1), State::Alive),
+                (CartesianP::of(0, -1), State::Alive),
+                (CartesianP::of(0, 0), State::Alive),
+                (CartesianP::of(0, 1), State::Alive),
             ]),)
         );
     }
@@ -357,21 +357,21 @@ mod test {
             String::from("⬛⬜⬜⬛"),
         ])
         .unwrap();
-        toggle_cell(&mut u, CartesianP::from(-2, 1));
+        toggle_cell(&mut u, CartesianP::of(-2, 1));
         assert_eq!(u, state1);
-        toggle_cell(&mut u, CartesianP::from(-1, 0));
+        toggle_cell(&mut u, CartesianP::of(-1, 0));
         assert_eq!(u, state2);
-        toggle_cell(&mut u, CartesianP::from(0, -1));
+        toggle_cell(&mut u, CartesianP::of(0, -1));
         assert_eq!(u, state3);
-        toggle_cell(&mut u, CartesianP::from(1, -2));
+        toggle_cell(&mut u, CartesianP::of(1, -2));
         assert_eq!(u, state4);
-        toggle_cell(&mut u, CartesianP::from(-2, -2));
+        toggle_cell(&mut u, CartesianP::of(-2, -2));
         assert_eq!(u, state5);
-        toggle_cell(&mut u, CartesianP::from(-1, -1));
+        toggle_cell(&mut u, CartesianP::of(-1, -1));
         assert_eq!(u, state6);
-        toggle_cell(&mut u, CartesianP::from(0, 0));
+        toggle_cell(&mut u, CartesianP::of(0, 0));
         assert_eq!(u, state7);
-        toggle_cell(&mut u, CartesianP::from(1, 1));
+        toggle_cell(&mut u, CartesianP::of(1, 1));
         assert_eq!(u, state8);
     }
 
@@ -521,30 +521,30 @@ mod test {
             String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
         ])
         .unwrap();
-        let s1 = RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 1000, gap: 0 };
-        let s2 = RenderSettings { cam: Rect::from(-4, -4, 5, 5), dim: 1000, gap: 0 };
-        let s3 = RenderSettings { cam: Rect::from(-5, -4, 4, 5), dim: 1000, gap: 0 };
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(10, 10));
+        let s1 = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
+        let s2 = RenderSettings { cam: Rect::of(-4, -4, 5, 5), dim: 1000, gap: 0 };
+        let s3 = RenderSettings { cam: Rect::of(-5, -4, 4, 5), dim: 1000, gap: 0 };
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(10, 10));
         assert_eq!(u, state1);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(990, 10));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(990, 10));
         assert_eq!(u, state2);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(10, 990));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(10, 990));
         assert_eq!(u, state3);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(990, 990));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(990, 990));
         assert_eq!(u, state4);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(110, 110));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(110, 110));
         assert_eq!(u, state5);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(890, 110));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(890, 110));
         assert_eq!(u, state6);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(110, 890));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(110, 890));
         assert_eq!(u, state7);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(890, 890));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(890, 890));
         assert_eq!(u, state8);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::from(710, 350));
+        toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(710, 350));
         assert_eq!(u, state9);
-        toggle_cell_by_absolute_point(&mut u, &s2, MatrixP::from(110, 890));
+        toggle_cell_by_absolute_point(&mut u, &s2, MatrixP::of(110, 890));
         assert_eq!(u, state10);
-        toggle_cell_by_absolute_point(&mut u, &s3, MatrixP::from(110, 890));
+        toggle_cell_by_absolute_point(&mut u, &s3, MatrixP::of(110, 890));
         assert_eq!(u, state11);
     }
 
@@ -576,15 +576,15 @@ mod test {
             String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
         ])
         .unwrap();
-        let s = RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 996, gap: 0 };
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(1, 1));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(897, 99));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(99, 897));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(995, 995));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(100, 100));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(797, 199));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(199, 797));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::from(895, 895));
+        let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 996, gap: 0 };
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(1, 1));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(897, 99));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(99, 897));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(995, 995));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(100, 100));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(797, 199));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(199, 797));
+        toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(895, 895));
         assert_eq!(state1, state2);
     }
 
@@ -699,7 +699,7 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-5, -5, 4, 4)
+            Rect::of(-5, -5, 4, 4)
         );
         assert_eq!(
             get_camera(
@@ -714,7 +714,7 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-5, -5, 5, 5)
+            Rect::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(
@@ -725,7 +725,7 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-5, -5, 5, 5)
+            Rect::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(
@@ -736,35 +736,35 @@ mod test {
                 ])
                 .unwrap()
             ),
-            Rect::from(-5, -5, 5, 5)
+            Rect::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(&from_string(vec![String::from("⬜"),]).unwrap()),
-            Rect::from(-4, -4, 4, 4)
+            Rect::of(-4, -4, 4, 4)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
-                (CartesianP::from(2, 2), State::Alive),
-                (CartesianP::from(3, 5), State::Alive),
-                (CartesianP::from(5, 3), State::Alive),
+                (CartesianP::of(2, 2), State::Alive),
+                (CartesianP::of(3, 5), State::Alive),
+                (CartesianP::of(5, 3), State::Alive),
             ]))),
-            Rect::from(-2, -2, 9, 9)
+            Rect::of(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
-                (CartesianP::from(2, 2), State::Alive),
-                (CartesianP::from(3, 4), State::Alive),
-                (CartesianP::from(5, 3), State::Alive),
+                (CartesianP::of(2, 2), State::Alive),
+                (CartesianP::of(3, 4), State::Alive),
+                (CartesianP::of(5, 3), State::Alive),
             ]))),
-            Rect::from(-2, -2, 9, 9)
+            Rect::of(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
-                (CartesianP::from(2, 2), State::Alive),
-                (CartesianP::from(3, 4), State::Alive),
-                (CartesianP::from(4, 3), State::Alive),
+                (CartesianP::of(2, 2), State::Alive),
+                (CartesianP::of(3, 4), State::Alive),
+                (CartesianP::of(4, 3), State::Alive),
             ]))),
-            Rect::from(-2, -2, 8, 8)
+            Rect::of(-2, -2, 8, 8)
         );
     }
 }

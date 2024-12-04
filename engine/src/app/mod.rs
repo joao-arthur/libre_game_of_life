@@ -391,7 +391,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
         assert_eq!(MODEL.with(|i| i.borrow().universe.clone()), get_preset_unsafe("block"));
@@ -415,7 +415,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -426,7 +426,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::from(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -437,11 +437,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 4, 4),
-                    dim: 1080,
-                    gap: 0
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 0 }
             }
         );
 
@@ -452,11 +448,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 4, 4),
-                    dim: 1080,
-                    gap: 2
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -467,11 +459,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 4, 4),
-                    dim: 1080,
-                    gap: 2,
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -482,11 +470,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 4, 4),
-                    dim: 1080,
-                    gap: 2,
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
         app_set_preset("r_pentomino".to_string());
@@ -496,11 +480,7 @@ mod test {
                 preset: Some(String::from("r_pentomino")),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 5, 5),
-                    dim: 1080,
-                    gap: 2,
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 5, 5), dim: 1080, gap: 2 }
             }
         );
         app_set_preset("block".to_string());
@@ -516,11 +496,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 4, 4),
-                    dim: 1080,
-                    gap: 2,
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -535,11 +511,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 60,
                 status: Status::Paused,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-5, -5, 4, 4),
-                    dim: 1080,
-                    gap: 2,
-                }
+                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -554,11 +526,7 @@ mod test {
                 preset: Some(String::from("block")),
                 fps: 60,
                 status: Status::Paused,
-                render_settings: RenderSettings {
-                    cam: Rect::from(-1, -1, 0, 0),
-                    dim: 1080,
-                    gap: 2,
-                }
+                render_settings: RenderSettings { cam: Rect::of(-1, -1, 0, 0), dim: 1080, gap: 2 }
             }
         );
         app_zoom_to(198);
@@ -573,7 +541,7 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-100, -100, 99, 99),
+                    cam: Rect::of(-100, -100, 99, 99),
                     dim: 1080,
                     gap: 2,
                 }
@@ -588,7 +556,7 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-20, -20, 19, 19),
+                    cam: Rect::of(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }
@@ -602,7 +570,7 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-19, -19, 18, 18),
+                    cam: Rect::of(-19, -19, 18, 18),
                     dim: 1080,
                     gap: 2,
                 }
@@ -616,28 +584,28 @@ mod test {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::from(-20, -20, 19, 19),
+                    cam: Rect::of(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }
             }
         );
 
-        app_move_cam(CartesianP::from(20, 20));
+        app_move_cam(CartesianP::of(20, 20));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe { age: 2, value: block.value.clone() }
         );
 
-        app_toggle_by_point(CartesianP::from(0, 0));
+        app_toggle_by_point(CartesianP::of(0, 0));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 age: 2,
                 value: HashMap::from([
-                    (CartesianP::from(-1, -1), State::Alive),
-                    (CartesianP::from(-1, 0), State::Alive),
-                    (CartesianP::from(0, -1), State::Alive),
+                    (CartesianP::of(-1, -1), State::Alive),
+                    (CartesianP::of(-1, 0), State::Alive),
+                    (CartesianP::of(0, -1), State::Alive),
                 ])
             }
         );
