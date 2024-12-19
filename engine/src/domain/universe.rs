@@ -33,42 +33,42 @@ impl Default for Universe {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct InvalidCharacterError;
+pub struct InvalidCharacterErr;
 
-impl fmt::Display for InvalidCharacterError {
+impl fmt::Display for InvalidCharacterErr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Only \"⬜\" and \"⬛\" characters are allowed!")
     }
 }
 
 #[derive(Debug, PartialEq)]
-pub struct InvalidLengthError;
+pub struct InvalidLengthErr;
 
-impl fmt::Display for InvalidLengthError {
+impl fmt::Display for InvalidLengthErr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "The length of every line and the number of lines must be equal!")
     }
 }
 
 #[derive(Debug, PartialEq)]
-pub enum FromStringError {
-    InvalidCharacter(InvalidCharacterError),
-    InvalidLength(InvalidLengthError),
+pub enum FromStringErr {
+    InvalidCharacter(InvalidCharacterErr),
+    InvalidLength(InvalidLengthErr),
 }
 
-pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringError> {
+pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     if !as_str.join("").replace("⬜", "").replace("⬛", "").is_empty() {
-        return Err(FromStringError::InvalidCharacter(InvalidCharacterError));
+        return Err(FromStringErr::InvalidCharacter(InvalidCharacterErr));
     }
     let mut value = HashMap::<CartesianP, State>::new();
     let len = as_str.len();
     let lines_len: HashSet<usize> = as_str.iter().map(|row| row.chars().count()).collect();
     if lines_len.len() > 1 {
-        return Err(FromStringError::InvalidLength(InvalidLengthError));
+        return Err(FromStringErr::InvalidLength(InvalidLengthErr));
     }
     let lines_len = as_str.get(0).unwrap().chars().count();
     if lines_len != len {
-        return Err(FromStringError::InvalidLength(InvalidLengthError));
+        return Err(FromStringErr::InvalidLength(InvalidLengthErr));
     }
     let rect_len = len as i64;
     let half = rect_len / 2;
@@ -207,14 +207,22 @@ mod test {
     }
 
     #[test]
-    fn test_from_string_error() {
+    fn test_from_string_err() {
+        assert_eq!(
+            format!("{}", InvalidCharacterErr),
+            "Only \"⬜\" and \"⬛\" characters are allowed!"
+        );
+        assert_eq!(
+            format!("{}", InvalidLengthErr),
+            "The length of every line and the number of lines must be equal!"
+        );
         assert_eq!(
             from_string(vec![String::from("")]),
-            Err(FromStringError::InvalidLength(InvalidLengthError)),
+            Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
             from_string(vec![String::from("abcdefg")]),
-            Err(FromStringError::InvalidCharacter(InvalidCharacterError)),
+            Err(FromStringErr::InvalidCharacter(InvalidCharacterErr)),
         );
         assert_eq!(
             from_string(vec![
@@ -222,7 +230,7 @@ mod test {
                 String::from("⬛⬛⬛⬛⬛"),
                 String::from("⬛⬛⬛"),
             ]),
-            Err(FromStringError::InvalidLength(InvalidLengthError)),
+            Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
             from_string(vec![
@@ -231,7 +239,7 @@ mod test {
                 String::from("⬛⬛⬛⬛⬛"),
                 String::from("⬛⬛⬛⬛⬛"),
             ]),
-            Err(FromStringError::InvalidLength(InvalidLengthError)),
+            Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
     }
 
