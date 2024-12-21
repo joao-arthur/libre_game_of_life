@@ -171,14 +171,11 @@ static PRESETS: LazyLock<HashMap<String, Universe>> = LazyLock::new(|| {
 });
 
 pub fn get_preset_unsafe(preset: &str) -> Universe {
-    PRESETS.get(preset).unwrap().clone()
+    PRESETS.get(preset).cloned().unwrap()
 }
 
 pub fn get_preset(preset: &String) -> Option<Universe> {
-    match PRESETS.get(preset) {
-        None => None,
-        Some(u) => Some(u.clone()),
-    }
+    PRESETS.get(preset).cloned()
 }
 
 pub fn get_preset_groups() -> Vec<PresetGroup> {
