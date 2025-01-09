@@ -60,7 +60,6 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     if !as_str.join("").replace("⬜", "").replace("⬛", "").is_empty() {
         return Err(FromStringErr::InvalidCharacter(InvalidCharacterErr));
     }
-    let mut value = HashMap::<CartesianP, State>::new();
     let len = as_str.len();
     let lines_len: HashSet<usize> = as_str.iter().map(|row| row.chars().count()).collect();
     if lines_len.len() > 1 {
@@ -74,6 +73,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     let half = rect_len / 2;
     let cam = Rect { x1: -half, y1: -half, x2: -half + rect_len - 1, y2: -half + rect_len - 1 };
     let row_iter = as_str.iter().enumerate();
+    let mut value = HashMap::<CartesianP, State>::new();
     for (row, row_str) in row_iter {
         let col_iter = row_str.chars().enumerate();
         for (col, col_str) in col_iter {
