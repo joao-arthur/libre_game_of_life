@@ -6,9 +6,7 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
-        "start": "next start",
-        "test": "vitest run",
-        "test:cov": "vitest run --coverage"
+        "start": "next start"
     },
     "dependencies": {
         "game_of_life_engine": "link:../game_of_life_engine",
