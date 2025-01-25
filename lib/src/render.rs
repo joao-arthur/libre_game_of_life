@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use super::{
     cell::State,
     geometry::{
@@ -50,7 +48,7 @@ pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<RectF64> {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::universe::from_string;
+    use crate::universe::from_string;
 
     use super::*;
 

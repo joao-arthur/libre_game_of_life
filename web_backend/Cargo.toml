@@ -22,3 +22,4 @@ serde = { version = "1.0.210", features = ["derive"] }
 serde-wasm-bindgen = "0.6.5"
 gloo-timers = "0.3.0"
 wasm-bindgen-futures = "0.4.45"
+libre_game_of_life_lib = { path = "../lib" }

@@ -1,4 +1,4 @@
-use crate::domain::geometry::coordinate::CartesianP;
+use crate::geometry::coordinate::CartesianP;
 use std::fmt;
 
 #[derive(Debug, PartialEq, Clone, Copy)]

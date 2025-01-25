@@ -3,7 +3,7 @@ use std::{
     fmt,
 };
 
-use crate::domain::{
+use crate::{
     cell::{self, toggle, State},
     geometry::{
         coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
@@ -182,7 +182,7 @@ pub fn get_camera(u: &Universe) -> Rect {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::domain::cell::State;
+    use crate::cell::State;
 
     #[test]
     fn test_model() {

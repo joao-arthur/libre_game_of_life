@@ -2,7 +2,7 @@ use gloo_timers::callback::Interval;
 use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
-use crate::domain::{
+use libre_game_of_life_lib::{
     geometry::{
         coordinate::{CartesianP, MatrixP},
         poligon::rect::{get_length, move_by, zoom_in, zoom_out, zoom_to, RectF64},
@@ -378,7 +378,7 @@ pub fn app_get_settings() -> AppInfo {
 
 #[cfg(test)]
 mod test {
-    use crate::domain::{cell::State, geometry::poligon::rect::Rect};
+    use libre_game_of_life_lib::{cell::State, geometry::poligon::rect::Rect};
     use std::collections::HashMap;
 
     use super::*;
