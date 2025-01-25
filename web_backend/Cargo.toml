@@ -1,6 +1,6 @@
 [package]
-name = "game_of_life_engine"
-version = "0.1.0"
+name = "libre_game_of_life_web_backend"
+version = "1.0.0"
 edition = "2021"
 
 [lib]
