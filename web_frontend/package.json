@@ -12,13 +12,15 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
+        "game_of_life_engine": "link:../game_of_life_engine",
 		"@sveltejs/adapter-auto": "6.0.1",
 		"@sveltejs/kit": "2.21.2",
 		"@sveltejs/vite-plugin-svelte": "5.1.0",
 		"svelte": "5.33.17",
 		"svelte-check": "4.2.1",
 		"typescript": "5.8.3",
-		"vite": "6.3.5"
+		"vite": "6.3.5",
+		"vite-plugin-wasm": "3.4.1"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
