@@ -15,6 +15,7 @@ use crate::{
 use super::render::RenderSettings;
 
 #[derive(Debug, PartialEq, Clone)]
+#[derive(Default)]
 pub struct Universe {
     pub value: HashMap<CartesianP, State>,
     pub age: u64,
@@ -26,11 +27,6 @@ impl From<HashMap<CartesianP, State>> for Universe {
     }
 }
 
-impl Default for Universe {
-    fn default() -> Self {
-        Universe { value: HashMap::new(), age: 0 }
-    }
-}
 
 #[derive(Debug, PartialEq)]
 pub struct InvalidCharacterErr;
@@ -65,7 +61,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     if lines_len.len() > 1 {
         return Err(FromStringErr::InvalidLength(InvalidLengthErr));
     }
-    let lines_len = as_str.get(0).unwrap().chars().count();
+    let lines_len = as_str.first().unwrap().chars().count();
     if lines_len != len {
         return Err(FromStringErr::InvalidLength(InvalidLengthErr));
     }
@@ -89,7 +85,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
 }
 
 pub fn get_value(u: &Universe, p: &CartesianP) -> State {
-    if u.value.get(&p).unwrap_or(&State::Dead) == &State::Alive {
+    if u.value.get(p).unwrap_or(&State::Dead) == &State::Alive {
         State::Alive
     } else {
         State::Dead
@@ -106,7 +102,7 @@ pub fn iterate(u: &mut Universe) {
                 CartesianP::of(point.x, point.y + 1),
                 CartesianP::of(point.x + 1, point.y + 1),
                 CartesianP::of(point.x - 1, point.y),
-                point.clone(),
+                *point,
                 CartesianP::of(point.x + 1, point.y),
                 CartesianP::of(point.x - 1, point.y - 1),
                 CartesianP::of(point.x, point.y - 1),
@@ -117,12 +113,12 @@ pub fn iterate(u: &mut Universe) {
     let entries: HashMap<CartesianP, State> = points
         .iter()
         .filter_map(|point| {
-            let s = get_value(&u, point);
+            let s = get_value(u, point);
             let number_of_alive_neighbors = number_of_alive_from_model(u, point);
-            let new_cell = cell::iterate(s.clone(), number_of_alive_neighbors);
+            let new_cell = cell::iterate(s, number_of_alive_neighbors);
             match new_cell {
                 State::Dead => None,
-                State::Alive => Some((point.clone(), State::Alive)),
+                State::Alive => Some((*point, State::Alive)),
             }
         })
         .collect();
