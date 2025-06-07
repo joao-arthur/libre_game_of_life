@@ -1,6 +1,6 @@
 use std::fmt;
 
-use super::poligon::rect::Rect;
+use super::poligon::rect::RectI64;
 
 #[derive(Debug, PartialEq)]
 pub struct MatrixP {
@@ -38,11 +38,11 @@ impl fmt::Display for CartesianP {
     }
 }
 
-pub fn matrix_to_cartesian(p: &MatrixP, cam: &Rect) -> CartesianP {
+pub fn matrix_to_cartesian(p: &MatrixP, cam: &RectI64) -> CartesianP {
     CartesianP { x: cam.x1 + p.col as i64, y: cam.y2 - p.row as i64 }
 }
 
-pub fn cartesian_to_matrix(&p: &CartesianP, cam: &Rect) -> MatrixP {
+pub fn cartesian_to_matrix(&p: &CartesianP, cam: &RectI64) -> MatrixP {
     MatrixP { row: (-p.y + cam.y2) as u64, col: (p.x - cam.x1) as u64 }
 }
 
@@ -66,19 +66,19 @@ mod tests {
 
     #[test]
     fn matrix_to_cartesian_1x1() {
-        let cam = Rect::of(0, 0, 0, 0);
+        let cam = RectI64::of(0, 0, 0, 0);
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 0), &cam), CartesianP::of(0, 0));
     }
 
     #[test]
     fn cartesian_to_matrix_1x1() {
-        let cam = Rect::of(0, 0, 0, 0);
+        let cam = RectI64::of(0, 0, 0, 0);
         assert_eq!(cartesian_to_matrix(&CartesianP::of(0, 0), &cam), MatrixP::of(0, 0));
     }
 
     #[test]
     fn matrix_to_cartesian_2x2() {
-        let cam = Rect::of(-1, -1, 0, 0);
+        let cam = RectI64::of(-1, -1, 0, 0);
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 0), &cam), CartesianP::of(-1, 0));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 1), &cam), CartesianP::of(0, 0));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(1, 0), &cam), CartesianP::of(-1, -1));
@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn cartesian_to_matrix_2x2() {
-        let cam = Rect::of(-1, -1, 0, 0);
+        let cam = RectI64::of(-1, -1, 0, 0);
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-1, 0), &cam), MatrixP::of(0, 0));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(0, 0), &cam), MatrixP::of(0, 1));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-1, -1), &cam), MatrixP::of(1, 0));
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn matrix_to_cartesian_3x3() {
-        let cam = Rect::of(-1, -1, 1, 1);
+        let cam = RectI64::of(-1, -1, 1, 1);
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 0), &cam), CartesianP::of(-1, 1));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 1), &cam), CartesianP::of(0, 1));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 2), &cam), CartesianP::of(1, 1));
@@ -110,7 +110,7 @@ mod tests {
 
     #[test]
     fn cartesian_to_matrix_3x3() {
-        let cam = Rect::of(-1, -1, 1, 1);
+        let cam = RectI64::of(-1, -1, 1, 1);
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-1, 1), &cam), MatrixP::of(0, 0));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(0, 1), &cam), MatrixP::of(0, 1));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(1, 1), &cam), MatrixP::of(0, 2));
@@ -124,7 +124,7 @@ mod tests {
 
     #[test]
     fn matrix_to_cartesian_4x4() {
-        let cam = Rect::of(-2, -2, 1, 1);
+        let cam = RectI64::of(-2, -2, 1, 1);
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 0), &cam), CartesianP::of(-2, 1));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 1), &cam), CartesianP::of(-1, 1));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 2), &cam), CartesianP::of(0, 1));
@@ -145,7 +145,7 @@ mod tests {
 
     #[test]
     fn cartesian_to_matrix_4x4() {
-        let cam = Rect::of(-2, -2, 1, 1);
+        let cam = RectI64::of(-2, -2, 1, 1);
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-2, 1), &cam), MatrixP::of(0, 0));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-1, 1), &cam), MatrixP::of(0, 1));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(0, 1), &cam), MatrixP::of(0, 2));
@@ -166,7 +166,7 @@ mod tests {
 
     #[test]
     fn test_matrix_to_cartesian_cam_negative() {
-        let cam = Rect::of(-10, -5, -8, -3);
+        let cam = RectI64::of(-10, -5, -8, -3);
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 0), &cam), CartesianP::of(-10, -3));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 1), &cam), CartesianP::of(-9, -3));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 2), &cam), CartesianP::of(-8, -3));
@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn cartesian_to_matrix_cam_negative() {
-        let cam = Rect::of(-10, -5, -8, -3);
+        let cam = RectI64::of(-10, -5, -8, -3);
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-10, -3), &cam), MatrixP::of(0, 0));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-9, -3), &cam), MatrixP::of(0, 1));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(-8, -3), &cam), MatrixP::of(0, 2));
@@ -194,7 +194,7 @@ mod tests {
 
     #[test]
     fn matrix_to_cartesian_cam_positive() {
-        let cam = Rect::of(3, 5, 5, 7);
+        let cam = RectI64::of(3, 5, 5, 7);
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 0), &cam), CartesianP::of(3, 7));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 1), &cam), CartesianP::of(4, 7));
         assert_eq!(matrix_to_cartesian(&MatrixP::of(0, 2), &cam), CartesianP::of(5, 7));
@@ -208,7 +208,7 @@ mod tests {
 
     #[test]
     fn cartesian_to_matrix_cam_positive() {
-        let cam = Rect::of(3, 5, 5, 7);
+        let cam = RectI64::of(3, 5, 5, 7);
         assert_eq!(cartesian_to_matrix(&CartesianP::of(3, 7), &cam), MatrixP::of(0, 0));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(4, 7), &cam), MatrixP::of(0, 1));
         assert_eq!(cartesian_to_matrix(&CartesianP::of(5, 7), &cam), MatrixP::of(0, 2));

@@ -378,7 +378,7 @@ pub fn app_get_settings() -> AppInfo {
 
 #[cfg(test)]
 mod tests {
-    use libre_game_of_life_lib::{cell::State, geometry::poligon::rect::Rect};
+    use libre_game_of_life_lib::{cell::State, geometry::poligon::rect::RectI64};
     use std::collections::HashMap;
 
     use super::*;
@@ -391,7 +391,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
         assert_eq!(MODEL.with(|i| i.borrow().universe.clone()), get_preset_unsafe("block"));
@@ -415,7 +415,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -426,7 +426,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -437,7 +437,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 0 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1080, gap: 0 }
             }
         );
 
@@ -448,7 +448,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -459,7 +459,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -470,7 +470,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
         app_set_preset("r_pentomino".into());
@@ -480,7 +480,7 @@ mod tests {
                 preset: Some("r_pentomino".into()),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 5, 5), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 5, 5), dim: 1080, gap: 2 }
             }
         );
         app_set_preset("block".into());
@@ -496,7 +496,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 60,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -511,7 +511,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 60,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1080, gap: 2 }
             }
         );
 
@@ -526,7 +526,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 60,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: Rect::of(-1, -1, 0, 0), dim: 1080, gap: 2 }
+                render_settings: RenderSettings { cam: RectI64::of(-1, -1, 0, 0), dim: 1080, gap: 2 }
             }
         );
         app_zoom_to(198);
@@ -541,7 +541,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::of(-100, -100, 99, 99),
+                    cam: RectI64::of(-100, -100, 99, 99),
                     dim: 1080,
                     gap: 2,
                 }
@@ -556,7 +556,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::of(-20, -20, 19, 19),
+                    cam: RectI64::of(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }
@@ -570,7 +570,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::of(-19, -19, 18, 18),
+                    cam: RectI64::of(-19, -19, 18, 18),
                     dim: 1080,
                     gap: 2,
                 }
@@ -584,7 +584,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: Rect::of(-20, -20, 19, 19),
+                    cam: RectI64::of(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }

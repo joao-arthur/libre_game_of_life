@@ -7,7 +7,7 @@ use crate::{
     cell::{self, toggle, State},
     geometry::{
         coordinate::{matrix_to_cartesian, CartesianP, MatrixP},
-        poligon::rect::{get_length, Rect},
+        poligon::rect::{get_length, RectI64},
     },
     neighbor::number_of_alive_from_model,
 };
@@ -67,7 +67,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     }
     let rect_len = len as i64;
     let half = rect_len / 2;
-    let cam = Rect { x1: -half, y1: -half, x2: -half + rect_len - 1, y2: -half + rect_len - 1 };
+    let cam = RectI64 { x1: -half, y1: -half, x2: -half + rect_len - 1, y2: -half + rect_len - 1 };
     let row_iter = as_str.iter().enumerate();
     let mut value = HashMap::<CartesianP, State>::new();
     for (row, row_str) in row_iter {
@@ -149,7 +149,7 @@ pub fn toggle_cell_by_absolute_point(u: &mut Universe, s: &RenderSettings, p: Ma
     toggle_cell(u, cartesian_point);
 }
 
-pub fn get_camera(u: &Universe) -> Rect {
+pub fn get_camera(u: &Universe) -> RectI64 {
     let xx: Vec<i64> = u.value.iter().map(|v| v.0.x).collect();
     let yy: Vec<i64> = u.value.iter().map(|v| v.0.y).collect();
     let mut min_x = xx.iter().min().unwrap().to_owned();
@@ -172,7 +172,7 @@ pub fn get_camera(u: &Universe) -> Rect {
         min_x -= diff_start;
         max_x += diff_end;
     }
-    Rect { x1: min_x - 4, y1: min_y - 4, x2: max_x + 4, y2: max_y + 4 }
+    RectI64 { x1: min_x - 4, y1: min_y - 4, x2: max_x + 4, y2: max_y + 4 }
 }
 
 #[cfg(test)]
@@ -521,9 +521,9 @@ mod tests {
             "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
-        let s1 = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
-        let s2 = RenderSettings { cam: Rect::of(-4, -4, 5, 5), dim: 1000, gap: 0 };
-        let s3 = RenderSettings { cam: Rect::of(-5, -4, 4, 5), dim: 1000, gap: 0 };
+        let s1 = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
+        let s2 = RenderSettings { cam: RectI64::of(-4, -4, 5, 5), dim: 1000, gap: 0 };
+        let s3 = RenderSettings { cam: RectI64::of(-5, -4, 4, 5), dim: 1000, gap: 0 };
         toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(10, 10));
         assert_eq!(u, state1);
         toggle_cell_by_absolute_point(&mut u, &s1, MatrixP::of(990, 10));
@@ -576,7 +576,7 @@ mod tests {
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
         ])
         .unwrap();
-        let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 996, gap: 0 };
+        let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 996, gap: 0 };
         toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(1, 1));
         toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(897, 99));
         toggle_cell_by_absolute_point(&mut state1, &s, MatrixP::of(99, 897));
@@ -657,7 +657,7 @@ mod tests {
                 ])
                 .unwrap()
             ),
-            Rect::of(-5, -5, 4, 4)
+            RectI64::of(-5, -5, 4, 4)
         );
         assert_eq!(
             get_camera(
@@ -672,28 +672,28 @@ mod tests {
                 ])
                 .unwrap()
             ),
-            Rect::of(-5, -5, 5, 5)
+            RectI64::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(
                 &from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into(),]).unwrap()
             ),
-            Rect::of(-5, -5, 5, 5)
+            RectI64::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(
                 &from_string(vec!["⬛⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into(),]).unwrap()
             ),
-            Rect::of(-5, -5, 5, 5)
+            RectI64::of(-5, -5, 5, 5)
         );
-        assert_eq!(get_camera(&from_string(vec!["⬜".into(),]).unwrap()), Rect::of(-4, -4, 4, 4));
+        assert_eq!(get_camera(&from_string(vec!["⬜".into(),]).unwrap()), RectI64::of(-4, -4, 4, 4));
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
                 (CartesianP::of(2, 2), State::Alive),
                 (CartesianP::of(3, 5), State::Alive),
                 (CartesianP::of(5, 3), State::Alive),
             ]))),
-            Rect::of(-2, -2, 9, 9)
+            RectI64::of(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
@@ -701,7 +701,7 @@ mod tests {
                 (CartesianP::of(3, 4), State::Alive),
                 (CartesianP::of(5, 3), State::Alive),
             ]))),
-            Rect::of(-2, -2, 9, 9)
+            RectI64::of(-2, -2, 9, 9)
         );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
@@ -709,7 +709,7 @@ mod tests {
                 (CartesianP::of(3, 4), State::Alive),
                 (CartesianP::of(4, 3), State::Alive),
             ]))),
-            Rect::of(-2, -2, 8, 8)
+            RectI64::of(-2, -2, 8, 8)
         );
     }
 }

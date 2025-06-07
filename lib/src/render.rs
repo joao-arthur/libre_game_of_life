@@ -2,14 +2,14 @@ use super::{
     cell::State,
     geometry::{
         coordinate::cartesian_to_matrix,
-        poligon::rect::{get_length, Rect, RectF64},
+        poligon::rect::{get_length, RectI64, RectF64},
     },
     universe::Universe,
 };
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RenderSettings {
-    pub cam: Rect,
+    pub cam: RectI64,
     pub dim: u16,
     pub gap: u8,
 }
@@ -71,7 +71,7 @@ mod tests {
     #[test]
     fn render() {
         let u = get_universe();
-        let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
+        let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
         assert_eq!(
             get_values_to_render(&u, &s),
             vec![
@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn render_gap() {
         let u = get_universe();
-        let cam = Rect::of(-5, -5, 4, 4);
+        let cam = RectI64::of(-5, -5, 4, 4);
         let s_gap1 = RenderSettings { cam, dim: 1000, gap: 1 };
         let s_gap2 = RenderSettings { cam, dim: 1000, gap: 2 };
         assert_eq!(
@@ -124,8 +124,8 @@ mod tests {
     #[test]
     fn render_cam() {
         let u = get_universe();
-        let s_cam_minus1 = RenderSettings { cam: Rect::of(-6, -5, 3, 4), dim: 1000, gap: 0 };
-        let s_cam_plus1 = RenderSettings { cam: Rect::of(-4, -5, 5, 4), dim: 1000, gap: 0 };
+        let s_cam_minus1 = RenderSettings { cam: RectI64::of(-6, -5, 3, 4), dim: 1000, gap: 0 };
+        let s_cam_plus1 = RenderSettings { cam: RectI64::of(-4, -5, 5, 4), dim: 1000, gap: 0 };
         assert_eq!(
             get_values_to_render(&u, &s_cam_minus1),
             vec![
@@ -153,7 +153,7 @@ mod tests {
     #[test]
     fn render_float_cell_size() {
         let u = get_universe();
-        let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 996, gap: 0 };
+        let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 996, gap: 0 };
         assert_eq!(
             get_values_to_render(&u, &s),
             vec![
