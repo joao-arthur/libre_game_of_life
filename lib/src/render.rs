@@ -47,7 +47,7 @@ pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<RectF64> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use crate::universe::from_string;
 
     use super::*;
@@ -69,7 +69,7 @@ mod test {
     }
 
     #[test]
-    fn test_render() {
+    fn render() {
         let u = get_universe();
         let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
         assert_eq!(
@@ -88,7 +88,7 @@ mod test {
     }
 
     #[test]
-    fn test_render_gap() {
+    fn render_gap() {
         let u = get_universe();
         let cam = Rect::of(-5, -5, 4, 4);
         let s_gap1 = RenderSettings { cam, dim: 1000, gap: 1 };
@@ -122,7 +122,7 @@ mod test {
     }
 
     #[test]
-    fn test_render_cam() {
+    fn render_cam() {
         let u = get_universe();
         let s_cam_minus1 = RenderSettings { cam: Rect::of(-6, -5, 3, 4), dim: 1000, gap: 0 };
         let s_cam_plus1 = RenderSettings { cam: Rect::of(-4, -5, 5, 4), dim: 1000, gap: 0 };
@@ -151,7 +151,7 @@ mod test {
     }
 
     #[test]
-    fn test_render_float_cell_size() {
+    fn render_float_cell_size() {
         let u = get_universe();
         let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 996, gap: 0 };
         assert_eq!(

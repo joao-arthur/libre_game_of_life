@@ -180,7 +180,7 @@ pub fn get_camera(u: &Universe) -> Rect {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use crate::cell::State;
 

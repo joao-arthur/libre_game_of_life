@@ -377,7 +377,7 @@ pub fn app_get_settings() -> AppInfo {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use libre_game_of_life_lib::{cell::State, geometry::poligon::rect::Rect};
     use std::collections::HashMap;
 

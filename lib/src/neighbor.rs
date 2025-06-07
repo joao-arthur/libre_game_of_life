@@ -24,7 +24,7 @@ pub fn number_of_alive_from_model(u: &Universe, p: &CartesianP) -> u8 {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]

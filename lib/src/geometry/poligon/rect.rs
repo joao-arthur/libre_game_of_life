@@ -99,7 +99,7 @@ pub fn move_by(r: &mut Rect, delta: CartesianP) {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
@@ -123,14 +123,14 @@ mod test {
 
     #[test]
     fn test_delta_y() {
-        assert_eq!(delta_x(&Rect::of(0, 0, 0, 0)), 0);
-        assert_eq!(delta_x(&Rect::of(0, 0, 1, 1)), 1);
-        assert_eq!(delta_x(&Rect::of(-1, -1, 0, 0)), 1);
-        assert_eq!(delta_x(&Rect::of(-1, -1, 1, 1)), 2);
-        assert_eq!(delta_x(&Rect::of(-2, -2, 2, 2)), 4);
-        assert_eq!(delta_x(&Rect::of(-3, -3, 3, 3)), 6);
-        assert_eq!(delta_x(&Rect::of(-4, -4, 4, 4)), 8);
-        assert_eq!(delta_x(&Rect::of(-5, -5, 5, 5)), 10);
+        assert_eq!(delta_y(&Rect::of(0, 0, 0, 0)), 0);
+        assert_eq!(delta_y(&Rect::of(0, 0, 1, 1)), 1);
+        assert_eq!(delta_y(&Rect::of(-1, -1, 0, 0)), 1);
+        assert_eq!(delta_y(&Rect::of(-1, -1, 1, 1)), 2);
+        assert_eq!(delta_y(&Rect::of(-2, -2, 2, 2)), 4);
+        assert_eq!(delta_y(&Rect::of(-3, -3, 3, 3)), 6);
+        assert_eq!(delta_y(&Rect::of(-4, -4, 4, 4)), 8);
+        assert_eq!(delta_y(&Rect::of(-5, -5, 5, 5)), 10);
     }
 
     #[test]
@@ -145,13 +145,13 @@ mod test {
     }
 
     #[test]
-    fn test_get_length_not_square() {
+    fn get_length_rectangle() {
         assert_eq!(get_length(&Rect::of(-10, -5, 10, 5)), 21);
         assert_eq!(get_length(&Rect::of(-5, -10, 5, 10)), 21);
     }
 
     #[test]
-    fn test_zoom_in_odd_size() {
+    fn zoom_in_odd_size() {
         let mut r = Rect::of(-5, -5, 5, 5);
         zoom_in(&mut r);
         assert_eq!(r, Rect::of(-4, -4, 4, 4));
@@ -166,7 +166,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_in_even_size_1() {
+    fn zoom_in_even_size_1st_scenario() {
         let mut r = Rect::of(-5, -5, 4, 4);
         zoom_in(&mut r);
         assert_eq!(r, Rect::of(-4, -4, 3, 3));
@@ -181,7 +181,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_in_even_size_2() {
+    fn zoom_in_even_size_2nd_scenario() {
         let mut r = Rect::of(-4, -4, 5, 5);
         zoom_in(&mut r);
         assert_eq!(r, Rect::of(-3, -3, 4, 4));
@@ -196,7 +196,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_out_odd_size() {
+    fn zoom_out_odd_size() {
         let mut r = Rect::of(-1, -1, 1, 1);
         zoom_out(&mut r);
         assert_eq!(r, Rect::of(-2, -2, 2, 2));
@@ -211,7 +211,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_out_even_size() {
+    fn zoom_out_even_size() {
         let mut r = Rect::of(0, 0, 1, 1);
         zoom_out(&mut r);
         assert_eq!(r, Rect::of(-1, -1, 2, 2));
@@ -226,7 +226,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_to_odd_size() {
+    fn zoom_to_odd_size() {
         let mut r = Rect::of(-5, -5, 5, 5);
         zoom_to(&mut r, 11);
         assert_eq!(r, Rect::of(-5, -5, 5, 5));
@@ -251,7 +251,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_to_even_size_1() {
+    fn zoom_to_even_size_1st_scenario() {
         let mut r = Rect::of(-5, -5, 4, 4);
         zoom_to(&mut r, 10);
         assert_eq!(r, Rect::of(-5, -5, 4, 4));
@@ -272,7 +272,7 @@ mod test {
     }
 
     #[test]
-    fn test_zoom_to_even_size_2() {
+    fn test_zoom_to_even_size_2nd_scenario() {
         let mut r = Rect::of(-4, -4, 5, 5);
         zoom_to(&mut r, 10);
         assert_eq!(r, Rect::of(-4, -4, 5, 5));

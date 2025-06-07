@@ -26,23 +26,23 @@ pub fn toggle(s: &State) -> State {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
-    fn test_iterate_any_live_cell_with_fewer_than_two_live_neighbours_dies() {
+    fn iterate_any_live_cell_with_fewer_than_two_live_neighbours_dies() {
         assert_eq!(iterate(State::Alive, 0), State::Dead);
         assert_eq!(iterate(State::Alive, 1), State::Dead);
     }
 
     #[test]
-    fn test_iterate_any_live_cell_with_two_or_three_live_neighbours_lives() {
+    fn iterate_any_live_cell_with_two_or_three_live_neighbours_lives() {
         assert_eq!(iterate(State::Alive, 2), State::Alive);
         assert_eq!(iterate(State::Alive, 3), State::Alive);
     }
 
     #[test]
-    fn test_iterate_any_live_cell_with_more_than_three_live_neighbours_dies() {
+    fn iterate_any_live_cell_with_more_than_three_live_neighbours_dies() {
         assert_eq!(iterate(State::Alive, 4), State::Dead);
         assert_eq!(iterate(State::Alive, 5), State::Dead);
         assert_eq!(iterate(State::Alive, 6), State::Dead);
@@ -51,7 +51,7 @@ mod test {
     }
 
     #[test]
-    fn test_iterate_any_dead_cell_with_exactly_three_live_neighbours_becomes_a_live_cell() {
+    fn iterate_any_dead_cell_with_exactly_three_live_neighbours_becomes_a_live_cell() {
         assert_eq!(iterate(State::Dead, 0), State::Dead);
         assert_eq!(iterate(State::Dead, 1), State::Dead);
         assert_eq!(iterate(State::Dead, 2), State::Dead);
