@@ -1,4 +1,4 @@
-use crate::geometry::coordinate::CartesianP;
+use crate::geometry::coordinate::CartesianPoint;
 use std::fmt;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -47,7 +47,7 @@ pub fn get_length(r: &RectI64) -> u64 {
     }
 }
 
-pub fn center(r: &mut RectI64, p: CartesianP) {
+pub fn center(r: &mut RectI64, p: CartesianPoint) {
     let len_x = r.x2 - r.x1;
     let len_y = r.y2 - r.y1;
     let end_x = len_x / 2;
@@ -91,7 +91,7 @@ pub fn zoom_to(r: &mut RectI64, size: u16) {
     r.y2 -= diff_y / 2;
 }
 
-pub fn move_by(r: &mut RectI64, delta: CartesianP) {
+pub fn move_by(r: &mut RectI64, delta: CartesianPoint) {
     r.x1 += delta.x;
     r.y1 += delta.y;
     r.x2 += delta.x;
@@ -295,20 +295,20 @@ mod tests {
     #[test]
     fn test_move_by() {
         let mut r = RectI64::of(-10, -10, 10, 10);
-        move_by(&mut r, CartesianP::of(10, 10));
+        move_by(&mut r, CartesianPoint::of(10, 10));
         assert_eq!(r, RectI64::of(0, 0, 20, 20));
-        move_by(&mut r, CartesianP::of(-5, -5));
+        move_by(&mut r, CartesianPoint::of(-5, -5));
         assert_eq!(r, RectI64::of(-5, -5, 15, 15));
-        move_by(&mut r, CartesianP::of(-15, 5));
+        move_by(&mut r, CartesianPoint::of(-15, 5));
         assert_eq!(r, RectI64::of(-20, 0, 0, 20));
     }
 
     #[test]
     fn test_center() {
         let mut r = RectI64::of(-10, -10, 10, 10);
-        center(&mut r, CartesianP::of(0, 0));
+        center(&mut r, CartesianPoint::of(0, 0));
         assert_eq!(r, RectI64::of(-10, -10, 10, 10));
-        center(&mut r, CartesianP::of(10, 10));
+        center(&mut r, CartesianPoint::of(10, 10));
         assert_eq!(r, RectI64::of(0, 0, 20, 20));
     }
 }

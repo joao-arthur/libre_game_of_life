@@ -6,7 +6,7 @@ use crate::app::{
     app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
 };
 use libre_game_of_life_lib::{
-    geometry::coordinate::{CartesianP, MatrixP},
+    geometry::coordinate::{CartesianPoint, MatrixPoint},
     preset::get_preset_groups,
 };
 
@@ -124,7 +124,7 @@ pub fn main_single_iteration() {
 
 #[wasm_bindgen(js_name = "engineToggle")]
 pub fn main_toggle(point: EngineMatrixPoint) {
-    app_toggle_model_cell_by_absolute_point(MatrixP { row: point.row, col: point.col });
+    app_toggle_model_cell_by_absolute_point(MatrixPoint { row: point.row, col: point.col });
 }
 
 #[wasm_bindgen(js_name = "engineZoomIn")]
@@ -144,7 +144,7 @@ pub fn main_zoom_by(new_size: u16) {
 
 #[wasm_bindgen(js_name = "engineMoveBy")]
 pub fn main_move_model(delta: EngineCartesianPoint) {
-    app_move_cam(CartesianP { x: delta.x, y: delta.y });
+    app_move_cam(CartesianPoint { x: delta.x, y: delta.y });
 }
 
 #[wasm_bindgen(js_name = "engineGetSettings")]

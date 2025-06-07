@@ -4,7 +4,7 @@ use web_sys::CanvasRenderingContext2d;
 
 use libre_game_of_life_lib::{
     geometry::{
-        coordinate::{CartesianP, MatrixP},
+        coordinate::{CartesianPoint, MatrixPoint},
         poligon::rect::{get_length, move_by, zoom_in, zoom_out, zoom_to, RectF64},
     },
     preset::{get_preset, get_preset_groups, get_preset_unsafe, Preset},
@@ -286,7 +286,7 @@ pub fn app_iterate() {
     on_change(Prop::Universe);
 }
 
-pub fn app_toggle_by_point(p: CartesianP) {
+pub fn app_toggle_by_point(p: CartesianPoint) {
     MODEL.with(|i| {
         let mut m = i.borrow_mut();
         toggle_cell(&mut m.universe, p);
@@ -296,7 +296,7 @@ pub fn app_toggle_by_point(p: CartesianP) {
     on_change(Prop::Preset);
 }
 
-pub fn app_toggle_model_cell_by_absolute_point(p: MatrixP) {
+pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
     MODEL.with(|i| {
         let mut m = i.borrow_mut();
         let render_settings = m.settings.render_settings.clone();
@@ -342,7 +342,7 @@ pub fn app_zoom_to(new_size: u16) {
     on_change(Prop::Cam);
 }
 
-pub fn app_move_cam(delta: CartesianP) {
+pub fn app_move_cam(delta: CartesianPoint) {
     MODEL.with(|i| {
         let mut m = i.borrow_mut();
         move_by(&mut m.settings.render_settings.cam, delta);
@@ -591,21 +591,21 @@ mod tests {
             }
         );
 
-        app_move_cam(CartesianP::of(20, 20));
+        app_move_cam(CartesianPoint::of(20, 20));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe { age: 2, value: block.value.clone() }
         );
 
-        app_toggle_by_point(CartesianP::of(0, 0));
+        app_toggle_by_point(CartesianPoint::of(0, 0));
         assert_eq!(
             MODEL.with(|i| i.borrow().universe.clone()),
             Universe {
                 age: 2,
                 value: HashMap::from([
-                    (CartesianP::of(-1, -1), State::Alive),
-                    (CartesianP::of(-1, 0), State::Alive),
-                    (CartesianP::of(0, -1), State::Alive),
+                    (CartesianPoint::of(-1, -1), State::Alive),
+                    (CartesianPoint::of(-1, 0), State::Alive),
+                    (CartesianPoint::of(0, -1), State::Alive),
                 ])
             }
         );
