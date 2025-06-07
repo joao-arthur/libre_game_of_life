@@ -1,0 +1,12 @@
+{
+    "fmt": {
+        "include": ["src/"],
+        "lineWidth": 100,
+        "indentWidth": 4,
+        "exclude": [
+            "static",
+            "pnpm-lock.yaml"
+        ]
+    },
+    "unstable": ["fmt-component"]
+}
