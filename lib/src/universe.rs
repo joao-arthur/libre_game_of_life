@@ -217,27 +217,23 @@ mod tests {
             "The length of every line and the number of lines must be equal!"
         );
         assert_eq!(
-            from_string(vec![String::from("")]),
+            from_string(vec!["".into()]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
-            from_string(vec![String::from("abcdefg")]),
+            from_string(vec!["abcdefg".into()]),
             Err(FromStringErr::InvalidCharacter(InvalidCharacterErr)),
         );
         assert_eq!(
-            from_string(vec![
-                String::from("⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛"),
-            ]),
+            from_string(vec!["⬛⬛⬛⬛".into(), "⬛⬛⬛⬛⬛".into(), "⬛⬛⬛".into(),]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
             from_string(vec![
-                String::from("⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛"),
+                "⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛".into(),
             ]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
@@ -245,17 +241,17 @@ mod tests {
 
     #[test]
     fn test_from_string() {
-        assert_eq!(from_string(vec![String::from("⬛")]).unwrap(), Universe::default());
+        assert_eq!(from_string(vec!["⬛".into()]).unwrap(), Universe::default());
         assert_eq!(
-            from_string(vec![String::from("⬜")]).unwrap(),
+            from_string(vec!["⬜".into()]).unwrap(),
             Universe::from(HashMap::from([(CartesianP::of(0, 0), State::Alive)])),
         );
         assert_eq!(
             from_string(vec![
-                String::from("⬛⬛⬛⬜"),
-                String::from("⬜⬛⬛⬛"),
-                String::from("⬛⬛⬜⬛"),
-                String::from("⬛⬛⬛⬛"),
+                "⬛⬛⬛⬜".into(),
+                "⬜⬛⬛⬛".into(),
+                "⬛⬛⬜⬛".into(),
+                "⬛⬛⬛⬛".into(),
             ])
             .unwrap(),
             Universe::from(HashMap::from([
@@ -266,12 +262,12 @@ mod tests {
         );
         assert_eq!(
             from_string(vec![
-                String::from("⬛⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬜⬜⬛⬛"),
-                String::from("⬛⬛⬜⬜⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛⬛"),
+                "⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬜⬜⬛⬛".into(),
+                "⬛⬛⬜⬜⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛".into(),
             ])
             .unwrap(),
             Universe::from(HashMap::from([
@@ -283,13 +279,13 @@ mod tests {
         );
         assert_eq!(
             from_string(vec![
-                String::from("⬛⬛⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬜⬛⬛⬛"),
-                String::from("⬛⬛⬛⬜⬛⬛⬛"),
-                String::from("⬛⬛⬛⬜⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛⬛⬛"),
-                String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬜⬛⬛⬛".into(),
+                "⬛⬛⬛⬜⬛⬛⬛".into(),
+                "⬛⬛⬛⬜⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
             ])
             .unwrap(),
             Universe::from(HashMap::from([
@@ -303,66 +299,66 @@ mod tests {
     #[test]
     fn test_toggle_model() {
         let mut u = from_string(vec![
-            String::from("⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛"),
-            String::from("⬜⬜⬜⬜"),
-            String::from("⬜⬜⬜⬜"),
+            "⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛".into(),
+            "⬜⬜⬜⬜".into(),
+            "⬜⬜⬜⬜".into(),
         ])
         .unwrap();
         let state1 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛"),
-            String::from("⬜⬜⬜⬜"),
-            String::from("⬜⬜⬜⬜"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬛⬛⬛".into(),
+            "⬜⬜⬜⬜".into(),
+            "⬜⬜⬜⬜".into(),
         ])
         .unwrap();
         let state2 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛"),
-            String::from("⬜⬜⬜⬜"),
-            String::from("⬜⬜⬜⬜"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬜⬛⬛".into(),
+            "⬜⬜⬜⬜".into(),
+            "⬜⬜⬜⬜".into(),
         ])
         .unwrap();
         let state3 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛"),
-            String::from("⬜⬜⬛⬜"),
-            String::from("⬜⬜⬜⬜"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬜⬛⬛".into(),
+            "⬜⬜⬛⬜".into(),
+            "⬜⬜⬜⬜".into(),
         ])
         .unwrap();
         let state4 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛"),
-            String::from("⬜⬜⬛⬜"),
-            String::from("⬜⬜⬜⬛"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬜⬛⬛".into(),
+            "⬜⬜⬛⬜".into(),
+            "⬜⬜⬜⬛".into(),
         ])
         .unwrap();
         let state5 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛"),
-            String::from("⬜⬜⬛⬜"),
-            String::from("⬛⬜⬜⬛"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬜⬛⬛".into(),
+            "⬜⬜⬛⬜".into(),
+            "⬛⬜⬜⬛".into(),
         ])
         .unwrap();
         let state6 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛"),
-            String::from("⬜⬛⬛⬜"),
-            String::from("⬛⬜⬜⬛"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬜⬛⬛".into(),
+            "⬜⬛⬛⬜".into(),
+            "⬛⬜⬜⬛".into(),
         ])
         .unwrap();
         let state7 = from_string(vec![
-            String::from("⬜⬛⬛⬛"),
-            String::from("⬛⬜⬜⬛"),
-            String::from("⬜⬛⬛⬜"),
-            String::from("⬛⬜⬜⬛"),
+            "⬜⬛⬛⬛".into(),
+            "⬛⬜⬜⬛".into(),
+            "⬜⬛⬛⬜".into(),
+            "⬛⬜⬜⬛".into(),
         ])
         .unwrap();
         let state8 = from_string(vec![
-            String::from("⬜⬛⬛⬜"),
-            String::from("⬛⬜⬜⬛"),
-            String::from("⬜⬛⬛⬜"),
-            String::from("⬛⬜⬜⬛"),
+            "⬜⬛⬛⬜".into(),
+            "⬛⬜⬜⬛".into(),
+            "⬜⬛⬛⬜".into(),
+            "⬛⬜⬜⬛".into(),
         ])
         .unwrap();
         toggle_cell(&mut u, CartesianP::of(-2, 1));
@@ -387,146 +383,146 @@ mod tests {
     fn test_toggle_cell_by_absolute_point() {
         let mut u = Universe::default();
         let state1 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
         ])
         .unwrap();
         let state2 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
         ])
         .unwrap();
         let state3 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
         ])
         .unwrap();
         let state4 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state5 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state6 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state7 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state8 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state9 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state10 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state11 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let s1 = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
@@ -559,29 +555,29 @@ mod tests {
     #[test]
     fn test_toggle_cell_by_absolute_point_float_cell_size() {
         let mut state1 = from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap();
         let state2 = from_string(vec![
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
         ])
         .unwrap();
         let s = RenderSettings { cam: Rect::of(-5, -5, 4, 4), dim: 996, gap: 0 };
@@ -598,96 +594,54 @@ mod tests {
 
     #[test]
     fn test_iterate() {
-        let mut model1x1iter0 = from_string(vec![String::from("⬜")]).unwrap();
-        let mut model1x1iter1 = from_string(vec![String::from("⬛")]).unwrap();
+        let mut model1x1iter0 = from_string(vec!["⬜".into()]).unwrap();
+        let mut model1x1iter1 = from_string(vec!["⬛".into()]).unwrap();
         model1x1iter1.age = 1;
         iterate(&mut model1x1iter0);
         assert_eq!(model1x1iter0, model1x1iter1);
 
-        let mut model2x2iter0 =
-            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
-        let mut model2x2iter1 =
-            from_string(vec![String::from("⬜⬜"), String::from("⬜⬜")]).unwrap();
+        let mut model2x2iter0 = from_string(vec!["⬜⬜".into(), "⬜⬜".into()]).unwrap();
+        let mut model2x2iter1 = from_string(vec!["⬜⬜".into(), "⬜⬜".into()]).unwrap();
         model2x2iter1.age = 1;
         iterate(&mut model2x2iter0);
         assert_eq!(model2x2iter0, model2x2iter1);
 
-        let mut model3x3_1_iter0 = from_string(vec![
-            String::from("⬛⬜⬛"),
-            String::from("⬛⬜⬛"),
-            String::from("⬛⬜⬛"),
-        ])
-        .unwrap();
-        let mut model3x3_1_iter1 = from_string(vec![
-            String::from("⬛⬛⬛"),
-            String::from("⬜⬜⬜"),
-            String::from("⬛⬛⬛"),
-        ])
-        .unwrap();
+        let mut model3x3_1_iter0 =
+            from_string(vec!["⬛⬜⬛".into(), "⬛⬜⬛".into(), "⬛⬜⬛".into()]).unwrap();
+        let mut model3x3_1_iter1 =
+            from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap();
         model3x3_1_iter1.age = 1;
         iterate(&mut model3x3_1_iter0);
         assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
 
-        let mut model3x3_2_iter0 = from_string(vec![
-            String::from("⬛⬛⬛"),
-            String::from("⬜⬜⬜"),
-            String::from("⬛⬛⬛"),
-        ])
-        .unwrap();
-        let mut model3x3_2_iter1 = from_string(vec![
-            String::from("⬛⬜⬛"),
-            String::from("⬛⬜⬛"),
-            String::from("⬛⬜⬛"),
-        ])
-        .unwrap();
+        let mut model3x3_2_iter0 =
+            from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap();
+        let mut model3x3_2_iter1 =
+            from_string(vec!["⬛⬜⬛".into(), "⬛⬜⬛".into(), "⬛⬜⬛".into()]).unwrap();
         model3x3_2_iter1.age = 1;
         iterate(&mut model3x3_2_iter0);
         assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
 
-        let mut model3x3_3_iter0 = from_string(vec![
-            String::from("⬛⬛⬜"),
-            String::from("⬜⬜⬜"),
-            String::from("⬛⬛⬛"),
-        ])
-        .unwrap();
-        let mut model3x3_3_iter1 = from_string(vec![
-            String::from("⬛⬛⬜"),
-            String::from("⬛⬜⬜"),
-            String::from("⬛⬜⬛"),
-        ])
-        .unwrap();
+        let mut model3x3_3_iter0 =
+            from_string(vec!["⬛⬛⬜".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap();
+        let mut model3x3_3_iter1 =
+            from_string(vec!["⬛⬛⬜".into(), "⬛⬜⬜".into(), "⬛⬜⬛".into()]).unwrap();
         model3x3_3_iter1.age = 1;
         iterate(&mut model3x3_3_iter0);
         assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
 
-        let mut model3x3_4_iter0 = from_string(vec![
-            String::from("⬛⬛⬜"),
-            String::from("⬛⬜⬜"),
-            String::from("⬛⬜⬛"),
-        ])
-        .unwrap();
-        let mut model3x3_4_iter1 = from_string(vec![
-            String::from("⬛⬜⬜"),
-            String::from("⬛⬜⬜"),
-            String::from("⬛⬜⬜"),
-        ])
-        .unwrap();
+        let mut model3x3_4_iter0 =
+            from_string(vec!["⬛⬛⬜".into(), "⬛⬜⬜".into(), "⬛⬜⬛".into()]).unwrap();
+        let mut model3x3_4_iter1 =
+            from_string(vec!["⬛⬜⬜".into(), "⬛⬜⬜".into(), "⬛⬜⬜".into()]).unwrap();
         model3x3_4_iter1.age = 1;
         iterate(&mut model3x3_4_iter0);
         assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
 
-        let mut model3x3_5_iter0 = from_string(vec![
-            String::from("⬜⬜⬛"),
-            String::from("⬜⬜⬜"),
-            String::from("⬛⬜⬛"),
-        ])
-        .unwrap();
-        let mut model3x3_5_iter1 = from_string(vec![
-            String::from("⬜⬛⬜"),
-            String::from("⬛⬛⬜"),
-            String::from("⬜⬜⬜"),
-        ])
-        .unwrap();
+        let mut model3x3_5_iter0 =
+            from_string(vec!["⬜⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into()]).unwrap();
+        let mut model3x3_5_iter1 =
+            from_string(vec!["⬜⬛⬜".into(), "⬛⬛⬜".into(), "⬜⬜⬜".into()]).unwrap();
         model3x3_5_iter1.age = 1;
         iterate(&mut model3x3_5_iter0);
         assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
@@ -698,12 +652,12 @@ mod tests {
         assert_eq!(
             get_camera(
                 &from_string(vec![
-                    String::from("⬛⬛⬛⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬛⬛⬛"),
-                    String::from("⬛⬛⬜⬜⬛⬛"),
-                    String::from("⬛⬛⬜⬜⬛⬛"),
-                    String::from("⬛⬛⬛⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬛⬛⬛"),
+                    "⬛⬛⬛⬛⬛⬛".into(),
+                    "⬛⬛⬛⬛⬛⬛".into(),
+                    "⬛⬛⬜⬜⬛⬛".into(),
+                    "⬛⬛⬜⬜⬛⬛".into(),
+                    "⬛⬛⬛⬛⬛⬛".into(),
+                    "⬛⬛⬛⬛⬛⬛".into(),
                 ])
                 .unwrap()
             ),
@@ -712,13 +666,13 @@ mod tests {
         assert_eq!(
             get_camera(
                 &from_string(vec![
-                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬜⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬜⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬜⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
-                    String::from("⬛⬛⬛⬛⬛⬛⬛"),
+                    "⬛⬛⬛⬛⬛⬛⬛".into(),
+                    "⬛⬛⬛⬛⬛⬛⬛".into(),
+                    "⬛⬛⬛⬜⬛⬛⬛".into(),
+                    "⬛⬛⬛⬜⬛⬛⬛".into(),
+                    "⬛⬛⬛⬜⬛⬛⬛".into(),
+                    "⬛⬛⬛⬛⬛⬛⬛".into(),
+                    "⬛⬛⬛⬛⬛⬛⬛".into(),
                 ])
                 .unwrap()
             ),
@@ -726,30 +680,17 @@ mod tests {
         );
         assert_eq!(
             get_camera(
-                &from_string(vec![
-                    String::from("⬛⬛⬛"),
-                    String::from("⬜⬜⬜"),
-                    String::from("⬛⬛⬛"),
-                ])
-                .unwrap()
+                &from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into(),]).unwrap()
             ),
             Rect::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(
-                &from_string(vec![
-                    String::from("⬛⬜⬛"),
-                    String::from("⬜⬜⬜"),
-                    String::from("⬛⬜⬛"),
-                ])
-                .unwrap()
+                &from_string(vec!["⬛⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into(),]).unwrap()
             ),
             Rect::of(-5, -5, 5, 5)
         );
-        assert_eq!(
-            get_camera(&from_string(vec![String::from("⬜"),]).unwrap()),
-            Rect::of(-4, -4, 4, 4)
-        );
+        assert_eq!(get_camera(&from_string(vec!["⬜".into(),]).unwrap()), Rect::of(-4, -4, 4, 4));
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
                 (CartesianP::of(2, 2), State::Alive),

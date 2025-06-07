@@ -54,16 +54,16 @@ mod tests {
 
     fn get_universe() -> Universe {
         from_string(vec![
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"),
-            String::from("⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛"),
-            String::from("⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜"),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
         ])
         .unwrap()
     }
