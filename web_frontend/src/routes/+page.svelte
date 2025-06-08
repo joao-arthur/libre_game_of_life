@@ -1,10 +1,13 @@
 <script lang="ts">
     import { onDestroy, onMount } from "svelte";
-    import initWASM, { 
+    import initWASM, {
         engineAddOnChangeListener,
+        EngineCartesianPoint,
         engineGetPresets,
         engineGetSettings,
+        EngineInfo,
         engineInit,
+        EngineMatrixPoint,
         engineMoveBy,
         enginePause,
         engineResume,
@@ -13,14 +16,11 @@
         engineSetGap,
         engineSetPreset,
         engineSingleIteration,
+        EngineStatus,
         engineToggle,
         engineZoomIn,
         engineZoomOut,
         engineZoomTo,
-        EngineCartesianPoint,
-        EngineInfo,
-        EngineMatrixPoint,
-        EngineStatus,
     } from "game_of_life_engine";
     import Button from "$lib/components/Button.svelte";
     import RangeInput from "$lib/components/RangeInput.svelte";
@@ -40,13 +40,13 @@
     let innerWidth = $state(0);
     let innerHeight = $state(0);
 
-    let canvas:HTMLCanvasElement;
+    let canvas: HTMLCanvasElement;
 
     onMount(() => {
         if (!initiated) {
             initWASM().then(() => {
                 initiated = true;
-                let context = canvas.getContext('2d');
+                let context = canvas.getContext("2d");
                 if (!context) {
                     return;
                 }
@@ -57,8 +57,9 @@
         }
     });
 
-
-    function onClick(e: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement; }): void {
+    function onClick(
+        e: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement },
+    ): void {
         if (!model) {
             return;
         }
@@ -89,13 +90,13 @@
         if (!model) return;
         switch (model.status) {
             case EngineStatus.Resumed:
-                    enginePause();
-                    model.status = EngineStatus.Paused;
-                    break;
+                enginePause();
+                model.status = EngineStatus.Paused;
+                break;
             case EngineStatus.Paused:
-                    engineResume();
-                    model.status = EngineStatus.Resumed;
-                    break;
+                engineResume();
+                model.status = EngineStatus.Resumed;
+                break;
         }
     }
 
@@ -106,28 +107,28 @@
     function onKeyPress(e: KeyboardEvent) {
         switch (e.key) {
             case "w":
-                    engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(1)));
+                engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(1)));
                 break;
             case "a":
-                    engineMoveBy(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
+                engineMoveBy(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
                 break;
             case "s":
-                    engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
+                engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
                 break;
             case "d":
-                    engineMoveBy(new EngineCartesianPoint(BigInt(1), BigInt(0)));
+                engineMoveBy(new EngineCartesianPoint(BigInt(1), BigInt(0)));
                 break;
             case "+":
-                    engineZoomIn();
+                engineZoomIn();
                 break;
             case "-":
-                    engineZoomOut();
+                engineZoomOut();
                 break;
         }
     }
 </script>
 
-<svelte:window onkeypress={onKeyPress} bind:innerWidth={innerWidth} bind:innerHeight={innerHeight} />
+<svelte:window onkeypress={onKeyPress} bind:innerWidth bind:innerHeight />
 
 <style>
     main {
@@ -164,12 +165,14 @@
 
 <main>
     <canvas
-        bind:this={canvas} 
+        bind:this={canvas}
         onkeypress={onKeyPress}
         onclick={onClick}
         width={Math.min(innerHeight, innerWidth)}
         height={Math.min(innerHeight, innerWidth)}
-        style={`width: ${Math.min(innerHeight, innerWidth)}px; height: ${Math.min(innerHeight, innerWidth)}px;`}
+        style={`width: ${Math.min(innerHeight, innerWidth)}px; height: ${
+            Math.min(innerHeight, innerWidth)
+        }px;`}
     >
     </canvas>
     <div>
