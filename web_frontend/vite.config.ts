@@ -1,10 +1,15 @@
 import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import wasm from "vite-plugin-wasm";
 
 export default defineConfig({
     plugins: [
         sveltekit(),
-        wasm(),
-    ]
+    ],
+    server: {
+        fs: {
+          allow: [
+            '/home/joao_arthur/Programming/Games/libre_game_of_life/game_of_life_engine'
+          ]
+        }
+      }
 });

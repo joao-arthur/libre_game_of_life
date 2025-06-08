@@ -1,45 +1,133 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import initWASM, { engineGetPresets, EngineStatus, } from "game_of_life_engine";
+    import { onDestroy, onMount } from "svelte";
+    import initWASM, { 
+        engineAddOnChangeListener,
+        engineGetPresets,
+        engineGetSettings,
+        engineInit,
+        engineMoveBy,
+        enginePause,
+        engineResume,
+        engineSetDimension,
+        engineSetFPS,
+        engineSetGap,
+        engineSetPreset,
+        engineSingleIteration,
+        engineToggle,
+        engineZoomIn,
+        engineZoomOut,
+        engineZoomTo,
+        EngineCartesianPoint,
+        EngineInfo,
+        EngineMatrixPoint,
+        EngineStatus,
+    } from "game_of_life_engine";
     import Button from "$lib/components/Button.svelte";
     import RangeInput from "$lib/components/RangeInput.svelte";
     import Select from "$lib/components/Select.svelte";
 
     let initiated = $state(false);
     let presets = $state([]);
-
-    onMount(() => {
-        if (!initiated) {
-            initiated = true;
-            initWASM().then(() => {
-                presets = engineGetPresets();
-            });
-        }
-    });
-
-    function onClick(): void {}
-
-    function handleZoomTo(size: number) {}
-
-    function handleSetGap(gap: number) {}
-
-    function handleSetFPS(fps: number) {}
-
-    function handleSetPreset(preset: string) {}
-
-    function handleToggle(): void {}
-
-    function handleIterate() {}
-
-    const model = {
-        size: 500,
+    const model = $state({
+        size: 0,
         fps: 60,
         gap: 0,
         preset: "block",
         age: 0n,
         status: EngineStatus.Paused,
-    };
+    });
+
+    let innerWidth = $state(0);
+    let innerHeight = $state(0);
+
+    let canvas:HTMLCanvasElement;
+
+    onMount(() => {
+        if (!initiated) {
+            initWASM().then(() => {
+                initiated = true;
+                let context = canvas.getContext('2d');
+                if (!context) {
+                    return;
+                }
+                engineInit(context);
+                presets = engineGetPresets();
+                engineSetDimension(Math.min(innerWidth, innerHeight));
+            });
+        }
+    });
+
+
+    function onClick(e: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement; }): void {
+        if (!model) {
+            return;
+        }
+        const row = e.pageX - e.currentTarget.offsetLeft;
+        const col = e.pageY - e.currentTarget.offsetTop;
+        engineToggle(new EngineMatrixPoint(BigInt(Number(col)), BigInt(Number(row))));
+    }
+
+    function handleZoomTo(size: number) {
+        engineZoomTo(size);
+    }
+
+    function handleSetGap(gap: number) {
+        model.gap = gap;
+        engineSetGap(gap);
+    }
+
+    function handleSetFPS(fps: number) {
+        model.fps = fps;
+        engineSetFPS(fps);
+    }
+
+    function handleSetPreset(preset: string) {
+        engineSetPreset(preset);
+    }
+
+    function handleToggle(): void {
+        if (!model) return;
+        switch (model.status) {
+            case EngineStatus.Resumed:
+                    enginePause();
+                    model.status = EngineStatus.Paused;
+                    break;
+            case EngineStatus.Paused:
+                    engineResume();
+                    model.status = EngineStatus.Resumed;
+                    break;
+        }
+    }
+
+    function handleIterate() {
+        engineSingleIteration();
+    }
+
+    function onKeyPress(e: KeyboardEvent) {
+        switch (e.key) {
+            case "w":
+                    engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(1)));
+                break;
+            case "a":
+                    engineMoveBy(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
+                break;
+            case "s":
+                    engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
+                break;
+            case "d":
+                    engineMoveBy(new EngineCartesianPoint(BigInt(1), BigInt(0)));
+                break;
+            case "+":
+                    engineZoomIn();
+                break;
+            case "-":
+                    engineZoomOut();
+                break;
+        }
+    }
 </script>
+
+<svelte:window onkeypress={onKeyPress} bind:innerWidth={innerWidth} bind:innerHeight={innerHeight} />
 
 <style>
     main {
@@ -76,10 +164,12 @@
 
 <main>
     <canvas
+        bind:this={canvas} 
+        onkeypress={onKeyPress}
         onclick={onClick}
-        width={300}
-        height={300}
-        style={`width: ${300}px; height: ${300}px;`}
+        width={Math.min(innerHeight, innerWidth)}
+        height={Math.min(innerHeight, innerWidth)}
+        style={`width: ${Math.min(innerHeight, innerWidth)}px; height: ${Math.min(innerHeight, innerWidth)}px;`}
     >
     </canvas>
     <div>
