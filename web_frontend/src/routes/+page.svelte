@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onDestroy, onMount } from "svelte";
+    import { onMount } from "svelte";
     import initWASM, {
         engineAddOnChangeListener,
         EngineCartesianPoint,
@@ -28,14 +28,14 @@
 
     let initiated = $state(false);
     let presets = $state([]);
-    const model = $state({
+    let model = $state({
         size: 0,
         fps: 60,
         gap: 0,
         preset: "block",
         age: 0n,
         status: EngineStatus.Paused,
-    });
+    } as EngineInfo);
 
     let innerWidth = $state(0);
     let innerHeight = $state(0);
@@ -50,6 +50,9 @@
                 if (!context) {
                     return;
                 }
+                engineAddOnChangeListener(() => {
+                    model = engineGetSettings();
+                });
                 engineInit(context);
                 presets = engineGetPresets();
                 engineSetDimension(Math.min(innerWidth, innerHeight));
@@ -60,9 +63,6 @@
     function onClick(
         e: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement },
     ): void {
-        if (!model) {
-            return;
-        }
         const row = e.pageX - e.currentTarget.offsetLeft;
         const col = e.pageY - e.currentTarget.offsetTop;
         engineToggle(new EngineMatrixPoint(BigInt(Number(col)), BigInt(Number(row))));
@@ -73,12 +73,10 @@
     }
 
     function handleSetGap(gap: number) {
-        model.gap = gap;
         engineSetGap(gap);
     }
 
     function handleSetFPS(fps: number) {
-        model.fps = fps;
         engineSetFPS(fps);
     }
 
@@ -91,11 +89,9 @@
         switch (model.status) {
             case EngineStatus.Resumed:
                 enginePause();
-                model.status = EngineStatus.Paused;
                 break;
             case EngineStatus.Paused:
                 engineResume();
-                model.status = EngineStatus.Resumed;
                 break;
         }
     }
@@ -175,8 +171,8 @@
         }px;`}
     >
     </canvas>
-    <div>
-        <div class="form">
+    <div class="form">
+        <div class="field-container">
             <label for="preset">Preset</label>
             <Select
                 id="preset"
@@ -203,7 +199,7 @@
                     value={model ? model.gap : 0}
                     onChange={handleSetGap}
                 />
-                <label class="input-value">{model ? model.gap : 0}</label>
+                <label for="gap" class="input-value">{model ? model.gap : 0}</label>
             </div>
         </div>
         <div class="field-container">
@@ -217,7 +213,7 @@
                     value={model ? model.size : 0}
                     onChange={handleZoomTo}
                 />
-                <label class="input-value">{model ? model.size : 0}</label>
+                <label for="size" class="input-value">{model ? model.size : 0}</label>
             </div>
         </div>
         <div class="field-container">
@@ -231,11 +227,11 @@
                     value={model ? model.fps : 0}
                     onChange={handleSetFPS}
                 />
-                <label class="input-value">{model ? model.fps : 0}</label>
+                <label for="fps" class="input-value">{model ? model.fps : 0}</label>
             </div>
         </div>
         <span>
-            <label>Iteration: {model ? Number(model.age) : 0}</label>
+            <span>Iteration: {model ? Number(model.age) : 0}</span>
         </span>
         <Button
             icon={model?.status === 0 ? "pause" : "play"}
