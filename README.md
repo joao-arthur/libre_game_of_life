@@ -6,18 +6,18 @@ A **FLOSS** implementation of _Conway's Game Of Life_.
 
 ### lib
 
-A reusable, generic implementation of _Game of Life_ in _Rust_.
+A **reusable**, **generic** implementation of _Game of Life_ in _Rust_.
 
 ### web_backend
 
-A _Web Assembly_ application that works as a bridge between _lib_ and _web_frontend_.
+A _Web Assembly_ application that works as a bridge between _lib_ and _web_frontend_, using **wasm-pack**.
 
 ### web_frontend
 
-A minimal user application, responsible for render the canvas, render the settings, and init the _Web Assembly_. Currently, the settings are the following:
+A minimal user application, responsible for render the canvas, render the settings, and init the _Web Assembly_, using **SvelteKit**. Currently, the settings are the following:
 
 - **Preset:** Allows the user to choose from many popular shapes (Glider, Blinker, etc.) 
-- **Gap:** A visual option, for aesthetics
+- **Gap:** A visual gap between the rendered cells
 - **Size:** The amount of zoom in the screen
 - **FPS:** The desired FPS for render (the actual FPS might be slower)
 
