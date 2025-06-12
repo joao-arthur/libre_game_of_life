@@ -4,18 +4,17 @@ use std::{
 };
 
 use crate::{
-    cell::{self, toggle, State},
+    cell::{self, State, toggle},
     geometry::{
-        coordinate::{matrix_to_cartesian, CartesianPoint, MatrixPoint},
-        poligon::rect::{get_length, RectI64},
+        coordinate::{CartesianPoint, MatrixPoint, matrix_to_cartesian},
+        poligon::rect::{RectI64, get_length},
     },
     neighbor::number_of_alive_from_model,
 };
 
 use super::render::RenderSettings;
 
-#[derive(Debug, PartialEq, Clone)]
-#[derive(Default)]
+#[derive(Debug, PartialEq, Clone, Default)]
 pub struct Universe {
     pub value: HashMap<CartesianPoint, State>,
     pub age: u64,
@@ -26,7 +25,6 @@ impl From<HashMap<CartesianPoint, State>> for Universe {
         Universe { value, ..Default::default() }
     }
 }
-
 
 #[derive(Debug, PartialEq)]
 pub struct InvalidCharacterErr;
@@ -85,11 +83,7 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
 }
 
 pub fn get_value(u: &Universe, p: &CartesianPoint) -> State {
-    if u.value.get(p).unwrap_or(&State::Dead) == &State::Alive {
-        State::Alive
-    } else {
-        State::Dead
-    }
+    if u.value.get(p).unwrap_or(&State::Dead) == &State::Alive { State::Alive } else { State::Dead }
 }
 
 pub fn iterate(u: &mut Universe) {
@@ -686,7 +680,10 @@ mod tests {
             ),
             RectI64::of(-5, -5, 5, 5)
         );
-        assert_eq!(get_camera(&from_string(vec!["⬜".into(),]).unwrap()), RectI64::of(-4, -4, 4, 4));
+        assert_eq!(
+            get_camera(&from_string(vec!["⬜".into(),]).unwrap()),
+            RectI64::of(-4, -4, 4, 4)
+        );
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
                 (CartesianPoint::of(2, 2), State::Alive),

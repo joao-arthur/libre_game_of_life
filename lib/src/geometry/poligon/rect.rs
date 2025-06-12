@@ -40,11 +40,7 @@ fn delta_y(r: &RectI64) -> u64 {
 pub fn get_length(r: &RectI64) -> u64 {
     let d_x = delta_x(r);
     let d_y = delta_y(r);
-    if d_x > d_y {
-        d_x + 1
-    } else {
-        d_y + 1
-    }
+    if d_x > d_y { d_x + 1 } else { d_y + 1 }
 }
 
 pub fn center(r: &mut RectI64, p: CartesianPoint) {

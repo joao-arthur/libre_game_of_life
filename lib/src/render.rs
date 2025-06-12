@@ -2,7 +2,7 @@ use super::{
     cell::State,
     geometry::{
         coordinate::cartesian_to_matrix,
-        poligon::rect::{get_length, RectI64, RectF64},
+        poligon::rect::{RectF64, RectI64, get_length},
     },
     universe::Universe,
 };

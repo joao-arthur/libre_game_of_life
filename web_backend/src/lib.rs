@@ -1,9 +1,9 @@
 pub mod app;
 
 use crate::app::{
-    add_on_change_listener, app_get_settings, app_init, app_move_cam, app_pause, app_resume,
-    app_set_dimension, app_set_fps, app_set_gap, app_set_preset, app_single_iteration,
-    app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to, Status,
+    Status, add_on_change_listener, app_get_settings, app_init, app_move_cam, app_pause,
+    app_resume, app_set_dimension, app_set_fps, app_set_gap, app_set_preset, app_single_iteration,
+    app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to,
 };
 use libre_game_of_life_lib::{
     geometry::coordinate::{CartesianPoint, MatrixPoint},

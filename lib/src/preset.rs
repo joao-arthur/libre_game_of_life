@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::LazyLock};
 
-use super::universe::{from_string, Universe};
+use super::universe::{Universe, from_string};
 
 #[derive(Clone)]
 pub struct PresetDiscover {
