@@ -48,9 +48,13 @@ pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<RectF64> {
 
 #[cfg(test)]
 mod tests {
-    use crate::universe::from_string;
+    use crate::{
+        geometry::poligon::rect::{RectF64, RectI64},
+        render::RenderSettings,
+        universe::{Universe, from_string},
+    };
 
-    use super::*;
+    use super::get_values_to_render;
 
     fn get_universe() -> Universe {
         from_string(vec![
@@ -70,11 +74,11 @@ mod tests {
 
     #[test]
     fn render() {
-        let u = get_universe();
+        let universe = get_universe();
         let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
         assert_eq!(
-            get_values_to_render(&u, &s),
-            vec![
+            get_values_to_render(&universe, &s),
+            [
                 RectF64 { x1: 0.0, y1: 0.0, x2: 100.0, y2: 100.0 },
                 RectF64 { x1: 0.0, y1: 900.0, x2: 100.0, y2: 1000.0 },
                 RectF64 { x1: 100.0, y1: 100.0, x2: 200.0, y2: 200.0 },
@@ -89,13 +93,13 @@ mod tests {
 
     #[test]
     fn render_gap() {
-        let u = get_universe();
+        let universe = get_universe();
         let cam = RectI64::of(-5, -5, 4, 4);
         let s_gap1 = RenderSettings { cam, dim: 1000, gap: 1 };
         let s_gap2 = RenderSettings { cam, dim: 1000, gap: 2 };
         assert_eq!(
-            get_values_to_render(&u, &s_gap1),
-            vec![
+            get_values_to_render(&universe, &s_gap1),
+            [
                 RectF64 { x1: 1.0, y1: 1.0, x2: 99.0, y2: 99.0 },
                 RectF64 { x1: 1.0, y1: 901.0, x2: 99.0, y2: 999.0 },
                 RectF64 { x1: 101.0, y1: 101.0, x2: 199.0, y2: 199.0 },
@@ -107,8 +111,8 @@ mod tests {
             ]
         );
         assert_eq!(
-            get_values_to_render(&u, &s_gap2),
-            vec![
+            get_values_to_render(&universe, &s_gap2),
+            [
                 RectF64 { x1: 2.0, y1: 2.0, x2: 98.0, y2: 98.0 },
                 RectF64 { x1: 2.0, y1: 902.0, x2: 98.0, y2: 998.0 },
                 RectF64 { x1: 102.0, y1: 102.0, x2: 198.0, y2: 198.0 },
@@ -123,12 +127,12 @@ mod tests {
 
     #[test]
     fn render_cam() {
-        let u = get_universe();
+        let universe = get_universe();
         let s_cam_minus1 = RenderSettings { cam: RectI64::of(-6, -5, 3, 4), dim: 1000, gap: 0 };
         let s_cam_plus1 = RenderSettings { cam: RectI64::of(-4, -5, 5, 4), dim: 1000, gap: 0 };
         assert_eq!(
-            get_values_to_render(&u, &s_cam_minus1),
-            vec![
+            get_values_to_render(&universe, &s_cam_minus1),
+            [
                 RectF64 { x1: 100.0, y1: 0.0, x2: 200.0, y2: 100.0 },
                 RectF64 { x1: 100.0, y1: 900.0, x2: 200.0, y2: 1000.0 },
                 RectF64 { x1: 200.0, y1: 100.0, x2: 300.0, y2: 200.0 },
@@ -138,8 +142,8 @@ mod tests {
             ]
         );
         assert_eq!(
-            get_values_to_render(&u, &s_cam_plus1),
-            vec![
+            get_values_to_render(&universe, &s_cam_plus1),
+            [
                 RectF64 { x1: 0.0, y1: 100.0, x2: 100.0, y2: 200.0 },
                 RectF64 { x1: 0.0, y1: 800.0, x2: 100.0, y2: 900.0 },
                 RectF64 { x1: 700.0, y1: 100.0, x2: 800.0, y2: 200.0 },
@@ -152,11 +156,11 @@ mod tests {
 
     #[test]
     fn render_float_cell_size() {
-        let u = get_universe();
+        let universe = get_universe();
         let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 996, gap: 0 };
         assert_eq!(
-            get_values_to_render(&u, &s),
-            vec![
+            get_values_to_render(&universe, &s),
+            [
                 RectF64 { x1: 0.0, y1: 0.0, x2: 99.6, y2: 99.6 },
                 RectF64 { x1: 0.0, y1: 896.4, x2: 99.6, y2: 996.0 },
                 RectF64 { x1: 99.6, y1: 99.6, x2: 199.2, y2: 199.2 },

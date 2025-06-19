@@ -7,7 +7,7 @@ use libre_game_of_life_lib::{
         coordinate::{CartesianPoint, MatrixPoint},
         poligon::rect::{RectF64, get_length, move_by, zoom_in, zoom_out, zoom_to},
     },
-    preset::{Preset, get_preset, get_preset_groups, get_preset_unsafe},
+    preset::{Preset, get_preset, get_preset_groups, try_get_preset},
     render::{RenderSettings, get_values_to_render},
     universe::{Universe, get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point},
 };
@@ -91,7 +91,7 @@ pub struct Model {
 
 impl Default for Model {
     fn default() -> Self {
-        let universe = get_preset_unsafe("block");
+        let universe = get_preset("block");
         let cam = get_camera(&universe);
         Model {
             universe,
@@ -148,9 +148,9 @@ const DEAD_COLOR: &str = "#dbdbdb";
 const ALIVE_COLOR: &str = "#2e2e2e";
 
 fn render() {
-    let (universe, settings, holder) = MODEL.with(|i| {
-        let m = i.borrow();
-        (m.universe.clone(), m.settings.clone(), m.holder.clone())
+    let (universe, settings, holder) = MODEL.with(|m| {
+        let model = m.borrow();
+        (model.universe.clone(), model.settings.clone(), model.holder.clone())
     });
     if settings.render_settings.dim == 0 {
         return;
@@ -176,11 +176,11 @@ pub enum Command {
 }
 
 pub fn app_init(context: CanvasRenderingContext2d) {
-    MODEL.with(|i| i.borrow_mut().holder = Some(Holder { context }));
+    MODEL.with(|m| m.borrow_mut().holder = Some(Holder { context }));
     let mut interval: Option<Interval> = None;
     add_on_change_listener({
         move |prop| {
-            let status = MODEL.with(|i| i.borrow().settings.status.clone());
+            let status = MODEL.with(|m| m.borrow().settings.status.clone());
             match status {
                 Status::Resumed => match prop {
                     Prop::Status | Prop::FPS => {
@@ -189,7 +189,7 @@ pub fn app_init(context: CanvasRenderingContext2d) {
                                 i.cancel();
                             }
                         }
-                        let fps = MODEL.with(|i| i.borrow().settings.fps);
+                        let fps = MODEL.with(|m| m.borrow().settings.fps);
                         interval = Some(Interval::new(u32::from(fps_to_mili(fps)), || {
                             app_iterate();
                             render();
@@ -215,52 +215,52 @@ pub fn app_init(context: CanvasRenderingContext2d) {
 }
 
 pub fn app_pause() {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        m.settings.status = Status::Paused;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        model.settings.status = Status::Paused;
     });
     on_change(Prop::Status);
 }
 
 pub fn app_resume() {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        m.settings.status = Status::Resumed;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        model.settings.status = Status::Resumed;
     });
     on_change(Prop::Status);
 }
 
 pub fn app_set_dimension(dim: u16) {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        m.settings.render_settings.dim = dim;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        model.settings.render_settings.dim = dim;
     });
     on_change(Prop::Dim);
 }
 
 pub fn app_set_gap(gap: u8) {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        m.settings.render_settings.gap = gap;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        model.settings.render_settings.gap = gap;
     });
     on_change(Prop::Gap);
 }
 
 pub fn app_set_fps(fps: u16) {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        m.settings.fps = fps;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        model.settings.fps = fps;
     });
     on_change(Prop::FPS);
 }
 
 pub fn app_set_preset(preset: String) {
-    if let Some(selected_preset) = get_preset(&preset) {
-        MODEL.with(|i| {
-            let mut m = i.borrow_mut();
-            m.settings.render_settings.cam = get_camera(&selected_preset);
-            m.universe = selected_preset;
-            m.settings.preset = Some(preset);
+    if let Some(selected_preset) = try_get_preset(&preset) {
+        MODEL.with(|m| {
+            let mut model = m.borrow_mut();
+            model.settings.render_settings.cam = get_camera(&selected_preset);
+            model.universe = selected_preset;
+            model.settings.preset = Some(preset);
         });
         on_change(Prop::Universe);
         on_change(Prop::Preset);
@@ -269,64 +269,64 @@ pub fn app_set_preset(preset: String) {
 }
 
 pub fn app_single_iteration() {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        m.settings.status = Status::Paused;
-        iterate(&mut m.universe);
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        model.settings.status = Status::Paused;
+        iterate(&mut model.universe);
     });
     on_change(Prop::Status);
     on_change(Prop::Universe);
 }
 
 pub fn app_iterate() {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        iterate(&mut m.universe);
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        iterate(&mut model.universe);
     });
     on_change(Prop::Universe);
 }
 
 pub fn app_toggle_by_point(p: CartesianPoint) {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        toggle_cell(&mut m.universe, p);
-        m.settings.preset = None;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        toggle_cell(&mut model.universe, p);
+        model.settings.preset = None;
     });
     on_change(Prop::Universe);
     on_change(Prop::Preset);
 }
 
 pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        let render_settings = m.settings.render_settings.clone();
-        toggle_cell_by_absolute_point(&mut m.universe, &render_settings, p);
-        m.settings.preset = None;
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        let render_settings = model.settings.render_settings.clone();
+        toggle_cell_by_absolute_point(&mut model.universe, &render_settings, p);
+        model.settings.preset = None;
     });
     on_change(Prop::Universe);
     on_change(Prop::Preset);
 }
 
 pub fn app_zoom_in() {
-    let cam = MODEL.with(|i| i.borrow().settings.render_settings.cam.clone());
+    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
     if get_length(&cam) <= 2 {
         return;
     }
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        zoom_in(&mut m.settings.render_settings.cam);
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        zoom_in(&mut model.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
 
 pub fn app_zoom_out() {
-    let cam = MODEL.with(|i| i.borrow().settings.render_settings.cam.clone());
+    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
     if get_length(&cam) >= 200 {
         return;
     }
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        zoom_out(&mut m.settings.render_settings.cam);
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        zoom_out(&mut model.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
@@ -335,17 +335,17 @@ pub fn app_zoom_to(new_size: u16) {
     if new_size < 2 || new_size > 200 {
         return;
     }
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        zoom_to(&mut m.settings.render_settings.cam, new_size);
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        zoom_to(&mut model.settings.render_settings.cam, new_size);
     });
     on_change(Prop::Cam);
 }
 
 pub fn app_move_cam(delta: CartesianPoint) {
-    MODEL.with(|i| {
-        let mut m = i.borrow_mut();
-        move_by(&mut m.settings.render_settings.cam, delta);
+    MODEL.with(|m| {
+        let mut model = m.borrow_mut();
+        move_by(&mut model.settings.render_settings.cam, delta);
     });
     on_change(Prop::Universe);
 }
@@ -361,32 +361,43 @@ pub struct AppInfo {
 }
 
 pub fn app_get_settings() -> AppInfo {
-    MODEL.with(|i| {
-        let m = i.borrow();
-        let s = m.settings.clone();
-        let u = m.universe.clone();
+    MODEL.with(|m| {
+        let model = m.borrow();
+        let settings = model.settings.clone();
+        let universe = model.universe.clone();
         AppInfo {
-            preset: s.preset,
-            gap: s.render_settings.gap,
-            size: get_length(&s.render_settings.cam) as u16,
-            fps: s.fps,
-            status: s.status,
-            age: u.age,
+            preset: settings.preset,
+            gap: settings.render_settings.gap,
+            size: get_length(&settings.render_settings.cam) as u16,
+            fps: settings.fps,
+            status: settings.status,
+            age: universe.age,
         }
     })
 }
 
 #[cfg(test)]
 mod tests {
-    use libre_game_of_life_lib::{cell::State, geometry::poligon::rect::RectI64};
     use std::collections::HashMap;
 
-    use super::*;
+    use libre_game_of_life_lib::{
+        cell::State,
+        geometry::{coordinate::CartesianPoint, poligon::rect::RectI64},
+        preset::get_preset,
+        render::RenderSettings,
+        universe::Universe,
+    };
+
+    use super::{
+        AppInfo, AppSettings, MODEL, Status, app_get_settings, app_iterate, app_move_cam,
+        app_pause, app_resume, app_set_dimension, app_set_fps, app_set_gap, app_set_preset,
+        app_single_iteration, app_toggle_by_point, app_zoom_in, app_zoom_out, app_zoom_to,
+    };
 
     #[test]
     fn test_instance() {
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 4,
@@ -394,7 +405,7 @@ mod tests {
                 render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
-        assert_eq!(MODEL.with(|i| i.borrow().universe.clone()), get_preset_unsafe("block"));
+        assert_eq!(MODEL.with(|m| m.borrow().universe.clone()), get_preset("block"));
         let settings = app_get_settings();
         assert_eq!(
             AppInfo {
@@ -410,7 +421,7 @@ mod tests {
 
         app_pause();
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 4,
@@ -421,7 +432,7 @@ mod tests {
 
         app_resume();
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 4,
@@ -432,7 +443,7 @@ mod tests {
 
         app_set_dimension(1080);
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 4,
@@ -447,7 +458,7 @@ mod tests {
 
         app_set_gap(2);
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 4,
@@ -462,7 +473,7 @@ mod tests {
 
         app_set_fps(60);
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -477,7 +488,7 @@ mod tests {
 
         app_set_preset("Gaius Julius Caesar".into());
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -491,7 +502,7 @@ mod tests {
         );
         app_set_preset("r_pentomino".into());
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("r_pentomino".into()),
                 fps: 60,
@@ -505,13 +516,13 @@ mod tests {
         );
         app_set_preset("block".into());
         app_iterate();
-        let block = get_preset_unsafe("block");
+        let block = get_preset("block");
         assert_eq!(
-            MODEL.with(|i| i.borrow().universe.clone()),
+            MODEL.with(|m| m.borrow().universe.clone()),
             Universe { age: 1, value: block.value.clone() }
         );
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -526,11 +537,11 @@ mod tests {
 
         app_single_iteration();
         assert_eq!(
-            MODEL.with(|i| i.borrow().universe.clone()),
+            MODEL.with(|m| m.borrow().universe.clone()),
             Universe { age: 2, value: block.value.clone() }
         );
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -549,7 +560,7 @@ mod tests {
         app_zoom_in();
         app_zoom_in();
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -567,7 +578,7 @@ mod tests {
         app_zoom_out();
         app_zoom_out();
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -582,7 +593,7 @@ mod tests {
 
         app_zoom_to(40);
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -596,7 +607,7 @@ mod tests {
         );
         app_zoom_in();
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -610,7 +621,7 @@ mod tests {
         );
         app_zoom_out();
         assert_eq!(
-            MODEL.with(|i| i.borrow().settings.clone()),
+            MODEL.with(|m| m.borrow().settings.clone()),
             AppSettings {
                 preset: Some("block".into()),
                 fps: 60,
@@ -625,13 +636,13 @@ mod tests {
 
         app_move_cam(CartesianPoint::of(20, 20));
         assert_eq!(
-            MODEL.with(|i| i.borrow().universe.clone()),
+            MODEL.with(|m| m.borrow().universe.clone()),
             Universe { age: 2, value: block.value.clone() }
         );
 
         app_toggle_by_point(CartesianPoint::of(0, 0));
         assert_eq!(
-            MODEL.with(|i| i.borrow().universe.clone()),
+            MODEL.with(|m| m.borrow().universe.clone()),
             Universe {
                 age: 2,
                 value: HashMap::from([

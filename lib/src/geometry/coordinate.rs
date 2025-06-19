@@ -48,20 +48,25 @@ pub fn cartesian_to_matrix(&p: &CartesianPoint, cam: &RectI64) -> MatrixPoint {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::geometry::{
+        coordinate::{CartesianPoint, MatrixPoint},
+        poligon::rect::RectI64,
+    };
+
+    use super::{cartesian_to_matrix, matrix_to_cartesian};
 
     #[test]
     fn matrix_point() {
-        let p = MatrixPoint::of(23, 38);
-        assert_eq!(p, MatrixPoint { row: 23, col: 38 });
-        assert_eq!(format!("{p}"), "(23, 38)");
+        let point = MatrixPoint::of(23, 38);
+        assert_eq!(point, MatrixPoint { row: 23, col: 38 });
+        assert_eq!(point.to_string(), "(23, 38)");
     }
 
     #[test]
     fn cartesian_point() {
-        let p = CartesianPoint::of(-23, 38);
-        assert_eq!(p, CartesianPoint { x: -23, y: 38 });
-        assert_eq!(format!("{p}"), "(-23, 38)");
+        let point = CartesianPoint::of(-23, 38);
+        assert_eq!(point, CartesianPoint { x: -23, y: 38 });
+        assert_eq!(point.to_string(), "(-23, 38)");
     }
 
     #[test]

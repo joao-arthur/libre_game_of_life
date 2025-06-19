@@ -174,16 +174,22 @@ pub fn main_add_on_change_listener(cb: Function) {
 pub fn main_get_presets() -> JsValue {
     let groups: Vec<EnginePresetGroup> = get_preset_groups()
         .iter()
-        .map(|g| EnginePresetGroup {
-            info: EnginePresetInfo { id: g.info.id.clone(), name: g.info.name.clone() },
-            items: g
+        .map(|preset_group| EnginePresetGroup {
+            info: EnginePresetInfo {
+                id: preset_group.info.id.clone(),
+                name: preset_group.info.name.clone(),
+            },
+            items: preset_group
                 .sub_groups
                 .iter()
                 .flat_map(|sub_group| {
                     sub_group
                         .items
                         .iter()
-                        .map(|i| EnginePresetInfo { id: i.id.clone(), name: i.name.clone() })
+                        .map(|preset| EnginePresetInfo {
+                            id: preset.id.clone(),
+                            name: preset.name.clone(),
+                        })
                         .collect::<Vec<EnginePresetInfo>>()
                 })
                 .collect(),

@@ -25,7 +25,9 @@ pub fn number_of_alive_from_model(u: &Universe, p: &CartesianPoint) -> u8 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::cell::State;
+
+    use super::number_of_alive;
 
     #[test]
     fn test_number_of_alive() {

@@ -171,8 +171,21 @@ pub fn get_camera(u: &Universe) -> RectI64 {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::cell::State;
+    use std::collections::HashMap;
+
+    use crate::{
+        cell::State,
+        geometry::{
+            coordinate::{CartesianPoint, MatrixPoint},
+            poligon::rect::RectI64,
+        },
+        render::RenderSettings,
+    };
+
+    use super::{
+        FromStringErr, InvalidCharacterErr, InvalidLengthErr, Universe, from_string, get_camera,
+        iterate, toggle_cell, toggle_cell_by_absolute_point,
+    };
 
     #[test]
     fn test_model() {
@@ -199,11 +212,11 @@ mod tests {
     #[test]
     fn test_from_string_err() {
         assert_eq!(
-            format!("{}", InvalidCharacterErr),
+            InvalidCharacterErr.to_string(),
             "Only \"⬜\" and \"⬛\" characters are allowed!"
         );
         assert_eq!(
-            format!("{}", InvalidLengthErr),
+            InvalidLengthErr.to_string(),
             "The length of every line and the number of lines must be equal!"
         );
         assert_eq!(

@@ -27,7 +27,7 @@ pub fn toggle(s: &State) -> State {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::{State, iterate, toggle};
 
     #[test]
     fn iterate_any_live_cell_with_fewer_than_two_live_neighbours_dies() {

@@ -61,10 +61,10 @@
     });
 
     function onClick(
-        e: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement },
+        event: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement },
     ): void {
-        const row = e.pageX - e.currentTarget.offsetLeft;
-        const col = e.pageY - e.currentTarget.offsetTop;
+        const row = event.pageX - event.currentTarget.offsetLeft;
+        const col = event.pageY - event.currentTarget.offsetTop;
         engineToggle(new EngineMatrixPoint(BigInt(Number(col)), BigInt(Number(row))));
     }
 

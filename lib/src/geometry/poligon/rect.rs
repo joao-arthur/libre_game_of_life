@@ -96,7 +96,9 @@ pub fn move_by(r: &mut RectI64, delta: CartesianPoint) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::geometry::{coordinate::CartesianPoint, poligon::rect::RectI64};
+
+    use super::{center, delta_x, delta_y, get_length, move_by, zoom_in, zoom_out, zoom_to};
 
     #[test]
     fn test_rect() {
