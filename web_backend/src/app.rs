@@ -308,7 +308,7 @@ pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
 }
 
 pub fn app_zoom_in() {
-    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
+    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam);
     if get_length(&cam) <= 2 {
         return;
     }
@@ -320,7 +320,7 @@ pub fn app_zoom_in() {
 }
 
 pub fn app_zoom_out() {
-    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
+    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam);
     if get_length(&cam) >= 200 {
         return;
     }
