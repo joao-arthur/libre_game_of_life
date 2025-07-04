@@ -9,7 +9,10 @@ use libre_game_of_life_lib::{
     },
     preset::{Preset, get_preset, get_preset_groups, try_get_preset},
     render::{RenderSettings, get_values_to_render},
-    universe::{Universe, get_camera, iterate, toggle_cell, toggle_cell_by_absolute_point},
+    universe::{
+        Universe, universe_get_camera, universe_iterate, universe_toggle,
+        universe_toggle_by_matrix_point,
+    },
 };
 
 pub struct PresetOptionItem {
@@ -92,7 +95,7 @@ pub struct Model {
 impl Default for Model {
     fn default() -> Self {
         let universe = get_preset("block");
-        let cam = get_camera(&universe);
+        let cam = universe_get_camera(&universe);
         Model {
             universe,
             settings: AppSettings {
@@ -258,7 +261,7 @@ pub fn app_set_preset(preset: String) {
     if let Some(selected_preset) = try_get_preset(&preset) {
         MODEL.with(|m| {
             let mut model = m.borrow_mut();
-            model.settings.render_settings.cam = get_camera(&selected_preset);
+            model.settings.render_settings.cam = universe_get_camera(&selected_preset);
             model.universe = selected_preset;
             model.settings.preset = Some(preset);
         });
@@ -272,7 +275,7 @@ pub fn app_single_iteration() {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
         model.settings.status = Status::Paused;
-        iterate(&mut model.universe);
+        universe_iterate(&mut model.universe);
     });
     on_change(Prop::Status);
     on_change(Prop::Universe);
@@ -281,7 +284,7 @@ pub fn app_single_iteration() {
 pub fn app_iterate() {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        iterate(&mut model.universe);
+        universe_iterate(&mut model.universe);
     });
     on_change(Prop::Universe);
 }
@@ -289,7 +292,7 @@ pub fn app_iterate() {
 pub fn app_toggle_by_point(p: CartesianPoint) {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        toggle_cell(&mut model.universe, p);
+        universe_toggle(&mut model.universe, p);
         model.settings.preset = None;
     });
     on_change(Prop::Universe);
@@ -300,7 +303,7 @@ pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
         let render_settings = model.settings.render_settings.clone();
-        toggle_cell_by_absolute_point(&mut model.universe, &render_settings, p);
+        universe_toggle_by_matrix_point(&mut model.universe, &render_settings, p);
         model.settings.preset = None;
     });
     on_change(Prop::Universe);
