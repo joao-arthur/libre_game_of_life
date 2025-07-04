@@ -26,6 +26,24 @@ impl From<HashMap<CartesianPoint, State>> for Universe {
     }
 }
 
+impl From<Vec<CartesianPoint>> for Universe {
+    fn from(value: Vec<CartesianPoint>) -> Self {
+        Universe {
+            value: value.into_iter().map(|point| (point, State::Alive)).collect(),
+            ..Default::default()
+        }
+    }
+}
+
+impl<const N: usize> From<[CartesianPoint; N]> for Universe {
+    fn from(value: [CartesianPoint; N]) -> Self {
+        Universe {
+            value: value.into_iter().map(|point| (point, State::Alive)).collect(),
+            ..Default::default()
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct InvalidCharacterErr;
 
@@ -50,7 +68,7 @@ pub enum FromStringErr {
     InvalidLength(InvalidLengthErr),
 }
 
-pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
+pub fn universe_try_from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     if as_str.join("").find(|c| c != ' ' && cell_try_of(c).is_none()).is_some() {
         return Err(FromStringErr::InvalidCharacter(InvalidCharacterErr));
     }
@@ -82,11 +100,27 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     Ok(Universe::from(value))
 }
 
-pub fn get_value(universe: &Universe, point: &CartesianPoint) -> State {
-    if universe.value.get(point).unwrap_or(&State::Dead) == &State::Alive { State::Alive } else { State::Dead }
+pub fn universe_from_string(as_str: Vec<String>) -> Universe {
+    universe_try_from_string(as_str).unwrap()
 }
 
-pub fn iterate(universe: &mut Universe) {
+pub fn universe_try_from_str<const N: usize>(as_str: [&str; N]) -> Result<Universe, FromStringErr> {
+    universe_try_from_string(as_str.into_iter().map(|s| s.into()).collect())
+}
+
+pub fn universe_from_str<const N: usize>(as_str: [&str; N]) -> Universe {
+    universe_try_from_str(as_str).unwrap()
+}
+
+pub fn universe_get_value(universe: &Universe, point: &CartesianPoint) -> State {
+    if universe.value.get(point).unwrap_or(&State::Dead) == &State::Alive {
+        State::Alive
+    } else {
+        State::Dead
+    }
+}
+
+pub fn universe_iterate(universe: &mut Universe) {
     let points: HashSet<CartesianPoint> = universe
         .value
         .keys()
@@ -107,7 +141,7 @@ pub fn iterate(universe: &mut Universe) {
     let entries: HashMap<CartesianPoint, State> = points
         .iter()
         .filter_map(|point| {
-            let s = get_value(universe, point);
+            let s = universe_get_value(universe, point);
             let number_of_alive_neighbors = number_of_alive_from_model(universe, point);
             let new_cell = cell_iterate(s, number_of_alive_neighbors);
             match new_cell {
@@ -120,8 +154,8 @@ pub fn iterate(universe: &mut Universe) {
     universe.value = entries;
 }
 
-pub fn toggle_cell(universe: &mut Universe, point: CartesianPoint) {
-    let new_cell = cell_toggle(&get_value(universe, &point));
+pub fn universe_toggle(universe: &mut Universe, point: CartesianPoint) {
+    let new_cell = cell_toggle(&universe_get_value(universe, &point));
     match new_cell {
         State::Dead => {
             universe.value.remove(&point);
@@ -132,7 +166,11 @@ pub fn toggle_cell(universe: &mut Universe, point: CartesianPoint) {
     }
 }
 
-pub fn toggle_cell_by_absolute_point(universe: &mut Universe, settings: &RenderSettings, point: MatrixPoint) {
+pub fn universe_toggle_by_matrix_point(
+    universe: &mut Universe,
+    settings: &RenderSettings,
+    point: MatrixPoint,
+) {
     let dim = f64::from(settings.dim);
     let len = get_length(&settings.cam) as f64;
     let cell_size = dim / len;
@@ -140,10 +178,10 @@ pub fn toggle_cell_by_absolute_point(universe: &mut Universe, settings: &RenderS
     let col = point.col as f64 / cell_size;
     let matrix_point = MatrixPoint { row: row as u64, col: col as u64 };
     let cartesian_point = matrix_to_cartesian(&matrix_point, &settings.cam);
-    toggle_cell(universe, cartesian_point);
+    universe_toggle(universe, cartesian_point);
 }
 
-pub fn get_camera(universe: &Universe) -> RectI64 {
+pub fn universe_get_camera(universe: &Universe) -> RectI64 {
     let all_x: Vec<i64> = universe.value.iter().map(|v| v.0.x).collect();
     let all_y: Vec<i64> = universe.value.iter().map(|v| v.0.y).collect();
     let mut min_x = all_x.iter().min().unwrap().to_owned();
@@ -183,8 +221,9 @@ mod tests {
     };
 
     use super::{
-        FromStringErr, InvalidCharacterErr, InvalidLengthErr, Universe, from_string, get_camera,
-        iterate, toggle_cell, toggle_cell_by_absolute_point,
+        FromStringErr, InvalidCharacterErr, InvalidLengthErr, Universe, universe_from_str,
+        universe_from_string, universe_get_camera, universe_iterate, universe_toggle,
+        universe_toggle_by_matrix_point, universe_try_from_str, universe_try_from_string,
     };
 
     #[test]
@@ -207,9 +246,43 @@ mod tests {
             Universe::from(HashMap::from([
                 (CartesianPoint::of(-1, -1), State::Alive),
                 (CartesianPoint::of(-1, 1), State::Alive),
-                (CartesianPoint::of(1, -1), State::Alive),
+                (CartesianPoint::of(1, -1), State::Dead),
                 (CartesianPoint::of(1, 1), State::Alive),
             ])),
+            Universe {
+                value: HashMap::from([
+                    (CartesianPoint::of(-1, -1), State::Alive),
+                    (CartesianPoint::of(-1, 1), State::Alive),
+                    (CartesianPoint::of(1, -1), State::Dead),
+                    (CartesianPoint::of(1, 1), State::Alive),
+                ]),
+                age: 0,
+            }
+        );
+        assert_eq!(
+            Universe::from(vec![
+                CartesianPoint::of(-1, -1),
+                CartesianPoint::of(-1, 1),
+                CartesianPoint::of(1, -1),
+                CartesianPoint::of(1, 1),
+            ]),
+            Universe {
+                value: HashMap::from([
+                    (CartesianPoint::of(-1, -1), State::Alive),
+                    (CartesianPoint::of(-1, 1), State::Alive),
+                    (CartesianPoint::of(1, -1), State::Alive),
+                    (CartesianPoint::of(1, 1), State::Alive),
+                ]),
+                age: 0,
+            }
+        );
+        assert_eq!(
+            Universe::from([
+                CartesianPoint::of(-1, -1),
+                CartesianPoint::of(-1, 1),
+                CartesianPoint::of(1, -1),
+                CartesianPoint::of(1, 1),
+            ]),
             Universe {
                 value: HashMap::from([
                     (CartesianPoint::of(-1, -1), State::Alive),
@@ -223,21 +296,21 @@ mod tests {
     }
 
     #[test]
-    fn test_from_string_err() {
+    fn test_universe_from_string_err() {
         assert_eq!(
-            from_string(vec!["".into()]),
+            universe_try_from_string(vec!["".into()]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
-            from_string(vec!["abcdefg".into()]),
+            universe_try_from_string(vec!["abcdefg".into()]),
             Err(FromStringErr::InvalidCharacter(InvalidCharacterErr)),
         );
         assert_eq!(
-            from_string(vec!["⬛⬛⬛⬛".into(), "⬛⬛⬛⬛⬛".into(), "⬛⬛⬛".into()]),
+            universe_try_from_string(vec!["⬛⬛⬛⬛".into(), "⬛⬛⬛⬛⬛".into(), "⬛⬛⬛".into()]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
-            from_string(vec![
+            universe_try_from_string(vec![
                 "⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛".into(),
@@ -248,45 +321,43 @@ mod tests {
     }
 
     #[test]
-    fn test_from_string() {
-        assert_eq!(from_string(vec!["⬛".into()]).unwrap(), Universe::default());
+    fn test_universe_try_from_string() {
+        assert_eq!(universe_try_from_string(vec!["⬛".into()]), Ok(Universe::default()));
         assert_eq!(
-            from_string(vec!["⬜".into()]).unwrap(),
-            Universe::from(HashMap::from([(CartesianPoint::of(0, 0), State::Alive)])),
+            universe_try_from_string(vec!["⬜".into()]),
+            Ok(Universe::from([CartesianPoint::of(0, 0)])),
         );
         assert_eq!(
-            from_string(vec![
+            universe_try_from_string(vec![
                 "⬛⬛⬛⬜".into(),
                 "⬜⬛⬛⬛".into(),
                 "⬛⬛⬜⬛".into(),
                 "⬛⬛⬛⬛".into(),
-            ])
-            .unwrap(),
-            Universe::from(HashMap::from([
-                (CartesianPoint::of(-2, 0), State::Alive),
-                (CartesianPoint::of(0, -1), State::Alive),
-                (CartesianPoint::of(1, 1), State::Alive),
+            ]),
+            Ok(Universe::from([
+                CartesianPoint::of(-2, 0),
+                CartesianPoint::of(0, -1),
+                CartesianPoint::of(1, 1),
             ]))
         );
         assert_eq!(
-            from_string(vec![
+            universe_try_from_string(vec![
                 "⬛⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬜⬜⬛⬛".into(),
                 "⬛⬛⬜⬜⬛⬛".into(),
                 "⬛⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛⬛".into(),
-            ])
-            .unwrap(),
-            Universe::from(HashMap::from([
-                (CartesianPoint::of(-1, -1), State::Alive),
-                (CartesianPoint::of(-1, 0), State::Alive),
-                (CartesianPoint::of(0, -1), State::Alive),
-                (CartesianPoint::of(0, 0), State::Alive),
+            ]),
+            Ok(Universe::from([
+                CartesianPoint::of(-1, -1),
+                CartesianPoint::of(-1, 0),
+                CartesianPoint::of(0, -1),
+                CartesianPoint::of(0, 0),
             ]))
         );
         assert_eq!(
-            from_string(vec![
+            universe_try_from_string(vec![
                 "⬛⬛⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬜⬛⬛⬛".into(),
@@ -294,433 +365,440 @@ mod tests {
                 "⬛⬛⬛⬜⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛⬛⬛".into(),
                 "⬛⬛⬛⬛⬛⬛⬛".into(),
-            ])
-            .unwrap(),
-            Universe::from(HashMap::from([
-                (CartesianPoint::of(0, -1), State::Alive),
-                (CartesianPoint::of(0, 0), State::Alive),
-                (CartesianPoint::of(0, 1), State::Alive),
+            ]),
+            Ok(Universe::from([
+                CartesianPoint::of(0, -1),
+                CartesianPoint::of(0, 0),
+                CartesianPoint::of(0, 1),
             ]))
         );
     }
 
     #[test]
-    fn test_toggle_model() {
-        let mut u = from_string(vec![
-            "⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛".into(),
-            "⬜⬜⬜⬜".into(),
-            "⬜⬜⬜⬜".into(),
-        ])
-        .unwrap();
-        let state1 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬛⬛⬛".into(),
-            "⬜⬜⬜⬜".into(),
-            "⬜⬜⬜⬜".into(),
-        ])
-        .unwrap();
-        let state2 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬜⬛⬛".into(),
-            "⬜⬜⬜⬜".into(),
-            "⬜⬜⬜⬜".into(),
-        ])
-        .unwrap();
-        let state3 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬜⬛⬛".into(),
-            "⬜⬜⬛⬜".into(),
-            "⬜⬜⬜⬜".into(),
-        ])
-        .unwrap();
-        let state4 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬜⬛⬛".into(),
-            "⬜⬜⬛⬜".into(),
-            "⬜⬜⬜⬛".into(),
-        ])
-        .unwrap();
-        let state5 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬜⬛⬛".into(),
-            "⬜⬜⬛⬜".into(),
-            "⬛⬜⬜⬛".into(),
-        ])
-        .unwrap();
-        let state6 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬜⬛⬛".into(),
-            "⬜⬛⬛⬜".into(),
-            "⬛⬜⬜⬛".into(),
-        ])
-        .unwrap();
-        let state7 = from_string(vec![
-            "⬜⬛⬛⬛".into(),
-            "⬛⬜⬜⬛".into(),
-            "⬜⬛⬛⬜".into(),
-            "⬛⬜⬜⬛".into(),
-        ])
-        .unwrap();
-        let state8 = from_string(vec![
-            "⬜⬛⬛⬜".into(),
-            "⬛⬜⬜⬛".into(),
-            "⬜⬛⬛⬜".into(),
-            "⬛⬜⬜⬛".into(),
-        ])
-        .unwrap();
-        toggle_cell(&mut u, CartesianPoint::of(-2, 1));
-        assert_eq!(u, state1);
-        toggle_cell(&mut u, CartesianPoint::of(-1, 0));
-        assert_eq!(u, state2);
-        toggle_cell(&mut u, CartesianPoint::of(0, -1));
-        assert_eq!(u, state3);
-        toggle_cell(&mut u, CartesianPoint::of(1, -2));
-        assert_eq!(u, state4);
-        toggle_cell(&mut u, CartesianPoint::of(-2, -2));
-        assert_eq!(u, state5);
-        toggle_cell(&mut u, CartesianPoint::of(-1, -1));
-        assert_eq!(u, state6);
-        toggle_cell(&mut u, CartesianPoint::of(0, 0));
-        assert_eq!(u, state7);
-        toggle_cell(&mut u, CartesianPoint::of(1, 1));
-        assert_eq!(u, state8);
+    fn test_universe_try_from_str() {
+        assert_eq!(
+            universe_try_from_str([
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+            ]),
+            Ok(Universe::from([
+                CartesianPoint::of(0, -1),
+                CartesianPoint::of(0, 0),
+                CartesianPoint::of(0, 1),
+            ]))
+        );
     }
 
     #[test]
-    fn test_toggle_cell_by_absolute_point() {
-        let mut u = Universe::default();
-        let state1 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-        ])
-        .unwrap();
-        let state2 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-        ])
-        .unwrap();
-        let state3 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-        ])
-        .unwrap();
-        let state4 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state5 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state6 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state7 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state8 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state9 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state10 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state11 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
+    fn test_universe_from_string() {
+        assert_eq!(
+            universe_from_string(vec![
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬜⬛⬛⬛".into(),
+                "⬛⬛⬛⬜⬛⬛⬛".into(),
+                "⬛⬛⬛⬜⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+                "⬛⬛⬛⬛⬛⬛⬛".into(),
+            ]),
+            Universe::from([
+                CartesianPoint::of(0, -1),
+                CartesianPoint::of(0, 0),
+                CartesianPoint::of(0, 1),
+            ])
+        );
+    }
+
+    #[test]
+    fn test_universe_from_str() {
+        assert_eq!(
+            universe_from_str([
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬜⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+                "⬛⬛⬛⬛⬛⬛⬛",
+            ]),
+            Universe::from([
+                CartesianPoint::of(0, -1),
+                CartesianPoint::of(0, 0),
+                CartesianPoint::of(0, 1),
+            ])
+        );
+    }
+
+    #[test]
+    fn test_universe_toggle() {
+        let mut universe = universe_from_str(["⬛⬛⬛⬛", "⬛⬛⬛⬛", "⬜⬜⬜⬜", "⬜⬜⬜⬜"]);
+        universe_toggle(&mut universe, CartesianPoint::of(-2, 1));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬛⬛⬛", "⬜⬜⬜⬜", "⬜⬜⬜⬜"]));
+        universe_toggle(&mut universe, CartesianPoint::of(-1, 0));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬜⬛⬛", "⬜⬜⬜⬜", "⬜⬜⬜⬜"]));
+        universe_toggle(&mut universe, CartesianPoint::of(0, -1));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬜⬛⬛", "⬜⬜⬛⬜", "⬜⬜⬜⬜"]));
+        universe_toggle(&mut universe, CartesianPoint::of(1, -2));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬜⬛⬛", "⬜⬜⬛⬜", "⬜⬜⬜⬛"]));
+        universe_toggle(&mut universe, CartesianPoint::of(-2, -2));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬜⬛⬛", "⬜⬜⬛⬜", "⬛⬜⬜⬛"]));
+        universe_toggle(&mut universe, CartesianPoint::of(-1, -1));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬜⬛⬛", "⬜⬛⬛⬜", "⬛⬜⬜⬛"]));
+        universe_toggle(&mut universe, CartesianPoint::of(0, 0));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬛", "⬛⬜⬜⬛", "⬜⬛⬛⬜", "⬛⬜⬜⬛"]));
+        universe_toggle(&mut universe, CartesianPoint::of(1, 1));
+        assert_eq!(universe, universe_from_str(["⬜⬛⬛⬜", "⬛⬜⬜⬛", "⬜⬛⬛⬜", "⬛⬜⬜⬛"]));
+    }
+
+    #[test]
+    fn test_universe_toggle_by_matrix_point() {
+        let mut universe = Universe::default();
+        let state_1 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+        ]);
+        let state_2 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+        ]);
+        let state_3 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+        ]);
+        let state_4 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_5 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_6 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_7 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_8 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_9 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_10 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_11 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬜⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
         let s1 = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
         let s2 = RenderSettings { cam: RectI64::of(-4, -4, 5, 5), dim: 1000, gap: 0 };
         let s3 = RenderSettings { cam: RectI64::of(-5, -4, 4, 5), dim: 1000, gap: 0 };
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(10, 10));
-        assert_eq!(u, state1);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(990, 10));
-        assert_eq!(u, state2);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(10, 990));
-        assert_eq!(u, state3);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(990, 990));
-        assert_eq!(u, state4);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(110, 110));
-        assert_eq!(u, state5);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(890, 110));
-        assert_eq!(u, state6);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(110, 890));
-        assert_eq!(u, state7);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(890, 890));
-        assert_eq!(u, state8);
-        toggle_cell_by_absolute_point(&mut u, &s1, MatrixPoint::of(710, 350));
-        assert_eq!(u, state9);
-        toggle_cell_by_absolute_point(&mut u, &s2, MatrixPoint::of(110, 890));
-        assert_eq!(u, state10);
-        toggle_cell_by_absolute_point(&mut u, &s3, MatrixPoint::of(110, 890));
-        assert_eq!(u, state11);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(10, 10));
+        assert_eq!(universe, state_1);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(990, 10));
+        assert_eq!(universe, state_2);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(10, 990));
+        assert_eq!(universe, state_3);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(990, 990));
+        assert_eq!(universe, state_4);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(110, 110));
+        assert_eq!(universe, state_5);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(890, 110));
+        assert_eq!(universe, state_6);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(110, 890));
+        assert_eq!(universe, state_7);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(890, 890));
+        assert_eq!(universe, state_8);
+        universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(710, 350));
+        assert_eq!(universe, state_9);
+        universe_toggle_by_matrix_point(&mut universe, &s2, MatrixPoint::of(110, 890));
+        assert_eq!(universe, state_10);
+        universe_toggle_by_matrix_point(&mut universe, &s3, MatrixPoint::of(110, 890));
+        assert_eq!(universe, state_11);
     }
 
     #[test]
-    fn test_toggle_cell_by_absolute_point_float_cell_size() {
-        let mut state1 = from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-        ])
-        .unwrap();
-        let state2 = from_string(vec![
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-        ])
-        .unwrap();
+    fn test_universe_toggle_by_matrix_point_float_cell_size() {
+        let mut state_1 = universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+        ]);
+        let state_2 = universe_from_str([
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+        ]);
         let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 996, gap: 0 };
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(1, 1));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(897, 99));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(99, 897));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(995, 995));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(100, 100));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(797, 199));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(199, 797));
-        toggle_cell_by_absolute_point(&mut state1, &s, MatrixPoint::of(895, 895));
-        assert_eq!(state1, state2);
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(1, 1));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(897, 99));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(99, 897));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(995, 995));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(100, 100));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(797, 199));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(199, 797));
+        universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(895, 895));
+        assert_eq!(state_1, state_2);
     }
 
     #[test]
-    fn test_iterate() {
-        let mut model1x1iter0 = from_string(vec!["⬜".into()]).unwrap();
-        let mut model1x1iter1 = from_string(vec!["⬛".into()]).unwrap();
-        model1x1iter1.age = 1;
-        iterate(&mut model1x1iter0);
-        assert_eq!(model1x1iter0, model1x1iter1);
+    fn universe_iterate_cell() {
+        let mut universe = universe_from_str(["⬜"]);
+        let mut state_1 = universe_from_str(["⬛"]);
+        state_1.age = 1;
+        universe_iterate(&mut universe);
+        assert_eq!(universe, state_1);
+    }
 
-        let mut model2x2iter0 = from_string(vec!["⬜⬜".into(), "⬜⬜".into()]).unwrap();
-        let mut model2x2iter1 = from_string(vec!["⬜⬜".into(), "⬜⬜".into()]).unwrap();
-        model2x2iter1.age = 1;
-        iterate(&mut model2x2iter0);
-        assert_eq!(model2x2iter0, model2x2iter1);
+    #[test]
+    fn universe_iterate_empty() {
+        let mut universe = universe_from_str(["⬜⬜", "⬜⬜"]);
+        let mut state_1 = universe_from_str(["⬜⬜", "⬜⬜"]);
+        state_1.age = 1;
+        universe_iterate(&mut universe);
+        assert_eq!(universe, state_1);
+    }
 
-        let mut model3x3_1_iter0 =
-            from_string(vec!["⬛⬜⬛".into(), "⬛⬜⬛".into(), "⬛⬜⬛".into()]).unwrap();
-        let mut model3x3_1_iter1 =
-            from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap();
-        model3x3_1_iter1.age = 1;
-        iterate(&mut model3x3_1_iter0);
-        assert_eq!(model3x3_1_iter0, model3x3_1_iter1);
+    #[test]
+    fn universe_iterate_blinker() {
+        let mut universe = universe_from_str([
+            "⬛⬜⬛", //
+            "⬛⬜⬛", //
+            "⬛⬜⬛", //
+        ]);
+        let mut state_1 = universe_from_str([
+            "⬛⬛⬛", //
+            "⬜⬜⬜", //
+            "⬛⬛⬛", //
+        ]);
+        state_1.age = 1;
+        let mut state_2 = universe_from_str([
+            "⬛⬜⬛", //
+            "⬛⬜⬛", //
+            "⬛⬜⬛", //
+        ]);
+        state_2.age = 2;
+        universe_iterate(&mut universe);
+        assert_eq!(universe, state_1);
+        universe_iterate(&mut universe);
+        assert_eq!(universe, state_2);
+    }
 
-        let mut model3x3_2_iter0 =
-            from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap();
-        let mut model3x3_2_iter1 =
-            from_string(vec!["⬛⬜⬛".into(), "⬛⬜⬛".into(), "⬛⬜⬛".into()]).unwrap();
-        model3x3_2_iter1.age = 1;
-        iterate(&mut model3x3_2_iter0);
-        assert_eq!(model3x3_2_iter0, model3x3_2_iter1);
+    #[test]
+    fn test_universe_l_shape() {
+        let mut universe = universe_from_str([
+            "⬛⬛⬜", //
+            "⬜⬜⬜", //
+            "⬛⬛⬛", //
+        ]);
+        let mut state_1 = universe_from_str([
+            "⬛⬛⬜", //
+            "⬛⬜⬜", //
+            "⬛⬜⬛", //
+        ]);
+        state_1.age = 1;
+        let mut state_2 = universe_from_str([
+            "⬛⬜⬜", //
+            "⬛⬜⬜", //
+            "⬛⬜⬜", //
+        ]);
+        state_2.age = 2;
+        universe_iterate(&mut universe);
+        assert_eq!(universe, state_1);
+        universe_iterate(&mut universe);
+        assert_eq!(universe, state_2);
+    }
 
-        let mut model3x3_3_iter0 =
-            from_string(vec!["⬛⬛⬜".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap();
-        let mut model3x3_3_iter1 =
-            from_string(vec!["⬛⬛⬜".into(), "⬛⬜⬜".into(), "⬛⬜⬛".into()]).unwrap();
-        model3x3_3_iter1.age = 1;
-        iterate(&mut model3x3_3_iter0);
-        assert_eq!(model3x3_3_iter0, model3x3_3_iter1);
-
-        let mut model3x3_4_iter0 =
-            from_string(vec!["⬛⬛⬜".into(), "⬛⬜⬜".into(), "⬛⬜⬛".into()]).unwrap();
-        let mut model3x3_4_iter1 =
-            from_string(vec!["⬛⬜⬜".into(), "⬛⬜⬜".into(), "⬛⬜⬜".into()]).unwrap();
-        model3x3_4_iter1.age = 1;
-        iterate(&mut model3x3_4_iter0);
-        assert_eq!(model3x3_4_iter0, model3x3_4_iter1);
-
-        let mut model3x3_5_iter0 =
-            from_string(vec!["⬜⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into()]).unwrap();
-        let mut model3x3_5_iter1 =
-            from_string(vec!["⬜⬛⬜".into(), "⬛⬛⬜".into(), "⬜⬜⬜".into()]).unwrap();
+    #[test]
+    fn test_universe_iterate() {
+        let mut model3x3_5_iter0 = universe_from_str([
+            "⬜⬜⬛", //
+            "⬜⬜⬜", //
+            "⬛⬜⬛", //
+        ]);
+        let mut model3x3_5_iter1 = universe_from_str([
+            "⬜⬛⬜", //
+            "⬛⬛⬜", //
+            "⬜⬜⬜", //
+        ]);
         model3x3_5_iter1.age = 1;
-        iterate(&mut model3x3_5_iter0);
+        universe_iterate(&mut model3x3_5_iter0);
         assert_eq!(model3x3_5_iter0, model3x3_5_iter1);
     }
 
     #[test]
-    fn test_get_camera() {
+    fn test_universe_get_camera() {
+        let preset_block = universe_from_str([
+            "⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬜⬛⬛",
+            "⬛⬛⬜⬜⬛⬛",
+            "⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛",
+        ]);
+        let preset_blinker_1 = universe_from_str([
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬛⬛⬛⬛",
+        ]);
+        let preset_blinker_2 = universe_from_str([
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛",
+            "⬛⬜⬜⬜⬛",
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛",
+        ]);
+        let preset_cross = universe_from_str([
+            "⬛⬛⬛⬛⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬜⬜⬜⬛",
+            "⬛⬛⬜⬛⬛",
+            "⬛⬛⬛⬛⬛",
+        ]);
+        let preset_cell = universe_from_str(["⬜"]);
+        assert_eq!(universe_get_camera(&preset_block), RectI64::of(-5, -5, 4, 4));
+        assert_eq!(universe_get_camera(&preset_blinker_1), RectI64::of(-5, -5, 5, 5));
+        assert_eq!(universe_get_camera(&preset_blinker_2), RectI64::of(-5, -5, 5, 5));
+        assert_eq!(universe_get_camera(&preset_cross), RectI64::of(-5, -5, 5, 5));
+        assert_eq!(universe_get_camera(&preset_cell), RectI64::of(-4, -4, 4, 4));
         assert_eq!(
-            get_camera(
-                &from_string(vec![
-                    "⬛⬛⬛⬛⬛⬛".into(),
-                    "⬛⬛⬛⬛⬛⬛".into(),
-                    "⬛⬛⬜⬜⬛⬛".into(),
-                    "⬛⬛⬜⬜⬛⬛".into(),
-                    "⬛⬛⬛⬛⬛⬛".into(),
-                    "⬛⬛⬛⬛⬛⬛".into(),
-                ])
-                .unwrap()
-            ),
-            RectI64::of(-5, -5, 4, 4)
-        );
-        assert_eq!(
-            get_camera(
-                &from_string(vec![
-                    "⬛⬛⬛⬛⬛⬛⬛".into(),
-                    "⬛⬛⬛⬛⬛⬛⬛".into(),
-                    "⬛⬛⬛⬜⬛⬛⬛".into(),
-                    "⬛⬛⬛⬜⬛⬛⬛".into(),
-                    "⬛⬛⬛⬜⬛⬛⬛".into(),
-                    "⬛⬛⬛⬛⬛⬛⬛".into(),
-                    "⬛⬛⬛⬛⬛⬛⬛".into(),
-                ])
-                .unwrap()
-            ),
-            RectI64::of(-5, -5, 5, 5)
-        );
-        assert_eq!(
-            get_camera(
-                &from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap()
-            ),
-            RectI64::of(-5, -5, 5, 5)
-        );
-        assert_eq!(
-            get_camera(
-                &from_string(vec!["⬛⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into()]).unwrap()
-            ),
-            RectI64::of(-5, -5, 5, 5)
-        );
-        assert_eq!(get_camera(&from_string(vec!["⬜".into()]).unwrap()), RectI64::of(-4, -4, 4, 4));
-        assert_eq!(
-            get_camera(&Universe::from(HashMap::from([
-                (CartesianPoint::of(2, 2), State::Alive),
-                (CartesianPoint::of(3, 5), State::Alive),
-                (CartesianPoint::of(5, 3), State::Alive),
-            ]))),
+            universe_get_camera(&Universe::from([
+                CartesianPoint::of(2, 2),
+                CartesianPoint::of(3, 5),
+                CartesianPoint::of(5, 3),
+            ])),
             RectI64::of(-2, -2, 9, 9)
         );
         assert_eq!(
-            get_camera(&Universe::from(HashMap::from([
-                (CartesianPoint::of(2, 2), State::Alive),
-                (CartesianPoint::of(3, 4), State::Alive),
-                (CartesianPoint::of(5, 3), State::Alive),
-            ]))),
+            universe_get_camera(&Universe::from([
+                CartesianPoint::of(2, 2),
+                CartesianPoint::of(3, 4),
+                CartesianPoint::of(5, 3),
+            ])),
             RectI64::of(-2, -2, 9, 9)
         );
         assert_eq!(
-            get_camera(&Universe::from(HashMap::from([
-                (CartesianPoint::of(2, 2), State::Alive),
-                (CartesianPoint::of(3, 4), State::Alive),
-                (CartesianPoint::of(4, 3), State::Alive),
-            ]))),
+            universe_get_camera(&Universe::from([
+                CartesianPoint::of(2, 2),
+                CartesianPoint::of(3, 4),
+                CartesianPoint::of(4, 3),
+            ])),
             RectI64::of(-2, -2, 8, 8)
         );
     }
