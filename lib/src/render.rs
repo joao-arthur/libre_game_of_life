@@ -14,23 +14,23 @@ pub struct RenderSettings {
     pub gap: u8,
 }
 
-pub fn get_values_to_render(u: &Universe, s: &RenderSettings) -> Vec<RectF64> {
-    let dim = f64::from(s.dim);
-    let len = get_length(&s.cam) as f64;
+pub fn get_values_to_render(universe: &Universe, settings: &RenderSettings) -> Vec<RectF64> {
+    let dim = f64::from(settings.dim);
+    let len = get_length(&settings.cam) as f64;
     let cell_size = dim / len;
-    let mut values_to_render: Vec<RectF64> = u
+    let mut values_to_render: Vec<RectF64> = universe
         .value
         .iter()
         .filter(|value| {
-            value.0.x >= s.cam.x1
-                && value.0.x <= s.cam.x2
-                && value.0.y >= s.cam.y1
-                && value.0.y <= s.cam.y2
+            value.0.x >= settings.cam.x1
+                && value.0.x <= settings.cam.x2
+                && value.0.y >= settings.cam.y1
+                && value.0.y <= settings.cam.y2
         })
         .filter(|value| value.1 == &State::Alive)
         .map(|value| {
-            let arr_index = cartesian_to_matrix(value.0, &s.cam);
-            let gap = f64::from(s.gap);
+            let arr_index = cartesian_to_matrix(value.0, &settings.cam);
+            let gap = f64::from(settings.gap);
             let col = arr_index.col as f64;
             let row = arr_index.row as f64;
             RectF64 {

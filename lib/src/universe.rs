@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    cell::{self, State, toggle},
+    cell::{State, cell_iterate, cell_toggle, cell_try_of},
     geometry::{
         coordinate::{CartesianPoint, MatrixPoint, matrix_to_cartesian},
         poligon::rect::{RectI64, get_length},
@@ -31,7 +31,7 @@ pub struct InvalidCharacterErr;
 
 impl fmt::Display for InvalidCharacterErr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Only \"⬜\" and \"⬛\" characters are allowed!")
+        write!(f, "Must match the pattern [⬜⬛]")
     }
 }
 
@@ -40,7 +40,7 @@ pub struct InvalidLengthErr;
 
 impl fmt::Display for InvalidLengthErr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "The length of every line and the number of lines must be equal!")
+        write!(f, "The length of every line and the number of lines must be equal")
     }
 }
 
@@ -51,7 +51,7 @@ pub enum FromStringErr {
 }
 
 pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
-    if !as_str.join("").replace("⬜", "").replace("⬛", "").is_empty() {
+    if as_str.join("").find(|c| c != ' ' && cell_try_of(c).is_none()).is_some() {
         return Err(FromStringErr::InvalidCharacter(InvalidCharacterErr));
     }
     let len = as_str.len();
@@ -82,12 +82,12 @@ pub fn from_string(as_str: Vec<String>) -> Result<Universe, FromStringErr> {
     Ok(Universe::from(value))
 }
 
-pub fn get_value(u: &Universe, p: &CartesianPoint) -> State {
-    if u.value.get(p).unwrap_or(&State::Dead) == &State::Alive { State::Alive } else { State::Dead }
+pub fn get_value(universe: &Universe, point: &CartesianPoint) -> State {
+    if universe.value.get(point).unwrap_or(&State::Dead) == &State::Alive { State::Alive } else { State::Dead }
 }
 
-pub fn iterate(u: &mut Universe) {
-    let points: HashSet<CartesianPoint> = u
+pub fn iterate(universe: &mut Universe) {
+    let points: HashSet<CartesianPoint> = universe
         .value
         .keys()
         .flat_map(|point| {
@@ -107,49 +107,49 @@ pub fn iterate(u: &mut Universe) {
     let entries: HashMap<CartesianPoint, State> = points
         .iter()
         .filter_map(|point| {
-            let s = get_value(u, point);
-            let number_of_alive_neighbors = number_of_alive_from_model(u, point);
-            let new_cell = cell::iterate(s, number_of_alive_neighbors);
+            let s = get_value(universe, point);
+            let number_of_alive_neighbors = number_of_alive_from_model(universe, point);
+            let new_cell = cell_iterate(s, number_of_alive_neighbors);
             match new_cell {
                 State::Dead => None,
                 State::Alive => Some((*point, State::Alive)),
             }
         })
         .collect();
-    u.age += 1;
-    u.value = entries;
+    universe.age += 1;
+    universe.value = entries;
 }
 
-pub fn toggle_cell(u: &mut Universe, p: CartesianPoint) {
-    let new_cell = toggle(&get_value(u, &p));
+pub fn toggle_cell(universe: &mut Universe, point: CartesianPoint) {
+    let new_cell = cell_toggle(&get_value(universe, &point));
     match new_cell {
         State::Dead => {
-            u.value.remove(&p);
+            universe.value.remove(&point);
         }
         State::Alive => {
-            u.value.insert(p, new_cell);
+            universe.value.insert(point, new_cell);
         }
     }
 }
 
-pub fn toggle_cell_by_absolute_point(u: &mut Universe, s: &RenderSettings, p: MatrixPoint) {
-    let dim = f64::from(s.dim);
-    let len = get_length(&s.cam) as f64;
+pub fn toggle_cell_by_absolute_point(universe: &mut Universe, settings: &RenderSettings, point: MatrixPoint) {
+    let dim = f64::from(settings.dim);
+    let len = get_length(&settings.cam) as f64;
     let cell_size = dim / len;
-    let row = p.row as f64 / cell_size;
-    let col = p.col as f64 / cell_size;
+    let row = point.row as f64 / cell_size;
+    let col = point.col as f64 / cell_size;
     let matrix_point = MatrixPoint { row: row as u64, col: col as u64 };
-    let cartesian_point = matrix_to_cartesian(&matrix_point, &s.cam);
-    toggle_cell(u, cartesian_point);
+    let cartesian_point = matrix_to_cartesian(&matrix_point, &settings.cam);
+    toggle_cell(universe, cartesian_point);
 }
 
-pub fn get_camera(u: &Universe) -> RectI64 {
-    let xx: Vec<i64> = u.value.iter().map(|v| v.0.x).collect();
-    let yy: Vec<i64> = u.value.iter().map(|v| v.0.y).collect();
-    let mut min_x = xx.iter().min().unwrap().to_owned();
-    let mut min_y = yy.iter().min().unwrap().to_owned();
-    let mut max_x = xx.iter().max().unwrap().to_owned();
-    let mut max_y = yy.iter().max().unwrap().to_owned();
+pub fn get_camera(universe: &Universe) -> RectI64 {
+    let all_x: Vec<i64> = universe.value.iter().map(|v| v.0.x).collect();
+    let all_y: Vec<i64> = universe.value.iter().map(|v| v.0.y).collect();
+    let mut min_x = all_x.iter().min().unwrap().to_owned();
+    let mut min_y = all_y.iter().min().unwrap().to_owned();
+    let mut max_x = all_x.iter().max().unwrap().to_owned();
+    let mut max_y = all_y.iter().max().unwrap().to_owned();
     let len_x = max_x - min_x + 1;
     let len_y = max_y - min_y + 1;
     if len_x > len_y {
@@ -188,6 +188,19 @@ mod tests {
     };
 
     #[test]
+    fn invalid_character_err() {
+        assert_eq!(InvalidCharacterErr.to_string(), "Must match the pattern [⬜⬛]");
+    }
+
+    #[test]
+    fn invalid_length_err() {
+        assert_eq!(
+            InvalidLengthErr.to_string(),
+            "The length of every line and the number of lines must be equal"
+        );
+    }
+
+    #[test]
     fn test_model() {
         assert_eq!(Universe::default(), Universe { value: HashMap::new(), age: 0 });
         assert_eq!(
@@ -212,14 +225,6 @@ mod tests {
     #[test]
     fn test_from_string_err() {
         assert_eq!(
-            InvalidCharacterErr.to_string(),
-            "Only \"⬜\" and \"⬛\" characters are allowed!"
-        );
-        assert_eq!(
-            InvalidLengthErr.to_string(),
-            "The length of every line and the number of lines must be equal!"
-        );
-        assert_eq!(
             from_string(vec!["".into()]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
@@ -228,7 +233,7 @@ mod tests {
             Err(FromStringErr::InvalidCharacter(InvalidCharacterErr)),
         );
         assert_eq!(
-            from_string(vec!["⬛⬛⬛⬛".into(), "⬛⬛⬛⬛⬛".into(), "⬛⬛⬛".into(),]),
+            from_string(vec!["⬛⬛⬛⬛".into(), "⬛⬛⬛⬛⬛".into(), "⬛⬛⬛".into()]),
             Err(FromStringErr::InvalidLength(InvalidLengthErr)),
         );
         assert_eq!(
@@ -278,7 +283,7 @@ mod tests {
                 (CartesianPoint::of(-1, 0), State::Alive),
                 (CartesianPoint::of(0, -1), State::Alive),
                 (CartesianPoint::of(0, 0), State::Alive),
-            ]),)
+            ]))
         );
         assert_eq!(
             from_string(vec![
@@ -295,7 +300,7 @@ mod tests {
                 (CartesianPoint::of(0, -1), State::Alive),
                 (CartesianPoint::of(0, 0), State::Alive),
                 (CartesianPoint::of(0, 1), State::Alive),
-            ]),)
+            ]))
         );
     }
 
@@ -683,20 +688,17 @@ mod tests {
         );
         assert_eq!(
             get_camera(
-                &from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into(),]).unwrap()
+                &from_string(vec!["⬛⬛⬛".into(), "⬜⬜⬜".into(), "⬛⬛⬛".into()]).unwrap()
             ),
             RectI64::of(-5, -5, 5, 5)
         );
         assert_eq!(
             get_camera(
-                &from_string(vec!["⬛⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into(),]).unwrap()
+                &from_string(vec!["⬛⬜⬛".into(), "⬜⬜⬜".into(), "⬛⬜⬛".into()]).unwrap()
             ),
             RectI64::of(-5, -5, 5, 5)
         );
-        assert_eq!(
-            get_camera(&from_string(vec!["⬜".into(),]).unwrap()),
-            RectI64::of(-4, -4, 4, 4)
-        );
+        assert_eq!(get_camera(&from_string(vec!["⬜".into()]).unwrap()), RectI64::of(-4, -4, 4, 4));
         assert_eq!(
             get_camera(&Universe::from(HashMap::from([
                 (CartesianPoint::of(2, 2), State::Alive),

@@ -6,21 +6,21 @@ fn number_of_alive(neighbors: [State; 8]) -> u8 {
     neighbors.iter().filter(|neighbor| neighbor == &&State::Alive).count() as u8
 }
 
-fn neighbors_in_rectangular_grid(u: &Universe, p: &CartesianPoint) -> [State; 8] {
+fn neighbors_in_rectangular_grid(universe: &Universe, point: &CartesianPoint) -> [State; 8] {
     [
-        get_value(u, &CartesianPoint::of(p.x - 1, p.y + 1)),
-        get_value(u, &CartesianPoint::of(p.x, p.y + 1)),
-        get_value(u, &CartesianPoint::of(p.x + 1, p.y + 1)),
-        get_value(u, &CartesianPoint::of(p.x - 1, p.y)),
-        get_value(u, &CartesianPoint::of(p.x + 1, p.y)),
-        get_value(u, &CartesianPoint::of(p.x - 1, p.y - 1)),
-        get_value(u, &CartesianPoint::of(p.x, p.y - 1)),
-        get_value(u, &CartesianPoint::of(p.x + 1, p.y - 1)),
+        get_value(universe, &CartesianPoint::of(point.x - 1, point.y + 1)),
+        get_value(universe, &CartesianPoint::of(point.x, point.y + 1)),
+        get_value(universe, &CartesianPoint::of(point.x + 1, point.y + 1)),
+        get_value(universe, &CartesianPoint::of(point.x - 1, point.y)),
+        get_value(universe, &CartesianPoint::of(point.x + 1, point.y)),
+        get_value(universe, &CartesianPoint::of(point.x - 1, point.y - 1)),
+        get_value(universe, &CartesianPoint::of(point.x, point.y - 1)),
+        get_value(universe, &CartesianPoint::of(point.x + 1, point.y - 1)),
     ]
 }
 
-pub fn number_of_alive_from_model(u: &Universe, p: &CartesianPoint) -> u8 {
-    number_of_alive(neighbors_in_rectangular_grid(u, p))
+pub fn number_of_alive_from_model(universe: &Universe, point: &CartesianPoint) -> u8 {
+    number_of_alive(neighbors_in_rectangular_grid(universe, point))
 }
 
 #[cfg(test)]

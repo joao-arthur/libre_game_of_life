@@ -43,17 +43,17 @@ pub fn get_length(r: &RectI64) -> u64 {
     if d_x > d_y { d_x + 1 } else { d_y + 1 }
 }
 
-pub fn center(r: &mut RectI64, p: CartesianPoint) {
+pub fn center(r: &mut RectI64, point: CartesianPoint) {
     let len_x = r.x2 - r.x1;
     let len_y = r.y2 - r.y1;
     let end_x = len_x / 2;
     let end_y = len_y / 2;
-    let start_x = p.x - end_x;
-    let start_y = p.y - end_y;
+    let start_x = point.x - end_x;
+    let start_y = point.y - end_y;
     r.x1 = start_x;
     r.y1 = start_y;
-    r.x2 = p.x + end_x;
-    r.y2 = p.y + end_y;
+    r.x2 = point.x + end_x;
+    r.y2 = point.y + end_y;
 }
 
 pub fn zoom_in(r: &mut RectI64) {

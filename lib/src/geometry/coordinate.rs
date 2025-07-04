@@ -38,12 +38,12 @@ impl fmt::Display for CartesianPoint {
     }
 }
 
-pub fn matrix_to_cartesian(p: &MatrixPoint, cam: &RectI64) -> CartesianPoint {
-    CartesianPoint { x: cam.x1 + p.col as i64, y: cam.y2 - p.row as i64 }
+pub fn matrix_to_cartesian(point: &MatrixPoint, cam: &RectI64) -> CartesianPoint {
+    CartesianPoint { x: cam.x1 + point.col as i64, y: cam.y2 - point.row as i64 }
 }
 
-pub fn cartesian_to_matrix(&p: &CartesianPoint, cam: &RectI64) -> MatrixPoint {
-    MatrixPoint { row: (-p.y + cam.y2) as u64, col: (p.x - cam.x1) as u64 }
+pub fn cartesian_to_matrix(&point: &CartesianPoint, cam: &RectI64) -> MatrixPoint {
+    MatrixPoint { row: (-point.y + cam.y2) as u64, col: (point.x - cam.x1) as u64 }
 }
 
 #[cfg(test)]
