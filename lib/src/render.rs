@@ -51,25 +51,24 @@ mod tests {
     use crate::{
         geometry::poligon::rect::{RectF64, RectI64},
         render::RenderSettings,
-        universe::{Universe, universe_try_from_string},
+        universe::{Universe, universe_from_str},
     };
 
     use super::get_values_to_render;
 
     fn get_universe() -> Universe {
-        universe_try_from_string(vec![
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛".into(),
-            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛".into(),
-            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜".into(),
+        universe_from_str([
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
+            "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
+            "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
         ])
-        .unwrap()
     }
 
     #[test]
