@@ -21,15 +21,15 @@ pub fn get_values_to_render(universe: &Universe, settings: &RenderSettings) -> V
     let mut values_to_render: Vec<RectF64> = universe
         .value
         .iter()
-        .filter(|value| {
-            value.0.x >= settings.cam.x1
-                && value.0.x <= settings.cam.x2
-                && value.0.y >= settings.cam.y1
-                && value.0.y <= settings.cam.y2
+        .filter(|(point, _)| {
+            point.x >= settings.cam.x1
+                && point.x <= settings.cam.x2
+                && point.y >= settings.cam.y1
+                && point.y <= settings.cam.y2
         })
-        .filter(|value| value.1 == &State::Alive)
-        .map(|value| {
-            let arr_index = cartesian_to_matrix(value.0, &settings.cam);
+        .filter(|(_, state)| state == &&State::Alive)
+        .map(|(point, _)| {
+            let arr_index = cartesian_to_matrix(point, &settings.cam);
             let gap = f64::from(settings.gap);
             let col = arr_index.col as f64;
             let row = arr_index.row as f64;

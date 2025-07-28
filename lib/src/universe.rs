@@ -182,8 +182,8 @@ pub fn universe_toggle_by_matrix_point(
 }
 
 pub fn universe_get_camera(universe: &Universe) -> RectI64 {
-    let all_x: Vec<i64> = universe.value.iter().map(|v| v.0.x).collect();
-    let all_y: Vec<i64> = universe.value.iter().map(|v| v.0.y).collect();
+    let all_x: Vec<i64> = universe.value.iter().map(|(point, _)| point.x).collect();
+    let all_y: Vec<i64> = universe.value.iter().map(|(point, _)| point.y).collect();
     let mut min_x = all_x.iter().min().unwrap().to_owned();
     let mut min_y = all_y.iter().min().unwrap().to_owned();
     let mut max_x = all_x.iter().max().unwrap().to_owned();
