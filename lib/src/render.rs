@@ -1,11 +1,12 @@
-use super::{
-    cell::State,
-    geometry::{
-        coordinate::cartesian_to_matrix,
-        poligon::rect::{RectF64, RectI64, get_length},
+use manfredo::{
+    cartesian::rect::{
+        rect_f64::RectF64,
+        rect_i64::{RectI64, max_len},
     },
-    universe::Universe,
+    transform::cartesian_in_cam_to_matrix::point_i64::cartesian_in_cam_to_matrix,
 };
+
+use super::{cell::State, universe::Universe};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RenderSettings {
@@ -16,40 +17,43 @@ pub struct RenderSettings {
 
 pub fn get_values_to_render(universe: &Universe, settings: &RenderSettings) -> Vec<RectF64> {
     let dim = f64::from(settings.dim);
-    let len = get_length(&settings.cam) as f64;
+    let len = max_len(&settings.cam) as f64;
     let cell_size = dim / len;
     let mut values_to_render: Vec<RectF64> = universe
         .value
         .iter()
         .filter(|(point, _)| {
-            point.x >= settings.cam.x1
-                && point.x <= settings.cam.x2
-                && point.y >= settings.cam.y1
-                && point.y <= settings.cam.y2
+            point.x >= settings.cam.min.x
+                && point.x <= settings.cam.max.x
+                && point.y >= settings.cam.min.y
+                && point.y <= settings.cam.max.y
         })
         .filter(|(_, state)| state == &&State::Alive)
         .map(|(point, _)| {
-            let arr_index = cartesian_to_matrix(point, &settings.cam);
+            let arr_index = cartesian_in_cam_to_matrix(point, &settings.cam);
             let gap = f64::from(settings.gap);
             let col = arr_index.col as f64;
             let row = arr_index.row as f64;
-            RectF64 {
-                x1: col * cell_size + gap,
-                y1: row * cell_size + gap,
-                x2: col * cell_size + cell_size - gap,
-                y2: row * cell_size + cell_size - gap,
-            }
+            RectF64::of(
+                col * cell_size + gap,
+                row * cell_size + gap,
+                col * cell_size + cell_size - gap,
+                row * cell_size + cell_size - gap,
+            )
         })
         .collect();
-    values_to_render.sort_by(|a, b| a.y1.partial_cmp(&b.y1).unwrap_or(std::cmp::Ordering::Greater));
-    values_to_render.sort_by(|a, b| a.x1.partial_cmp(&b.x1).unwrap_or(std::cmp::Ordering::Greater));
+    values_to_render
+        .sort_by(|a, b| a.min.y.partial_cmp(&b.min.y).unwrap_or(std::cmp::Ordering::Greater));
+    values_to_render
+        .sort_by(|a, b| a.min.x.partial_cmp(&b.min.x).unwrap_or(std::cmp::Ordering::Greater));
     values_to_render
 }
 
 #[cfg(test)]
 mod tests {
+    use manfredo::cartesian::rect::{rect_f64::RectF64, rect_i64::RectI64};
+
     use crate::{
-        geometry::poligon::rect::{RectF64, RectI64},
         render::RenderSettings,
         universe::{Universe, universe_from_str},
     };
@@ -78,14 +82,14 @@ mod tests {
         assert_eq!(
             get_values_to_render(&universe, &s),
             [
-                RectF64 { x1: 0.0, y1: 0.0, x2: 100.0, y2: 100.0 },
-                RectF64 { x1: 0.0, y1: 900.0, x2: 100.0, y2: 1000.0 },
-                RectF64 { x1: 100.0, y1: 100.0, x2: 200.0, y2: 200.0 },
-                RectF64 { x1: 100.0, y1: 800.0, x2: 200.0, y2: 900.0 },
-                RectF64 { x1: 800.0, y1: 100.0, x2: 900.0, y2: 200.0 },
-                RectF64 { x1: 800.0, y1: 800.0, x2: 900.0, y2: 900.0 },
-                RectF64 { x1: 900.0, y1: 0.0, x2: 1000.0, y2: 100.0 },
-                RectF64 { x1: 900.0, y1: 900.0, x2: 1000.0, y2: 1000.0 },
+                RectF64::of(0.0, 0.0, 100.0, 100.0),
+                RectF64::of(0.0, 900.0, 100.0, 1000.0),
+                RectF64::of(100.0, 100.0, 200.0, 200.0),
+                RectF64::of(100.0, 800.0, 200.0, 900.0),
+                RectF64::of(800.0, 100.0, 900.0, 200.0),
+                RectF64::of(800.0, 800.0, 900.0, 900.0),
+                RectF64::of(900.0, 0.0, 1000.0, 100.0),
+                RectF64::of(900.0, 900.0, 1000.0, 1000.0),
             ]
         );
     }
@@ -93,33 +97,32 @@ mod tests {
     #[test]
     fn render_gap() {
         let universe = get_universe();
-        let cam = RectI64::of(-5, -5, 4, 4);
-        let s_gap1 = RenderSettings { cam, dim: 1000, gap: 1 };
-        let s_gap2 = RenderSettings { cam, dim: 1000, gap: 2 };
+        let s_gap1 = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 1 };
+        let s_gap2 = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 2 };
         assert_eq!(
             get_values_to_render(&universe, &s_gap1),
             [
-                RectF64 { x1: 1.0, y1: 1.0, x2: 99.0, y2: 99.0 },
-                RectF64 { x1: 1.0, y1: 901.0, x2: 99.0, y2: 999.0 },
-                RectF64 { x1: 101.0, y1: 101.0, x2: 199.0, y2: 199.0 },
-                RectF64 { x1: 101.0, y1: 801.0, x2: 199.0, y2: 899.0 },
-                RectF64 { x1: 801.0, y1: 101.0, x2: 899.0, y2: 199.0 },
-                RectF64 { x1: 801.0, y1: 801.0, x2: 899.0, y2: 899.0 },
-                RectF64 { x1: 901.0, y1: 1.0, x2: 999.0, y2: 99.0 },
-                RectF64 { x1: 901.0, y1: 901.0, x2: 999.0, y2: 999.0 },
+                RectF64::of(1.0, 1.0, 99.0, 99.0),
+                RectF64::of(1.0, 901.0, 99.0, 999.0),
+                RectF64::of(101.0, 101.0, 199.0, 199.0),
+                RectF64::of(101.0, 801.0, 199.0, 899.0),
+                RectF64::of(801.0, 101.0, 899.0, 199.0),
+                RectF64::of(801.0, 801.0, 899.0, 899.0),
+                RectF64::of(901.0, 1.0, 999.0, 99.0),
+                RectF64::of(901.0, 901.0, 999.0, 999.0),
             ]
         );
         assert_eq!(
             get_values_to_render(&universe, &s_gap2),
             [
-                RectF64 { x1: 2.0, y1: 2.0, x2: 98.0, y2: 98.0 },
-                RectF64 { x1: 2.0, y1: 902.0, x2: 98.0, y2: 998.0 },
-                RectF64 { x1: 102.0, y1: 102.0, x2: 198.0, y2: 198.0 },
-                RectF64 { x1: 102.0, y1: 802.0, x2: 198.0, y2: 898.0 },
-                RectF64 { x1: 802.0, y1: 102.0, x2: 898.0, y2: 198.0 },
-                RectF64 { x1: 802.0, y1: 802.0, x2: 898.0, y2: 898.0 },
-                RectF64 { x1: 902.0, y1: 2.0, x2: 998.0, y2: 98.0 },
-                RectF64 { x1: 902.0, y1: 902.0, x2: 998.0, y2: 998.0 },
+                RectF64::of(2.0, 2.0, 98.0, 98.0),
+                RectF64::of(2.0, 902.0, 98.0, 998.0),
+                RectF64::of(102.0, 102.0, 198.0, 198.0),
+                RectF64::of(102.0, 802.0, 198.0, 898.0),
+                RectF64::of(802.0, 102.0, 898.0, 198.0),
+                RectF64::of(802.0, 802.0, 898.0, 898.0),
+                RectF64::of(902.0, 2.0, 998.0, 98.0),
+                RectF64::of(902.0, 902.0, 998.0, 998.0),
             ]
         );
     }
@@ -132,23 +135,23 @@ mod tests {
         assert_eq!(
             get_values_to_render(&universe, &s_cam_minus1),
             [
-                RectF64 { x1: 100.0, y1: 0.0, x2: 200.0, y2: 100.0 },
-                RectF64 { x1: 100.0, y1: 900.0, x2: 200.0, y2: 1000.0 },
-                RectF64 { x1: 200.0, y1: 100.0, x2: 300.0, y2: 200.0 },
-                RectF64 { x1: 200.0, y1: 800.0, x2: 300.0, y2: 900.0 },
-                RectF64 { x1: 900.0, y1: 100.0, x2: 1000.0, y2: 200.0 },
-                RectF64 { x1: 900.0, y1: 800.0, x2: 1000.0, y2: 900.0 },
+                RectF64::of(100.0, 0.0, 200.0, 100.0),
+                RectF64::of(100.0, 900.0, 200.0, 1000.0),
+                RectF64::of(200.0, 100.0, 300.0, 200.0),
+                RectF64::of(200.0, 800.0, 300.0, 900.0),
+                RectF64::of(900.0, 100.0, 1000.0, 200.0),
+                RectF64::of(900.0, 800.0, 1000.0, 900.0),
             ]
         );
         assert_eq!(
             get_values_to_render(&universe, &s_cam_plus1),
             [
-                RectF64 { x1: 0.0, y1: 100.0, x2: 100.0, y2: 200.0 },
-                RectF64 { x1: 0.0, y1: 800.0, x2: 100.0, y2: 900.0 },
-                RectF64 { x1: 700.0, y1: 100.0, x2: 800.0, y2: 200.0 },
-                RectF64 { x1: 700.0, y1: 800.0, x2: 800.0, y2: 900.0 },
-                RectF64 { x1: 800.0, y1: 0.0, x2: 900.0, y2: 100.0 },
-                RectF64 { x1: 800.0, y1: 900.0, x2: 900.0, y2: 1000.0 },
+                RectF64::of(0.0, 100.0, 100.0, 200.0),
+                RectF64::of(0.0, 800.0, 100.0, 900.0),
+                RectF64::of(700.0, 100.0, 800.0, 200.0),
+                RectF64::of(700.0, 800.0, 800.0, 900.0),
+                RectF64::of(800.0, 0.0, 900.0, 100.0),
+                RectF64::of(800.0, 900.0, 900.0, 1000.0),
             ]
         );
     }
@@ -160,14 +163,14 @@ mod tests {
         assert_eq!(
             get_values_to_render(&universe, &s),
             [
-                RectF64 { x1: 0.0, y1: 0.0, x2: 99.6, y2: 99.6 },
-                RectF64 { x1: 0.0, y1: 896.4, x2: 99.6, y2: 996.0 },
-                RectF64 { x1: 99.6, y1: 99.6, x2: 199.2, y2: 199.2 },
-                RectF64 { x1: 99.6, y1: 796.8, x2: 199.2, y2: 896.4 },
-                RectF64 { x1: 796.8, y1: 99.6, x2: 896.4, y2: 199.2 },
-                RectF64 { x1: 796.8, y1: 796.8, x2: 896.4, y2: 896.4 },
-                RectF64 { x1: 896.4, y1: 0.0, x2: 996.0, y2: 99.6 },
-                RectF64 { x1: 896.4, y1: 896.4, x2: 996.0, y2: 996.0 }
+                RectF64::of(0.0, 0.0, 99.6, 99.6),
+                RectF64::of(0.0, 896.4, 99.6, 996.0),
+                RectF64::of(99.6, 99.6, 199.2, 199.2),
+                RectF64::of(99.6, 796.8, 199.2, 896.4),
+                RectF64::of(796.8, 99.6, 896.4, 199.2),
+                RectF64::of(796.8, 796.8, 896.4, 896.4),
+                RectF64::of(896.4, 0.0, 996.0, 99.6),
+                RectF64::of(896.4, 896.4, 996.0, 996.0)
             ]
         );
     }

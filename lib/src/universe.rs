@@ -3,16 +3,21 @@ use std::{
     fmt,
 };
 
+use manfredo::{
+    cartesian::rect::rect_i64::max_len,
+    transform::matrix_to_cartesian_in_cam::point_i64::matrix_to_cartesian_in_cam,
+};
+
 use crate::{
     cell::{State, cell_iterate, cell_toggle, cell_try_of},
-    geometry::{
-        coordinate::{CartesianPoint, MatrixPoint, matrix_to_cartesian},
-        poligon::rect::{RectI64, get_length},
-    },
     neighbor::number_of_alive_from_model,
 };
 
 use super::render::RenderSettings;
+
+pub type CartesianPoint = manfredo::cartesian::point::point_i64::PointI64;
+pub type MatrixPoint = manfredo::matrix::point::point_u64::PointU64;
+pub type Cam = manfredo::cartesian::rect::rect_i64::RectI64;
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Universe {
@@ -83,7 +88,7 @@ pub fn universe_try_from_string(as_str: Vec<String>) -> Result<Universe, FromStr
     }
     let rect_len = len as i64;
     let half = rect_len / 2;
-    let cam = RectI64 { x1: -half, y1: -half, x2: -half + rect_len - 1, y2: -half + rect_len - 1 };
+    let cam = Cam::of(-half, -half, -half + rect_len - 1, -half + rect_len - 1);
     let row_iter = as_str.iter().enumerate();
     let mut value = HashMap::<CartesianPoint, State>::new();
     for (row, row_str) in row_iter {
@@ -91,7 +96,10 @@ pub fn universe_try_from_string(as_str: Vec<String>) -> Result<Universe, FromStr
         for (col, col_str) in col_iter {
             if col_str == '⬜' {
                 value.insert(
-                    matrix_to_cartesian(&MatrixPoint { row: row as u64, col: col as u64 }, &cam),
+                    matrix_to_cartesian_in_cam(
+                        &MatrixPoint { row: row as u64, col: col as u64 },
+                        &cam,
+                    ),
                     State::Alive,
                 );
             }
@@ -130,7 +138,7 @@ pub fn universe_iterate(universe: &mut Universe) {
                 CartesianPoint::of(point.x, point.y + 1),
                 CartesianPoint::of(point.x + 1, point.y + 1),
                 CartesianPoint::of(point.x - 1, point.y),
-                *point,
+                point.clone(),
                 CartesianPoint::of(point.x + 1, point.y),
                 CartesianPoint::of(point.x - 1, point.y - 1),
                 CartesianPoint::of(point.x, point.y - 1),
@@ -146,7 +154,7 @@ pub fn universe_iterate(universe: &mut Universe) {
             let new_cell = cell_iterate(s, number_of_alive_neighbors);
             match new_cell {
                 State::Dead => None,
-                State::Alive => Some((*point, State::Alive)),
+                State::Alive => Some((point.clone(), State::Alive)),
             }
         })
         .collect();
@@ -172,16 +180,16 @@ pub fn universe_toggle_by_matrix_point(
     point: MatrixPoint,
 ) {
     let dim = f64::from(settings.dim);
-    let len = get_length(&settings.cam) as f64;
+    let len = max_len(&settings.cam) as f64;
     let cell_size = dim / len;
     let row = point.row as f64 / cell_size;
     let col = point.col as f64 / cell_size;
     let matrix_point = MatrixPoint { row: row as u64, col: col as u64 };
-    let cartesian_point = matrix_to_cartesian(&matrix_point, &settings.cam);
+    let cartesian_point = matrix_to_cartesian_in_cam(&matrix_point, &settings.cam);
     universe_toggle(universe, cartesian_point);
 }
 
-pub fn universe_get_camera(universe: &Universe) -> RectI64 {
+pub fn universe_get_camera(universe: &Universe) -> Cam {
     let all_x: Vec<i64> = universe.value.iter().map(|(point, _)| point.x).collect();
     let all_y: Vec<i64> = universe.value.iter().map(|(point, _)| point.y).collect();
     let mut min_x = all_x.iter().min().unwrap().to_owned();
@@ -204,26 +212,22 @@ pub fn universe_get_camera(universe: &Universe) -> RectI64 {
         min_x -= diff_start;
         max_x += diff_end;
     }
-    RectI64 { x1: min_x - 4, y1: min_y - 4, x2: max_x + 4, y2: max_y + 4 }
+    Cam::of(min_x - 4, min_y - 4, max_x + 4, max_y + 4)
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
-    use crate::{
-        cell::State,
-        geometry::{
-            coordinate::{CartesianPoint, MatrixPoint},
-            poligon::rect::RectI64,
-        },
-        render::RenderSettings,
-    };
+    use manfredo::cartesian::rect::rect_i64::RectI64;
+
+    use crate::{cell::State, render::RenderSettings};
 
     use super::{
-        FromStringErr, InvalidCharacterErr, InvalidLengthErr, Universe, universe_from_str,
-        universe_from_string, universe_get_camera, universe_iterate, universe_toggle,
-        universe_toggle_by_matrix_point, universe_try_from_str, universe_try_from_string,
+        CartesianPoint, FromStringErr, InvalidCharacterErr, InvalidLengthErr, MatrixPoint,
+        Universe, universe_from_str, universe_from_string, universe_get_camera, universe_iterate,
+        universe_toggle, universe_toggle_by_matrix_point, universe_try_from_str,
+        universe_try_from_string,
     };
 
     #[test]
