@@ -63,9 +63,9 @@
     function onClick(
         event: MouseEvent & { currentTarget: EventTarget & HTMLCanvasElement },
     ): void {
-        const row = event.pageX - event.currentTarget.offsetLeft;
-        const col = event.pageY - event.currentTarget.offsetTop;
-        engineToggle(new EngineMatrixPoint(BigInt(Number(col)), BigInt(Number(row))));
+        const col = event.pageX - event.currentTarget.offsetLeft;
+        const row = event.pageY - event.currentTarget.offsetTop;
+        engineToggle(new EngineMatrixPoint(row, col));
     }
 
     function handleZoomTo(size: number) {
@@ -103,16 +103,16 @@
     function onKeyPress(e: KeyboardEvent) {
         switch (e.key) {
             case "w":
-                engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(1)));
+                engineMoveBy(new EngineCartesianPoint(0, 1));
                 break;
             case "a":
-                engineMoveBy(new EngineCartesianPoint(BigInt(-1), BigInt(0)));
+                engineMoveBy(new EngineCartesianPoint(-1, 0));
                 break;
             case "s":
-                engineMoveBy(new EngineCartesianPoint(BigInt(0), BigInt(-1)));
+                engineMoveBy(new EngineCartesianPoint(0, -1));
                 break;
             case "d":
-                engineMoveBy(new EngineCartesianPoint(BigInt(1), BigInt(0)));
+                engineMoveBy(new EngineCartesianPoint(1, 0));
                 break;
             case "+":
                 engineZoomIn();
