@@ -37,3 +37,4 @@ pnpm dev
 - [ ] Mouse drag
 - [ ] More presets
 - [ ] Better UI
+- [ ] Fix render when resize
