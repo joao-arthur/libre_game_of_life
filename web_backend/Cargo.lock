@@ -37,6 +37,9 @@ dependencies = [
 [[package]]
 name = "libre_game_of_life_lib"
 version = "1.0.0"
+dependencies = [
+ "manfredo",
+]
 
 [[package]]
 name = "libre_game_of_life_web_backend"
@@ -45,6 +48,7 @@ dependencies = [
  "gloo-timers",
  "js-sys",
  "libre_game_of_life_lib",
+ "manfredo",
  "serde",
  "serde-wasm-bindgen",
  "wasm-bindgen",
@@ -57,6 +61,11 @@ name = "log"
 version = "0.4.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94"
+
+[[package]]
+name = "manfredo"
+version = "1.0.0"
+source = "git+https://github.com/joao-arthur/manfredo?rev=a1ecdf323348f87ad17ae23a426297e0bbb13a4d#a1ecdf323348f87ad17ae23a426297e0bbb13a4d"
 
 [[package]]
 name = "once_cell"
