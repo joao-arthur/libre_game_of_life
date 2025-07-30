@@ -6,7 +6,7 @@ use crate::app::{
     app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to,
 };
 use libre_game_of_life_lib::{
-    geometry::coordinate::{CartesianPoint, MatrixPoint},
+    universe::{CartesianPoint, MatrixPoint},
     preset::get_preset_groups,
 };
 
@@ -18,14 +18,14 @@ use web_sys::CanvasRenderingContext2d;
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct EngineCartesianPoint {
-    pub x: i64,
-    pub y: i64,
+    pub x: i32,
+    pub y: i32,
 }
 
 #[wasm_bindgen]
 impl EngineCartesianPoint {
     #[wasm_bindgen(constructor)]
-    pub fn new(x: i64, y: i64) -> EngineCartesianPoint {
+    pub fn new(x: i32, y: i32) -> EngineCartesianPoint {
         EngineCartesianPoint { x, y }
     }
 }
@@ -33,14 +33,14 @@ impl EngineCartesianPoint {
 #[wasm_bindgen]
 #[derive(Clone)]
 pub struct EngineMatrixPoint {
-    pub row: u64,
-    pub col: u64,
+    pub row: u32,
+    pub col: u32,
 }
 
 #[wasm_bindgen]
 impl EngineMatrixPoint {
     #[wasm_bindgen(constructor)]
-    pub fn new(row: u64, col: u64) -> EngineMatrixPoint {
+    pub fn new(row: u32, col: u32) -> EngineMatrixPoint {
         EngineMatrixPoint { row, col }
     }
 }
@@ -56,7 +56,7 @@ pub enum EngineStatus {
 pub struct EngineInfo {
     preset: Option<String>,
     pub gap: u8,
-    pub size: u16,
+    pub size: u32,
     pub fps: u16,
     pub status: EngineStatus,
     pub age: u64,
@@ -138,7 +138,7 @@ pub fn main_zoom_out() {
 }
 
 #[wasm_bindgen(js_name = "engineZoomTo")]
-pub fn main_zoom_by(new_size: u16) {
+pub fn main_zoom_by(new_size: u32) {
     app_zoom_to(new_size);
 }
 

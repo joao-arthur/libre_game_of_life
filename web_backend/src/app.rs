@@ -1,16 +1,13 @@
 use gloo_timers::callback::Interval;
+use manfredo::cartesian::rect::rect_f64::RectF64;
 use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
 use libre_game_of_life_lib::{
-    geometry::{
-        coordinate::{CartesianPoint, MatrixPoint},
-        poligon::rect::{RectF64, get_length, move_by, zoom_in, zoom_out, zoom_to},
-    },
     preset::{Preset, get_preset, get_preset_groups, try_get_preset},
     render::{RenderSettings, get_values_to_render},
     universe::{
-        Universe, universe_get_camera, universe_iterate, universe_toggle,
+        Universe, CartesianPoint, MatrixPoint, universe_get_camera, universe_iterate, universe_toggle,
         universe_toggle_by_matrix_point,
     },
 };
@@ -66,7 +63,7 @@ impl Holder {
             return;
         }
         self.context.set_fill_style(&color.into());
-        self.context.fill_rect(r.x1, r.y1, r.x2 - r.x1, r.y2 - r.y1);
+        self.context.fill_rect(r.min.x, r.min.y, manfredo::cartesian::rect::rect_f64::delta_x(&r), manfredo::cartesian::rect::rect_f64::delta_y(&r));
     }
 }
 
@@ -159,12 +156,12 @@ fn render() {
         return;
     }
     if let Some(holder) = holder {
-        let bg = RectF64 {
-            x1: 0.0,
-            y1: 0.0,
-            x2: f64::from(settings.render_settings.dim),
-            y2: f64::from(settings.render_settings.dim),
-        };
+        let bg = RectF64::of(
+            0.0,
+            0.0,
+            f64::from(settings.render_settings.dim),
+            f64::from(settings.render_settings.dim),
+        );
         holder.draw_square(bg, DEAD_COLOR.into());
         let values_to_render = get_values_to_render(&universe, &settings.render_settings);
         for sq in values_to_render {
@@ -311,36 +308,36 @@ pub fn app_toggle_model_cell_by_absolute_point(p: MatrixPoint) {
 }
 
 pub fn app_zoom_in() {
-    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam);
-    if get_length(&cam) <= 2 {
+    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
+    if manfredo::cartesian::rect::rect_i32::max_len(&cam) <= 2 {
         return;
     }
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        zoom_in(&mut model.settings.render_settings.cam);
+        manfredo::cartesian::rect::rect_i32::deflate(&mut model.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
 
 pub fn app_zoom_out() {
-    let cam = MODEL.with(|m| m.borrow().settings.render_settings.cam);
-    if get_length(&cam) >= 200 {
+    let cam = &MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
+    if manfredo::cartesian::rect::rect_i32::max_len(&cam) > 200 {
         return;
     }
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        zoom_out(&mut model.settings.render_settings.cam);
+        manfredo::cartesian::rect::rect_i32::inflate(&mut model.settings.render_settings.cam);
     });
     on_change(Prop::Cam);
 }
 
-pub fn app_zoom_to(new_size: u16) {
+pub fn app_zoom_to(new_size: u32) {
     if new_size < 2 || new_size > 200 {
         return;
     }
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        zoom_to(&mut model.settings.render_settings.cam, new_size);
+        manfredo::cartesian::rect::rect_i32::resize(&mut model.settings.render_settings.cam, new_size.into());
     });
     on_change(Prop::Cam);
 }
@@ -348,7 +345,7 @@ pub fn app_zoom_to(new_size: u16) {
 pub fn app_move_cam(delta: CartesianPoint) {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        move_by(&mut model.settings.render_settings.cam, delta);
+        manfredo::cartesian::rect::rect_i32::translate(&mut model.settings.render_settings.cam, &delta);
     });
     on_change(Prop::Universe);
 }
@@ -357,7 +354,7 @@ pub fn app_move_cam(delta: CartesianPoint) {
 pub struct AppInfo {
     pub preset: Option<String>,
     pub gap: u8,
-    pub size: u16,
+    pub size: u32,
     pub fps: u16,
     pub status: Status,
     pub age: u64,
@@ -371,7 +368,7 @@ pub fn app_get_settings() -> AppInfo {
         AppInfo {
             preset: settings.preset,
             gap: settings.render_settings.gap,
-            size: get_length(&settings.render_settings.cam) as u16,
+            size: manfredo::cartesian::rect::rect_i32::max_len(&settings.render_settings.cam),
             fps: settings.fps,
             status: settings.status,
             age: universe.age,
@@ -385,11 +382,11 @@ mod tests {
 
     use libre_game_of_life_lib::{
         cell::State,
-        geometry::{coordinate::CartesianPoint, poligon::rect::RectI64},
         preset::get_preset,
         render::RenderSettings,
-        universe::Universe,
+        universe::{Universe, CartesianPoint},
     };
+    use manfredo::cartesian::rect::rect_i32::RectI32;
 
     use super::{
         AppInfo, AppSettings, MODEL, Status, app_get_settings, app_iterate, app_move_cam,
@@ -405,7 +402,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
         assert_eq!(MODEL.with(|m| m.borrow().universe.clone()), get_preset("block"));
@@ -429,7 +426,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Paused,
-                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -440,7 +437,7 @@ mod tests {
                 preset: Some("block".into()),
                 fps: 4,
                 status: Status::Resumed,
-                render_settings: RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 0, gap: 0 }
+                render_settings: RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 0, gap: 0 }
             }
         );
 
@@ -452,7 +449,7 @@ mod tests {
                 fps: 4,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 4, 4),
+                    cam: RectI32::of(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 0
                 }
@@ -467,7 +464,7 @@ mod tests {
                 fps: 4,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 4, 4),
+                    cam: RectI32::of(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2
                 }
@@ -482,7 +479,7 @@ mod tests {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 4, 4),
+                    cam: RectI32::of(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2
                 }
@@ -497,7 +494,7 @@ mod tests {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 4, 4),
+                    cam: RectI32::of(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2
                 }
@@ -511,7 +508,7 @@ mod tests {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 5, 5),
+                    cam: RectI32::of(-5, -5, 5, 5),
                     dim: 1080,
                     gap: 2
                 }
@@ -531,7 +528,7 @@ mod tests {
                 fps: 60,
                 status: Status::Resumed,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 4, 4),
+                    cam: RectI32::of(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2
                 }
@@ -550,7 +547,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-5, -5, 4, 4),
+                    cam: RectI32::of(-5, -5, 4, 4),
                     dim: 1080,
                     gap: 2
                 }
@@ -569,7 +566,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-1, -1, 0, 0),
+                    cam: RectI32::of(-1, -1, 0, 0),
                     dim: 1080,
                     gap: 2
                 }
@@ -587,7 +584,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-100, -100, 99, 99),
+                    cam: RectI32::of(-101, -101, 100, 100),
                     dim: 1080,
                     gap: 2,
                 }
@@ -602,7 +599,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-20, -20, 19, 19),
+                    cam: RectI32::of(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }
@@ -616,7 +613,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-19, -19, 18, 18),
+                    cam: RectI32::of(-19, -19, 18, 18),
                     dim: 1080,
                     gap: 2,
                 }
@@ -630,7 +627,7 @@ mod tests {
                 fps: 60,
                 status: Status::Paused,
                 render_settings: RenderSettings {
-                    cam: RectI64::of(-20, -20, 19, 19),
+                    cam: RectI32::of(-20, -20, 19, 19),
                     dim: 1080,
                     gap: 2,
                 }

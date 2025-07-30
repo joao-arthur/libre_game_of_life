@@ -1,16 +1,16 @@
 use manfredo::{
     cartesian::rect::{
         rect_f64::RectF64,
-        rect_i64::{RectI64, max_len},
+        rect_i32::{RectI32, max_len},
     },
-    transform::cartesian_in_cam_to_matrix::point_i64::cartesian_in_cam_to_matrix,
+    transform::cartesian_in_cam_to_matrix::point_i32::cartesian_in_cam_to_matrix,
 };
 
 use super::{cell::State, universe::Universe};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct RenderSettings {
-    pub cam: RectI64,
+    pub cam: RectI32,
     pub dim: u16,
     pub gap: u8,
 }
@@ -51,7 +51,7 @@ pub fn get_values_to_render(universe: &Universe, settings: &RenderSettings) -> V
 
 #[cfg(test)]
 mod tests {
-    use manfredo::cartesian::rect::{rect_f64::RectF64, rect_i64::RectI64};
+    use manfredo::cartesian::rect::{rect_f64::RectF64, rect_i32::RectI32};
 
     use crate::{
         render::RenderSettings,
@@ -78,7 +78,7 @@ mod tests {
     #[test]
     fn render() {
         let universe = get_universe();
-        let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
+        let s = RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
         assert_eq!(
             get_values_to_render(&universe, &s),
             [
@@ -97,8 +97,8 @@ mod tests {
     #[test]
     fn render_gap() {
         let universe = get_universe();
-        let s_gap1 = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 1 };
-        let s_gap2 = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 1000, gap: 2 };
+        let s_gap1 = RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 1000, gap: 1 };
+        let s_gap2 = RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 1000, gap: 2 };
         assert_eq!(
             get_values_to_render(&universe, &s_gap1),
             [
@@ -130,8 +130,8 @@ mod tests {
     #[test]
     fn render_cam() {
         let universe = get_universe();
-        let s_cam_minus1 = RenderSettings { cam: RectI64::of(-6, -5, 3, 4), dim: 1000, gap: 0 };
-        let s_cam_plus1 = RenderSettings { cam: RectI64::of(-4, -5, 5, 4), dim: 1000, gap: 0 };
+        let s_cam_minus1 = RenderSettings { cam: RectI32::of(-6, -5, 3, 4), dim: 1000, gap: 0 };
+        let s_cam_plus1 = RenderSettings { cam: RectI32::of(-4, -5, 5, 4), dim: 1000, gap: 0 };
         assert_eq!(
             get_values_to_render(&universe, &s_cam_minus1),
             [
@@ -159,7 +159,7 @@ mod tests {
     #[test]
     fn render_float_cell_size() {
         let universe = get_universe();
-        let s = RenderSettings { cam: RectI64::of(-5, -5, 4, 4), dim: 996, gap: 0 };
+        let s = RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 996, gap: 0 };
         assert_eq!(
             get_values_to_render(&universe, &s),
             [
