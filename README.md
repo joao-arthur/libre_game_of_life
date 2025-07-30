@@ -30,3 +30,10 @@ cd ../web_frontend
 pnpm install
 pnpm dev
 ```
+
+## Roadmap
+
+- [ ] Use `setTimeout` over `gloo`
+- [ ] Mouse drag
+- [ ] More presets
+- [ ] Better UI
