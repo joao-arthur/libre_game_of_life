@@ -1,7 +1,7 @@
 use manfredo::{
     cartesian::rect::{
         rect_f64::RectF64,
-        rect_i32::{RectI32, max_len},
+        rect_i32::{RectI32, contains, max_len},
     },
     transform::cartesian_in_cam_to_matrix::point_i32::cartesian_in_cam_to_matrix,
 };
@@ -22,12 +22,7 @@ pub fn get_values_to_render(universe: &Universe, settings: &RenderSettings) -> V
     let mut values_to_render: Vec<RectF64> = universe
         .value
         .iter()
-        .filter(|(point, _)| {
-            point.x >= settings.cam.min.x
-                && point.x <= settings.cam.max.x
-                && point.y >= settings.cam.min.y
-                && point.y <= settings.cam.max.y
-        })
+        .filter(|(point, _)| contains(&settings.cam, point))
         .filter(|(_, state)| state == &&State::Alive)
         .map(|(point, _)| {
             let arr_index = cartesian_in_cam_to_matrix(point, &settings.cam);

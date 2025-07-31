@@ -321,7 +321,7 @@ pub fn app_zoom_in() {
 
 pub fn app_zoom_out() {
     let cam = &MODEL.with(|m| m.borrow().settings.render_settings.cam.clone());
-    if manfredo::cartesian::rect::rect_i32::max_len(&cam) > 200 {
+    if manfredo::cartesian::rect::rect_i32::max_len(cam) > 200 {
         return;
     }
     MODEL.with(|m| {
@@ -337,7 +337,7 @@ pub fn app_zoom_to(new_size: u32) {
     }
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        manfredo::cartesian::rect::rect_i32::resize(&mut model.settings.render_settings.cam, new_size.into());
+        manfredo::cartesian::rect::rect_i32::resize(&mut model.settings.render_settings.cam, new_size);
     });
     on_change(Prop::Cam);
 }
