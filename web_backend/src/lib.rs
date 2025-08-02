@@ -6,8 +6,8 @@ use crate::app::{
     app_toggle_model_cell_by_absolute_point, app_zoom_in, app_zoom_out, app_zoom_to,
 };
 use libre_game_of_life_lib::{
-    universe::{CartesianPoint, MatrixPoint},
     preset::get_preset_groups,
+    universe::{CartesianPoint, MatrixPoint},
 };
 
 use js_sys::Function;

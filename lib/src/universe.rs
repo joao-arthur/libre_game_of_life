@@ -88,11 +88,9 @@ pub fn universe_try_from_string(as_str: Vec<String>) -> Result<Universe, FromStr
     let rect_len = len as i32;
     let half = rect_len / 2;
     let cam = RectI32::of(-half, -half, -half + rect_len - 1, -half + rect_len - 1);
-    let row_iter = as_str.iter().enumerate();
     let mut value = HashMap::<CartesianPoint, State>::new();
-    for (row, row_str) in row_iter {
-        let col_iter = row_str.chars().enumerate();
-        for (col, col_str) in col_iter {
+    for (row, row_str) in as_str.iter().enumerate() {
+        for (col, col_str) in row_str.chars().enumerate() {
             if col_str == '⬜' {
                 value.insert(
                     matrix_to_cartesian_in_cam(

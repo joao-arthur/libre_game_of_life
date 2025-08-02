@@ -1,5 +1,4 @@
 use gloo_timers::callback::Interval;
-use manfredo::cartesian::rect::rect_f64::RectF64;
 use std::cell::RefCell;
 use web_sys::CanvasRenderingContext2d;
 
@@ -7,8 +6,8 @@ use libre_game_of_life_lib::{
     preset::{Preset, get_preset, get_preset_groups, try_get_preset},
     render::{RenderSettings, get_values_to_render},
     universe::{
-        Universe, CartesianPoint, MatrixPoint, universe_get_camera, universe_iterate, universe_toggle,
-        universe_toggle_by_matrix_point,
+        CartesianPoint, MatrixPoint, Universe, universe_get_camera, universe_iterate,
+        universe_toggle, universe_toggle_by_matrix_point,
     },
 };
 
@@ -58,12 +57,17 @@ pub struct Holder {
 }
 
 impl Holder {
-    fn draw_square(&self, r: RectF64, color: String) {
+    fn draw_square(&self, r: manfredo::cartesian::rect::rect_f64::RectF64, color: String) {
         if self.context.is_undefined() || self.context.is_null() {
             return;
         }
         self.context.set_fill_style(&color.into());
-        self.context.fill_rect(r.min.x, r.min.y, manfredo::cartesian::rect::rect_f64::delta_x(&r), manfredo::cartesian::rect::rect_f64::delta_y(&r));
+        self.context.fill_rect(
+            r.min.x,
+            r.min.y,
+            manfredo::cartesian::rect::rect_f64::delta_x(&r),
+            manfredo::cartesian::rect::rect_f64::delta_y(&r),
+        );
     }
 }
 
@@ -156,7 +160,7 @@ fn render() {
         return;
     }
     if let Some(holder) = holder {
-        let bg = RectF64::of(
+        let bg = manfredo::cartesian::rect::rect_f64::RectF64::of(
             0.0,
             0.0,
             f64::from(settings.render_settings.dim),
@@ -337,7 +341,10 @@ pub fn app_zoom_to(new_size: u32) {
     }
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        manfredo::cartesian::rect::rect_i32::resize(&mut model.settings.render_settings.cam, new_size);
+        manfredo::cartesian::rect::rect_i32::resize(
+            &mut model.settings.render_settings.cam,
+            new_size,
+        );
     });
     on_change(Prop::Cam);
 }
@@ -345,7 +352,10 @@ pub fn app_zoom_to(new_size: u32) {
 pub fn app_move_cam(delta: CartesianPoint) {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        manfredo::cartesian::rect::rect_i32::translate(&mut model.settings.render_settings.cam, &delta);
+        manfredo::cartesian::rect::rect_i32::translate(
+            &mut model.settings.render_settings.cam,
+            &delta,
+        );
     });
     on_change(Prop::Universe);
 }
@@ -384,7 +394,7 @@ mod tests {
         cell::State,
         preset::get_preset,
         render::RenderSettings,
-        universe::{Universe, CartesianPoint},
+        universe::{CartesianPoint, Universe},
     };
     use manfredo::cartesian::rect::rect_i32::RectI32;
 
