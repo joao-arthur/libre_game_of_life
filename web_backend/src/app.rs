@@ -352,7 +352,7 @@ pub fn app_zoom_to(new_size: u32) {
 pub fn app_move_cam(delta: CartesianPoint) {
     MODEL.with(|m| {
         let mut model = m.borrow_mut();
-        manfredo::cartesian::rect::rect_i32::translate(
+        manfredo::cartesian::rect::rect_i32::saturating_translate(
             &mut model.settings.render_settings.cam,
             &delta,
         );
