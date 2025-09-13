@@ -4,7 +4,7 @@ use std::{
 };
 
 use manfredo::{
-    cartesian::rect::rect_i32::{RectI32, max_len},
+    cartesian::rect::rect_i32,
     transform::matrix_to_cartesian_in_cam::point_i32::matrix_to_cartesian_in_cam,
 };
 
@@ -15,8 +15,8 @@ use crate::{
 
 use super::render::RenderSettings;
 
-pub type CartesianPoint = manfredo::cartesian::point::point_i32::PointI32;
-pub type MatrixPoint = manfredo::matrix::point::point_u32::PointU32;
+pub type CartesianPoint = manfredo::cartesian::point::point_i32::Point;
+pub type MatrixPoint = manfredo::matrix::point::point_u32::Point;
 
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct Universe {
@@ -87,7 +87,7 @@ pub fn universe_try_from_string(as_str: Vec<String>) -> Result<Universe, FromStr
     }
     let rect_len = len as i32;
     let half = rect_len / 2;
-    let cam = RectI32::of(-half, -half, -half + rect_len - 1, -half + rect_len - 1);
+    let cam = rect_i32::Rect::of(-half, -half, -half + rect_len - 1, -half + rect_len - 1);
     let mut value = HashMap::<CartesianPoint, State>::new();
     for (row, row_str) in as_str.iter().enumerate() {
         for (col, col_str) in row_str.chars().enumerate() {
@@ -177,7 +177,7 @@ pub fn universe_toggle_by_matrix_point(
     point: MatrixPoint,
 ) {
     let dim = f64::from(settings.dim);
-    let len = max_len(&settings.cam) as f64;
+    let len = rect_i32::max_len(&settings.cam) as f64;
     let cell_size = dim / len;
     let row = point.row as f64 / cell_size;
     let col = point.col as f64 / cell_size;
@@ -186,7 +186,7 @@ pub fn universe_toggle_by_matrix_point(
     universe_toggle(universe, cartesian_point);
 }
 
-pub fn universe_get_camera(universe: &Universe) -> RectI32 {
+pub fn universe_get_camera(universe: &Universe) -> rect_i32::Rect {
     let all_x: Vec<i32> = universe.value.keys().map(|point| point.x).collect();
     let all_y: Vec<i32> = universe.value.keys().map(|point| point.y).collect();
     let mut min_x = all_x.iter().min().unwrap().to_owned();
@@ -209,14 +209,14 @@ pub fn universe_get_camera(universe: &Universe) -> RectI32 {
         min_x -= diff_start;
         max_x += diff_end;
     }
-    RectI32::of(min_x - 4, min_y - 4, max_x + 4, max_y + 4)
+    rect_i32::Rect::of(min_x - 4, min_y - 4, max_x + 4, max_y + 4)
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
 
-    use manfredo::cartesian::rect::rect_i32::RectI32;
+    use manfredo::cartesian::rect::rect_i32;
 
     use crate::{cell::State, render::RenderSettings};
 
@@ -591,9 +591,9 @@ mod tests {
             "⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛",
             "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜",
         ]);
-        let s1 = RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
-        let s2 = RenderSettings { cam: RectI32::of(-4, -4, 5, 5), dim: 1000, gap: 0 };
-        let s3 = RenderSettings { cam: RectI32::of(-5, -4, 4, 5), dim: 1000, gap: 0 };
+        let s1 = RenderSettings { cam: rect_i32::Rect::of(-5, -5, 4, 4), dim: 1000, gap: 0 };
+        let s2 = RenderSettings { cam: rect_i32::Rect::of(-4, -4, 5, 5), dim: 1000, gap: 0 };
+        let s3 = RenderSettings { cam: rect_i32::Rect::of(-5, -4, 4, 5), dim: 1000, gap: 0 };
         universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(10, 10));
         assert_eq!(universe, state_1);
         universe_toggle_by_matrix_point(&mut universe, &s1, MatrixPoint::of(990, 10));
@@ -644,7 +644,7 @@ mod tests {
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
             "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛",
         ]);
-        let s = RenderSettings { cam: RectI32::of(-5, -5, 4, 4), dim: 996, gap: 0 };
+        let s = RenderSettings { cam: rect_i32::Rect::of(-5, -5, 4, 4), dim: 996, gap: 0 };
         universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(1, 1));
         universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(897, 99));
         universe_toggle_by_matrix_point(&mut state_1, &s, MatrixPoint::of(99, 897));
@@ -773,18 +773,18 @@ mod tests {
             "⬛⬛⬛⬛⬛",
         ]);
         let preset_cell = universe_from_str(["⬜"]);
-        assert_eq!(universe_get_camera(&preset_block), RectI32::of(-5, -5, 4, 4));
-        assert_eq!(universe_get_camera(&preset_blinker_1), RectI32::of(-5, -5, 5, 5));
-        assert_eq!(universe_get_camera(&preset_blinker_2), RectI32::of(-5, -5, 5, 5));
-        assert_eq!(universe_get_camera(&preset_cross), RectI32::of(-5, -5, 5, 5));
-        assert_eq!(universe_get_camera(&preset_cell), RectI32::of(-4, -4, 4, 4));
+        assert_eq!(universe_get_camera(&preset_block), rect_i32::Rect::of(-5, -5, 4, 4));
+        assert_eq!(universe_get_camera(&preset_blinker_1), rect_i32::Rect::of(-5, -5, 5, 5));
+        assert_eq!(universe_get_camera(&preset_blinker_2), rect_i32::Rect::of(-5, -5, 5, 5));
+        assert_eq!(universe_get_camera(&preset_cross), rect_i32::Rect::of(-5, -5, 5, 5));
+        assert_eq!(universe_get_camera(&preset_cell), rect_i32::Rect::of(-4, -4, 4, 4));
         assert_eq!(
             universe_get_camera(&Universe::from([
                 CartesianPoint::of(2, 2),
                 CartesianPoint::of(3, 5),
                 CartesianPoint::of(5, 3),
             ])),
-            RectI32::of(-2, -2, 9, 9)
+            rect_i32::Rect::of(-2, -2, 9, 9)
         );
         assert_eq!(
             universe_get_camera(&Universe::from([
@@ -792,7 +792,7 @@ mod tests {
                 CartesianPoint::of(3, 4),
                 CartesianPoint::of(5, 3),
             ])),
-            RectI32::of(-2, -2, 9, 9)
+            rect_i32::Rect::of(-2, -2, 9, 9)
         );
         assert_eq!(
             universe_get_camera(&Universe::from([
@@ -800,7 +800,7 @@ mod tests {
                 CartesianPoint::of(3, 4),
                 CartesianPoint::of(4, 3),
             ])),
-            RectI32::of(-2, -2, 8, 8)
+            rect_i32::Rect::of(-2, -2, 8, 8)
         );
     }
 }

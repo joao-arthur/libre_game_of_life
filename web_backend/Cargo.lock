@@ -65,7 +65,7 @@ checksum = "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94"
 [[package]]
 name = "manfredo"
 version = "1.0.0"
-source = "git+https://github.com/joao-arthur/manfredo?rev=4ae37e3b9b66532af1ac66f2c16157d831af6910#4ae37e3b9b66532af1ac66f2c16157d831af6910"
+source = "git+https://github.com/joao-arthur/manfredo?rev=b3714a1da97a12722f13c36294241763334095f1#b3714a1da97a12722f13c36294241763334095f1"
 
 [[package]]
 name = "once_cell"

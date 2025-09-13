@@ -33,7 +33,6 @@ pnpm dev
 
 ## Roadmap
 
-- [ ] Use `setTimeout` over `gloo`
 - [ ] Mouse drag
 - [ ] More presets
 - [ ] Better UI
