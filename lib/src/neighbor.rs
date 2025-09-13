@@ -1,9 +1,7 @@
 use crate::{
     cell::State,
-    universe::{CartesianPoint, Universe},
+    universe::{CartesianPoint, Universe, universe_get_value},
 };
-
-use super::universe::universe_get_value;
 
 fn number_of_alive(neighbors: [State; 8]) -> u8 {
     neighbors.iter().filter(|neighbor| neighbor == &&State::Alive).count() as u8
@@ -28,9 +26,8 @@ pub fn number_of_alive_from_model(universe: &Universe, point: &CartesianPoint) -
 
 #[cfg(test)]
 mod tests {
-    use crate::cell::State;
-
     use super::number_of_alive;
+    use crate::cell::State;
 
     #[test]
     fn test_number_of_alive() {
